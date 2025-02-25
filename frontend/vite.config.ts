@@ -1,20 +1,26 @@
-import {defineConfig, loadEnv} from 'vite'
+import {defineConfig} from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig(({mode}) => {
-  const env = loadEnv(mode, process.cwd(), '')
-
-  return {
-    plugins: [react()],
-    base: mode === 'production' ? '/' : `/${env.VITE_APP_PATHNAME}/`,
-    server: {
-      proxy: {
-        '/api': {
-          target: 'http://localhost:3000',
-          changeOrigin: true,
-          rewrite: path => path.replace(/^\/api/, ''),
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
         },
       },
     },
-  }
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })
