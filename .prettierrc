@@ -1,0 +1,24 @@
+{
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "semi": false,
+  "printWidth": 400,
+  "htmlWhitespaceSensitivity": "ignore",
+  "jsxBracketSameLine": true,
+  "arrowParens": "avoid",
+  "bracketSpacing": false,
+  "endOfLine": "auto",
+  "proseWrap": "always",
+  "requirePragma": false,
+  "insertPragma": false,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "printWidth": 1200
+      }
+    }
+  ]
+}
