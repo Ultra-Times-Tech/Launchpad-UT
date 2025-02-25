@@ -26,7 +26,6 @@
     "glob": "^11.0.1",
     "lru-cache": "^11.0.2",
     "reflect-metadata": "^0.2.2",
-    "rollup": "^4.34.8",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20"
   },
