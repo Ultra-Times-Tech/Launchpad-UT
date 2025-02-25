@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     const fetchNFTs = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/nfts');
+        const response = await axios.get('/api/nfts');
         setNfts(response.data);
       } catch (error) {
         console.error('Error fetching NFTs:', error);
