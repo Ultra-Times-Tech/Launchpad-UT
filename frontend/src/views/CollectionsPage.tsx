@@ -106,9 +106,11 @@ function CollectionsPage() {
                         <span className="ml-2 text-green-400 font-semibold">{collection.floorPrice}</span>
                       </div>
                     </div>
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                      View Collection
-                    </button>
+                    <Link to={`/collections/${collection.id}`} className="block w-full">
+                      <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                        View Collection
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </div>
