@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import './App.css';
+// Helpers
+import { apiRequestor } from './utils/axiosInstanceHelper';
 
 interface NFT {
   id: number;
@@ -20,7 +21,7 @@ function App() {
   useEffect(() => {
     const fetchNFTs = async () => {
       try {
-        const response = await axios.get('/api/nfts');
+        const response = await apiRequestor.get('/nfts');
         setNfts(response.data);
       } catch (error) {
         console.error('Error fetching NFTs:', error);
