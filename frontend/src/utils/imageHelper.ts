@@ -36,13 +36,20 @@ export const imageDimensions = {
  */
 export const getAssetUrl = (path: string): string => {
   const baseUrl = import.meta.env.VITE_APP_ASSETS_URL || ''
+  const isProduction = import.meta.env.PROD
+  const basePath = import.meta.env.VITE_APP_PATHNAME || ''
 
   // If the path already starts with http or https, return it as is
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path
   }
 
-  // If the path starts with a slash, remove it
+  // For local development with paths starting with /
+  if (!isProduction && path.startsWith('/')) {
+    return `/${basePath}${path}`
+  }
+
+  // If the path starts with a slash, remove it for concatenation with baseUrl
   const normalizedPath = path.startsWith('/') ? path.substring(1) : path
 
   // Return the full URL

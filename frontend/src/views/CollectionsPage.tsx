@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { getAssetUrl } from '../utils/imageHelper';
 
 interface Collection {
   id: number;
@@ -83,7 +84,7 @@ function CollectionsPage() {
                 {/* Image section - optimized for different screen sizes */}
                 <div className="md:w-1/2 lg:w-2/5">
                   <img 
-                    src={collection.image} 
+                    src={getAssetUrl(collection.image)} 
                     alt={collection.name} 
                     className="w-full h-64 md:h-full object-cover"
                   />
