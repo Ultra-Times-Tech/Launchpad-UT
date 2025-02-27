@@ -1,7 +1,8 @@
-import {useEffect, useState} from 'react'
-import {Link} from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 // Helpers
-import {apiRequestor} from '../utils/axiosInstanceHelper'
+import { apiRequestor } from '../utils/axiosInstanceHelper'
+import CollectionCard,{CollectionCardProps} from '../components/Card/CollectionCard'
 
 interface NFT {
   id: number
@@ -14,7 +15,7 @@ interface NFT {
   minted: number
 }
 
-interface Collection {
+interface Article {
   id: number
   title: string
   description: string
@@ -23,77 +24,66 @@ interface Collection {
   author: string
 }
 
-interface NFTCollection {
-  id: number
-  name: string
-  description: string
-  image: string
-  artist: string
-  date: string
-  mintDate: string
-  buttonText: string
-}
-
 function HomePage() {
   const [nfts, setNfts] = useState<NFT[]>([])
+  const [featuredCollections, setFeaturedCollections] = useState<CollectionCardProps[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchNFTs = async () => {
+    const fetchData = async () => {
       try {
-        console.log('Fetching NFTs from backend...')
-        const response = await apiRequestor.get('/nfts')
-        console.log('NFTs response:', response.data)
-        setNfts(response.data)
+        console.log('Fetching data from backend...')
+        // Fetch NFTs
+        const nftResponse = await apiRequestor.get('/nfts')
+        console.log('NFTs response:', nftResponse.data)
+        setNfts(nftResponse.data)
+        
+        // Set featured collections (mock data for now)
+        setFeaturedCollections([
+          {
+            id: 1,
+            name: 'Vox-in-Time',
+            description: 'A collection of rare weapons and equipment from the future, featuring unique designs and powerful capabilities.',
+            image: '/banners/vit-banner.png',
+            artist: 'Ultra Times Studios',
+            totalItems: 1000,
+            floorPrice: '0.5 ETH',
+          },
+          {
+            id: 2,
+            name: 'Ultra Street-Cubism Discover',
+            description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations.',
+            image: '/banners/factory-artifact.png',
+            artist: 'Ultra Times Archaeology',
+            totalItems: 500,
+            floorPrice: '0.8 ETH',
+          },
+          {
+            id: 3,
+            name: 'Crypto Punks Edition',
+            description: 'A collection featuring unique characters with different abilities, backgrounds, and stories from the Ultra Times universe.',
+            image: '/banners/factory-characters.png',
+            artist: 'Ultra Times Creative',
+            totalItems: 750,
+            floorPrice: '1.2 ETH',
+          },
+        ])
+        
         setError(null)
       } catch (error) {
-        console.error('Error fetching NFTs:', error)
-        setError('Failed to load NFTs. Please try again later.')
+        console.error('Error fetching data:', error)
+        setError('Failed to load data. Please try again later.')
       } finally {
         setLoading(false)
       }
     }
 
-    fetchNFTs()
+    fetchData()
   }, [])
 
-  // NFT Collections data
-  const nftCollections: NFTCollection[] = [
-    {
-      id: 1,
-      name: 'Vox-in-Time',
-      description: 'Suspendisse potenti. Sed neque augue, mattis in posuere quis, sagittis...',
-      image: 'https://images.unsplash.com/photo-1645378999013-95abebf5f3c1?q=80&w=1470&auto=format&fit=crop',
-      artist: 'Ultra Times',
-      date: 'Mar 25, 2023',
-      mintDate: 'Mar 25, 2023',
-      buttonText: 'COMING SOON',
-    },
-    {
-      id: 2,
-      name: 'Ultra Street-Cubism Discover',
-      description: 'Nunc mi tortor, convallis fermentum ipsum id, gravida luctus orci...',
-      image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1374&auto=format&fit=crop',
-      artist: 'Alex Jones',
-      date: 'Feb 18, 2023',
-      mintDate: 'Feb 18, 2023',
-      buttonText: 'ACCÈS AU MINT',
-    },
-    {
-      id: 3,
-      name: 'Crypto Punks Edition',
-      description: 'Praesent lobortis, lorem et elementum vehicula, sapien ipsum tincidunt...',
-      image: 'https://images.unsplash.com/photo-1622547748225-3fc4abd2cca0?q=80&w=1632&auto=format&fit=crop',
-      artist: 'John Blades',
-      date: 'Mar 12, 2022',
-      mintDate: 'Mar 12, 2022 • 14 min read',
-      buttonText: 'ACCÈS AU MINT',
-    },
-  ]
-
-  // Mock data for latest collections
-  const latestCollections: Collection[] = [
+  // Mock data for latest articles
+  const latestArticles: Article[] = [
     {
       id: 1,
       title: '10 Life-Changing Books Everyone Should Read',
@@ -104,8 +94,8 @@ function HomePage() {
     },
   ]
 
-  // Mock data for newest collections
-  const newestCollections: Collection[] = [
+  // Mock data for newest articles
+  const newestArticles: Article[] = [
     {
       id: 1,
       title: 'Exploring the Future of Digital Art and NFTs',
@@ -189,8 +179,12 @@ function HomePage() {
       {/* Featured Collections */}
       <div className='container mx-auto px-4 py-12'>
         <div className='flex justify-between items-center mb-8'>
-          <h2 className='text-2xl font-cabin font-bold text-primary-300'>NFT Collections</h2>
+          <h2 className='text-2xl font-cabin font-bold text-primary-300'>Featured Collections</h2>
+          <Link to="/collections" className='text-gray-400 hover:text-white font-medium'>
+            View all collections →
+          </Link>
         </div>
+        
         <div className='flex justify-between items-center mb-4'>
           <div className='flex space-x-6 font-cabin'>
             <button className='text-white font-medium border-b-2 border-primary-500'>All</button>
@@ -199,59 +193,47 @@ function HomePage() {
             <button className='text-gray-400 hover:text-white'>Game Assets</button>
             <button className='text-gray-400 hover:text-white'>Music</button>
           </div>
-          <button className='text-gray-400 hover:text-white font-medium'>View all collections →</button>
         </div>
 
-        {/* NFT Collections - New Section based on the image */}
-        <div className='container mx-auto px-4 py-6'>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-            {nftCollections.map(collection => (
-              <div key={collection.id} className='bg-dark-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300'>
-                <div className='h-48 bg-dark-700'>
-                  <img src={collection.image} alt={collection.name} className='w-full h-full object-cover' />
-                </div>
-                <div className='p-6'>
-                  <h3 className='text-xl font-cabin font-bold mb-2 text-primary-300'>{collection.name}</h3>
-                  <div className='flex items-center text-sm text-gray-400 mb-3'>
-                    <span>{collection.artist}</span>
-                    <span className='mx-2'>•</span>
-                    <span>{collection.date}</span>
-                  </div>
-                  <p className='text-gray-300 text-sm mb-4'>{collection.description}</p>
-                  <div className='flex justify-center'>
-                    {collection.id === 1 ? (
-                      <button className='bg-dark-700 text-primary-300 font-bold py-2 px-6 rounded-lg transition duration-200 text-sm'>{collection.buttonText}</button>
-                    ) : (
-                      <Link to={`/collection/${collection.id}`} className='block'>
-                        <button className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200 text-sm'>{collection.buttonText}</button>
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Collections Grid */}
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+          {featuredCollections.map(collection => (
+            <CollectionCard 
+              key={collection.id}
+              id={collection.id}
+              name={collection.name}
+              description={collection.description}
+              image={collection.image}
+              artist={collection.artist}
+              totalItems={collection.totalItems}
+              floorPrice={collection.floorPrice}
+            />
+          ))}
+        </div>
 
-          <div className='flex justify-center mt-8'>
-            <button className='bg-dark-800 hover:bg-dark-700 text-gray-300 font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>LOAD MORE COLLECTIONS</button>
-          </div>
+        <div className='flex justify-center mt-8'>
+          <Link to="/collections">
+            <button className='bg-dark-800 hover:bg-dark-700 text-gray-300 font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>
+              LOAD MORE COLLECTIONS
+            </button>
+          </Link>
         </div>
       </div>
 
-      {/* Latest Collections */}
+      {/* Latest Articles */}
       <div className='container mx-auto px-4 py-12'>
-        <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300'>Latest Collections</h2>
+        <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300'>Latest Articles</h2>
 
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
           <div className='md:col-span-2'>
-            {latestCollections.map(collection => (
-              <div key={collection.id} className='bg-dark-800 text-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1'>
+            {latestArticles.map(article => (
+              <div key={article.id} className='bg-dark-800 text-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1'>
                 <div className='relative h-64'>
-                  <img src={collection.image} alt={collection.title} className='w-full h-full object-cover' />
+                  <img src={article.image} alt={article.title} className='w-full h-full object-cover' />
                   <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent flex items-center justify-center'>
                     <div className='text-center p-6'>
-                      <h3 className='text-2xl md:text-3xl font-cabin font-bold mb-2 text-primary-300'>{collection.title}</h3>
-                      <p className='text-gray-300 mb-4 font-quicksand'>{collection.description}</p>
+                      <h3 className='text-2xl md:text-3xl font-cabin font-bold mb-2 text-primary-300'>{article.title}</h3>
+                      <p className='text-gray-300 mb-4 font-quicksand'>{article.description}</p>
                     </div>
                   </div>
                 </div>
@@ -276,25 +258,25 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Newest Collections */}
+      {/* Newest Articles */}
       <div className='container mx-auto px-4 py-12'>
         <div className='flex justify-between items-center mb-8'>
-          <h2 className='text-2xl font-cabin font-bold text-primary-300'>Newest from Collections</h2>
+          <h2 className='text-2xl font-cabin font-bold text-primary-300'>Newest Articles</h2>
           <button className='text-gray-400 hover:text-white font-medium'>View all articles →</button>
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-          {newestCollections.map(collection => (
-            <div key={collection.id} className='bg-dark-800 border border-dark-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1'>
+          {newestArticles.map(article => (
+            <div key={article.id} className='bg-dark-800 border border-dark-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1'>
               <div className='h-48 bg-dark-700 flex items-center justify-center'>
-                <img src={collection.image} alt={collection.title} className='w-full h-full object-cover' />
+                <img src={article.image} alt={article.title} className='w-full h-full object-cover' />
               </div>
               <div className='p-4'>
-                <h3 className='font-cabin font-bold mb-2 text-primary-300'>{collection.title}</h3>
-                <p className='text-sm text-gray-400 mb-3 font-quicksand'>{collection.description}</p>
+                <h3 className='font-cabin font-bold mb-2 text-primary-300'>{article.title}</h3>
+                <p className='text-sm text-gray-400 mb-3 font-quicksand'>{article.description}</p>
                 <div className='flex justify-between items-center text-xs text-gray-500 font-quicksand'>
-                  <span>{collection.date}</span>
-                  <span>By {collection.author}</span>
+                  <span>{article.date}</span>
+                  <span>By {article.author}</span>
                 </div>
               </div>
             </div>

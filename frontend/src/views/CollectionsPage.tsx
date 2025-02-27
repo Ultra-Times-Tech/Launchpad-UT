@@ -1,23 +1,10 @@
-import {useState, useEffect} from 'react'
-import {Link} from 'react-router-dom'
-import {getAssetUrl} from '../utils/imageHelper'
-
-interface Collection {
-  id: number
-  name: string
-  description: string
-  image: string
-  totalItems: number
-  floorPrice: string
-  artist?: string
-  mintPrice?: string
-  minted?: number
-  supply?: number
-}
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import CollectionCard, {CollectionCardProps} from '../components/Card/CollectionCard'
 
 function CollectionsPage() {
   const [currentPage, setCurrentPage] = useState(1)
-  const [collections, setCollections] = useState<Collection[]>([])
+  const [collections, setCollections] = useState<CollectionCardProps[]>([])
   const [loading, setLoading] = useState(true)
 
   const collectionsPerPage = 12
@@ -35,7 +22,7 @@ function CollectionsPage() {
       try {
         // In a real app, this would be an API call
         setTimeout(() => {
-          // Generate 24 collections for pagination demo
+          // Generate collections for pagination demo
           const mockCollections = generateMockCollections(24)
           setCollections(mockCollections)
           setLoading(false)
@@ -52,7 +39,7 @@ function CollectionsPage() {
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
     // Scroll to top when changing page
-    window.scrollTo({top: 0, behavior: 'smooth'})
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   if (loading) {
@@ -90,46 +77,20 @@ function CollectionsPage() {
         </div>
       </div>
 
-      {/* Collections Grid - 4 per row, 12 per page */}
+      {/* Collections Grid */}
       <div className='container mx-auto px-4 py-12'>
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
           {currentCollections.map(collection => (
-            <div key={collection.id} className='bg-dark-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300'>
-              <div className='p-4'>
-                <div className='mb-4'>
-                  <img src={getAssetUrl(collection.image)} alt={collection.name} className='w-full h-48 object-cover rounded-lg' />
-                </div>
-                <h3 className='text-xl font-cabin font-bold mb-2 text-primary-300'>{collection.name}</h3>
-                <p className='text-sm text-gray-400 mb-4'>by {collection.artist}</p>
-                <p className='text-gray-300 mb-4 text-sm line-clamp-2'>{collection.description}</p>
-
-                <div className='flex justify-between items-center mb-4'>
-                  <div>
-                    <span className='text-gray-400 text-sm'>Mint Price:</span>
-                    <span className='ml-2 text-primary-300 font-semibold'>{collection.mintPrice}</span>
-                  </div>
-                  <div className='flex items-center'>
-                    <span className='text-gray-400 text-sm mr-2'>Supply:</span>
-                    <span className='text-white font-semibold'>{collection.supply}</span>
-                  </div>
-                </div>
-
-                <div className='flex justify-between items-center mb-4'>
-                  <div className='w-full bg-dark-700 rounded-full h-2.5'>
-                    <div className='bg-primary-500 h-2.5 rounded-full' style={{width: `${(collection.minted! / collection.supply!) * 100}%`}}></div>
-                  </div>
-                </div>
-
-                <div className='flex justify-between items-center mb-4 text-sm'>
-                  <span className='text-gray-400'>{collection.minted} minted</span>
-                  <span className='text-gray-400'>Total: {collection.supply}</span>
-                </div>
-
-                <Link to={`/collection/${collection.id}`} className='block w-full'>
-                  <button className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200'>ACCESS AU MINT</button>
-                </Link>
-              </div>
-            </div>
+            <CollectionCard 
+              key={collection.id}
+              id={collection.id}
+              name={collection.name}
+              description={collection.description}
+              image={collection.image}
+              artist={collection.artist}
+              totalItems={collection.totalItems}
+              floorPrice={collection.floorPrice}
+            />
           ))}
         </div>
 
@@ -137,17 +98,29 @@ function CollectionsPage() {
         {totalPages > 1 && (
           <div className='flex justify-center mt-12'>
             <div className='flex space-x-2'>
-              <button onClick={() => handlePageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className={`px-4 py-2 rounded-lg ${currentPage === 1 ? 'bg-dark-700 text-gray-500 cursor-not-allowed' : 'bg-dark-800 text-white hover:bg-primary-600 transition-colors'}`}>
+              <button 
+                onClick={() => handlePageChange(Math.max(1, currentPage - 1))} 
+                disabled={currentPage === 1} 
+                className={`px-4 py-2 rounded-lg ${currentPage === 1 ? 'bg-dark-700 text-gray-500 cursor-not-allowed' : 'bg-dark-800 text-white hover:bg-primary-600 transition-colors'}`}
+              >
                 Previous
               </button>
 
-              {Array.from({length: totalPages}, (_, i) => i + 1).map(number => (
-                <button key={number} onClick={() => handlePageChange(number)} className={`w-10 h-10 rounded-lg ${currentPage === number ? 'bg-primary-500 text-white' : 'bg-dark-800 text-white hover:bg-dark-700 transition-colors'}`}>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                <button 
+                  key={number} 
+                  onClick={() => handlePageChange(number)} 
+                  className={`w-10 h-10 rounded-lg ${currentPage === number ? 'bg-primary-500 text-white' : 'bg-dark-800 text-white hover:bg-dark-700 transition-colors'}`}
+                >
                   {number}
                 </button>
               ))}
 
-              <button onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? 'bg-dark-700 text-gray-500 cursor-not-allowed' : 'bg-dark-800 text-white hover:bg-primary-600 transition-colors'}`}>
+              <button 
+                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} 
+                disabled={currentPage === totalPages} 
+                className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? 'bg-dark-700 text-gray-500 cursor-not-allowed' : 'bg-dark-800 text-white hover:bg-primary-600 transition-colors'}`}
+              >
                 Next
               </button>
             </div>
@@ -159,60 +132,48 @@ function CollectionsPage() {
 }
 
 // Helper function to generate mock collections
-function generateMockCollections(count: number): Collection[] {
+function generateMockCollections(count: number): CollectionCardProps[] {
   const baseCollections = [
     {
       id: 1,
       name: 'Vox-in-Time',
       description: 'A collection of rare weapons and equipment from the future, featuring unique designs and powerful capabilities.',
-      image: '/banners/vit.png',
+      image: '/banners/vit-banner.png',
+      artist: 'Ultra Times Studios',
       totalItems: 1000,
       floorPrice: '0.5 ETH',
-      artist: 'Ultra Times Studios',
-      mintPrice: '0.5 UOS',
-      minted: 22,
-      supply: 100,
     },
     {
       id: 2,
       name: 'Ultra Street-Cubism Discover',
       description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations.',
       image: '/banners/factory-artifact.png',
+      artist: 'Ultra Times Archaeology',
       totalItems: 500,
       floorPrice: '0.8 ETH',
-      artist: 'Ultra Times Archaeology',
-      mintPrice: '0.8 UOS',
-      minted: 45,
-      supply: 150,
     },
     {
       id: 3,
       name: 'Crypto Punks Edition',
       description: 'A collection featuring unique characters with different abilities, backgrounds, and stories from the Ultra Times universe.',
       image: '/banners/factory-characters.png',
+      artist: 'Ultra Times Creative',
       totalItems: 750,
       floorPrice: '1.2 ETH',
-      artist: 'Ultra Times Creative',
-      mintPrice: '1.2 UOS',
-      minted: 75,
-      supply: 200,
     },
     {
       id: 4,
       name: 'Factory Power Booster',
       description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem.',
       image: '/banners/factory-powerbooster.png',
+      artist: 'Ultra Times Labs',
       totalItems: 600,
       floorPrice: '0.75 ETH',
-      artist: 'Ultra Times Labs',
-      mintPrice: '0.75 UOS',
-      minted: 30,
-      supply: 100,
     },
   ]
 
   // Generate additional collections based on the base collections
-  const collections: Collection[] = []
+  const collections: CollectionCardProps[] = []
 
   for (let i = 0; i < count; i++) {
     const baseCollection = baseCollections[i % baseCollections.length]
@@ -220,7 +181,6 @@ function generateMockCollections(count: number): Collection[] {
       ...baseCollection,
       id: i + 1,
       name: i < baseCollections.length ? baseCollection.name : `${baseCollection.name} #${Math.floor(i / baseCollections.length) + 1}`,
-      minted: Math.floor(Math.random() * baseCollection.supply!),
     })
   }
 
