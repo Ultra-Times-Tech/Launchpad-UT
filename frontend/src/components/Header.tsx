@@ -1,16 +1,8 @@
 import {Link} from 'react-router-dom'
-import {useState} from 'react'
 import {getAssetUrl} from '../utils/imageHelper'
+import WalletConnectButton from './Button/WalletConnectButton'
 
 function Header() {
-  const [isWalletConnected, setIsWalletConnected] = useState(false)
-
-  const handleConnectWallet = () => {
-    // This would be replaced with actual Ultra wallet connection logic
-    setIsWalletConnected(true)
-    console.log('Connecting to Ultra wallet...')
-  }
-
   return (
     <header className='border-b border-dark-700 bg-dark-900 text-white'>
       <div className='container mx-auto px-4 py-4'>
@@ -59,9 +51,7 @@ function Header() {
               </a>
             </div>
 
-            <button onClick={handleConnectWallet} className={`px-4 py-2 rounded-lg font-medium transition-colors ${isWalletConnected ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-primary-500 text-white hover:bg-primary-600'}`}>
-              {isWalletConnected ? 'Wallet Connected' : 'Connect Ultra Wallet'}
-            </button>
+            <WalletConnectButton />
           </div>
         </div>
       </div>
