@@ -10,7 +10,7 @@ export const apiRequestor = axios.create({
   baseURL: apiUrl,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
   timeout: 15000,
   withCredentials: false,

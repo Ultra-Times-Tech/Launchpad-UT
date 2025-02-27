@@ -6,7 +6,7 @@ async function bootstrap() {
   try {
     await AppDataSource.initialize()
     console.log('Database initialized successfully')
-    
+
     const app = await NestFactory.create(AppModule)
 
     // Configure CORS
@@ -18,6 +18,14 @@ async function bootstrap() {
       exposedHeaders: ['Content-Disposition'],
       preflightContinue: false,
       optionsSuccessStatus: 204,
+    })
+
+    // Add a health check endpoint
+    app.use('/', (req, res, next) => {
+      if (req.path === '/') {
+        return res.send({status: 'ok', message: 'API is running'})
+      }
+      next()
     })
 
     const port = process.env.PORT || 3000
