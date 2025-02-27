@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 // Helpers
 import { apiRequestor } from '../utils/axiosInstanceHelper';
 
@@ -12,6 +12,15 @@ interface NFT {
   artist: string;
   supply: number;
   minted: number;
+}
+
+interface Collection {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  date: string;
+  author: string;
 }
 
 function HomePage() {
@@ -38,61 +47,291 @@ function HomePage() {
     fetchNFTs();
   }, []);
 
+  // Mock data for featured collections
+  const featuredCollections = [
+    {
+      id: 1,
+      title: "Ultra Marketplace Browser",
+      description: "Explore the latest digital collectibles",
+      image: "https://picsum.photos/400/300?random=1",
+      buttonText: "Explore Marketplace"
+    },
+    {
+      id: 2,
+      title: "Mint to Earn",
+      description: "Create and earn with your digital art",
+      image: "https://picsum.photos/400/300?random=2",
+      buttonText: "Start Minting"
+    },
+    {
+      id: 3,
+      title: "P2E",
+      description: "Play games and earn rewards",
+      image: "https://picsum.photos/400/300?random=3",
+      buttonText: "Discover Games"
+    }
+  ];
+
+  // Mock data for latest collections
+  const latestCollections: Collection[] = [
+    {
+      id: 1,
+      title: "10 Life-Changing Books Everyone Should Read",
+      description: "Discover the books that have transformed lives around the world",
+      image: "https://picsum.photos/600/400?random=4",
+      date: "Feb 28, 2025",
+      author: "John Smith"
+    }
+  ];
+
+  // Mock data for newest collections
+  const newestCollections: Collection[] = [
+    {
+      id: 1,
+      title: "Exploring the Future of Digital Art and NFTs",
+      description: "How NFTs Are Changing the Art World",
+      image: "https://picsum.photos/400/300?random=5",
+      date: "Feb 27, 2025",
+      author: "Emma Johnson"
+    },
+    {
+      id: 2,
+      title: "The Evolution of Blockchain Technology",
+      description: "A Journey from Bitcoin to Smart Contracts",
+      image: "https://picsum.photos/400/300?random=6",
+      date: "Feb 26, 2025",
+      author: "Michael Chen"
+    },
+    {
+      id: 3,
+      title: "Understanding Web3 and Decentralized Applications",
+      description: "The Next Generation of Internet",
+      image: "https://picsum.photos/400/300?random=7",
+      date: "Feb 25, 2025",
+      author: "Sarah Williams"
+    },
+    {
+      id: 4,
+      title: "Cryptocurrency Trading Strategies for Beginners",
+      description: "Essential Tips for New Traders",
+      image: "https://picsum.photos/400/300?random=8",
+      date: "Feb 24, 2025",
+      author: "David Rodriguez"
+    }
+  ];
+
+  // Mock data for most popular articles
+  const popularArticles = [
+    {
+      id: 1,
+      title: "How to Create Your First NFT Collection",
+      date: "Feb 20, 2025"
+    },
+    {
+      id: 2,
+      title: "The Top 5 NFT Marketplaces in 2025",
+      date: "Feb 18, 2025"
+    },
+    {
+      id: 3,
+      title: "Understanding Gas Fees and How to Minimize Them",
+      date: "Feb 15, 2025"
+    },
+    {
+      id: 4,
+      title: "NFT Investment Strategies for Long-term Growth",
+      date: "Feb 12, 2025"
+    }
+  ];
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
-          <p className="mt-4 text-xl">Loading NFTs...</p>
+          <p className="mt-4 text-xl">Loading content...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <header className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Launchpad Ultra Times</h1>
-        <p className="text-gray-400 mb-6">Discover and collect unique digital art NFTs</p>
-        <Link to="/collections" className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
-          View Collections
-        </Link>
-      </header>
-
-      {error && (
-        <div className="bg-red-500 bg-opacity-20 border border-red-500 text-white p-4 rounded-lg mb-8">
-          <p>{error}</p>
+    <div className="min-h-screen bg-gray-900 text-white">
+      <Navbar />
+      
+      {/* Hero Banner */}
+      <div className="bg-gray-800 text-white py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">10 collections d'Uniq à ne pas rater</h1>
+          <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Découvrez notre sélection exclusive de collections numériques créées par des artistes de renommée mondiale</p>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition duration-300">
+            En savoir plus
+          </button>
         </div>
-      )}
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {nfts.map((nft) => (
-          <div key={nft.id} className="bg-gray-800 rounded-xl overflow-hidden">
-            <img src={nft.image} alt={nft.name} className="w-full h-64 object-cover" />
-            <div className="p-6">
-              <h2 className="text-xl font-bold mb-2">{nft.name}</h2>
-              <p className="text-gray-400 mb-4">{nft.description}</p>
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-green-400 font-semibold">{nft.price}</span>
-                <span className="text-gray-400">by {nft.artist}</span>
+      {/* Featured Collections */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex space-x-6">
+            <button className="text-white font-medium border-b-2 border-blue-500">All</button>
+            <button className="text-gray-400 hover:text-white">Art</button>
+            <button className="text-gray-400 hover:text-white">Collectibles</button>
+            <button className="text-gray-400 hover:text-white">Game Assets</button>
+            <button className="text-gray-400 hover:text-white">Music</button>
+          </div>
+          <button className="text-gray-400 hover:text-white font-medium">View all collections →</button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {featuredCollections.map((collection) => (
+            <div key={collection.id} className="bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+              <div className="h-48 bg-gray-700 flex items-center justify-center">
+                <img src={collection.image} alt={collection.title} className="w-full h-full object-cover" />
               </div>
-              <div className="bg-gray-700 rounded-full h-2 mb-2">
-                <div 
-                  className="bg-blue-500 h-2 rounded-full"
-                  style={{ width: `${(nft.minted / nft.supply) * 100}%` }}
-                ></div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-2">{collection.title}</h3>
+                <p className="text-gray-400 mb-4">{collection.description}</p>
+                <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition duration-300">
+                  {collection.buttonText}
+                </button>
               </div>
-              <div className="flex justify-between text-sm text-gray-400">
-                <span>{nft.minted} minted</span>
-                <span>Total supply: {nft.supply}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Latest Collections */}
+      <div className="container mx-auto px-4 py-12">
+        <h2 className="text-2xl font-bold mb-8 text-center">Latest Collections</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2">
+            {latestCollections.map((collection) => (
+              <div key={collection.id} className="bg-gray-800 text-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+                <div className="relative h-64">
+                  <img src={collection.image} alt={collection.title} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent flex items-center justify-center">
+                    <div className="text-center p-6">
+                      <h3 className="text-2xl md:text-3xl font-bold mb-2">{collection.title}</h3>
+                      <p className="text-gray-300 mb-4">{collection.description}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <button className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-                Mint NFT
-              </button>
+            ))}
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-bold mb-4">Most popular</h3>
+            <div className="space-y-4">
+              {popularArticles.map((article) => (
+                <div key={article.id} className="flex items-center space-x-4 bg-gray-800 p-3 rounded-lg hover:bg-gray-700 transition duration-300">
+                  <div className="w-16 h-16 bg-gray-700 rounded-md flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-medium">{article.title}</h4>
+                    <p className="text-sm text-gray-400">{article.date}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
+        </div>
       </div>
+
+      {/* Newest Collections */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold">Newest from Collections</h2>
+          <button className="text-gray-400 hover:text-white font-medium">View all articles →</button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {newestCollections.map((collection) => (
+            <div key={collection.id} className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300">
+              <div className="h-48 bg-gray-700 flex items-center justify-center">
+                <img src={collection.image} alt={collection.title} className="w-full h-full object-cover" />
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold mb-2">{collection.title}</h3>
+                <p className="text-sm text-gray-400 mb-3">{collection.description}</p>
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                  <span>{collection.date}</span>
+                  <span>By {collection.author}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Newsletter */}
+      <div className="container mx-auto px-4 py-12 text-center">
+        <h2 className="text-2xl font-bold mb-6">Subscribe to our Newsletter</h2>
+        <div className="max-w-md mx-auto">
+          <div className="flex">
+            <input 
+              type="email" 
+              placeholder="Your email address" 
+              className="flex-grow px-4 py-3 bg-gray-800 border border-gray-700 text-white rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-r-md transition duration-300">
+              Subscribe
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 py-12 border-t border-gray-700">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="font-bold mb-4">Your Company</h3>
+              <p className="text-gray-400 mb-4">A brief description of your company and what you offer to your users and customers.</p>
+            </div>
+            
+            <div>
+              <h3 className="font-bold mb-4">Tags</h3>
+              <div className="flex flex-wrap gap-2">
+                <span className="bg-gray-700 px-3 py-1 rounded-full text-sm">NFTs</span>
+                <span className="bg-gray-700 px-3 py-1 rounded-full text-sm">Art</span>
+                <span className="bg-gray-700 px-3 py-1 rounded-full text-sm">Blockchain</span>
+                <span className="bg-gray-700 px-3 py-1 rounded-full text-sm">Crypto</span>
+                <span className="bg-gray-700 px-3 py-1 rounded-full text-sm">Digital</span>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-bold mb-4">Social</h3>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="w-5 h-5 bg-gray-700 rounded-full"></span>
+                  <span className="text-gray-300">Facebook</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-5 h-5 bg-gray-700 rounded-full"></span>
+                  <span className="text-gray-300">Twitter</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="w-5 h-5 bg-gray-700 rounded-full"></span>
+                  <span className="text-gray-300">Instagram</span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-bold mb-4">Links</h3>
+              <div className="space-y-2">
+                <div><a href="#" className="text-gray-300 hover:text-white hover:underline">Home</a></div>
+                <div><a href="#" className="text-gray-300 hover:text-white hover:underline">About</a></div>
+                <div><a href="#" className="text-gray-300 hover:text-white hover:underline">Collections</a></div>
+                <div><a href="#" className="text-gray-300 hover:text-white hover:underline">Contact</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
