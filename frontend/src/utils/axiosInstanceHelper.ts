@@ -14,7 +14,7 @@ export const apiRequestor = axios.create({
     Accept: 'application/json',
   },
   timeout: 15000,
-  withCredentials: false,
+  withCredentials: true,
 })
 
 apiRequestor.interceptors.request.use(

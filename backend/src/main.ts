@@ -11,6 +11,10 @@ async function bootstrap() {
     origin: ['https://launchpad-ut.vercel.app', 'http://localhost:5173', 'https://launchpad-ut-backend.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    exposedHeaders: ['Content-Disposition'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 
   await app.listen(process.env.PORT ?? 3000)
