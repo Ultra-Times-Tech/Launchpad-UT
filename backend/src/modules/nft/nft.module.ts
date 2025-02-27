@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NftService } from './nft.service';
 import { NftController } from './nft.controller';
-import { NFT } from './nft.entity';
+import { NFTEntity } from './nft.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([NFT])],
+  imports: [TypeOrmModule.forFeature([NFTEntity])],
   providers: [NftService],
   controllers: [NftController],
 })

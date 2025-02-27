@@ -1,33 +1,33 @@
 import {Injectable, OnModuleInit} from '@nestjs/common'
 import {InjectRepository} from '@nestjs/typeorm'
 import {Repository} from 'typeorm'
-import {NFT} from './nft.entity'
+import { NFTEntity } from './nft.entity'
 
 @Injectable()
 export class NftService implements OnModuleInit {
   constructor(
-    @InjectRepository(NFT)
-    private nftRepository: Repository<NFT>
+    @InjectRepository(NFTEntity)
+    private nftRepository: Repository<NFTEntity>
   ) {}
 
   async onModuleInit() {
     await this.seed()
   }
 
-  findAll(): Promise<NFT[]> {
+  findAll(): Promise<NFTEntity[]> {
     return this.nftRepository.find()
   }
 
-  findOne(id: number): Promise<NFT | null> {
+  findOne(id: number): Promise<NFTEntity | null> {
     return this.nftRepository.findOneBy({id})
   }
 
-  create(nftData: Partial<NFT>): Promise<NFT> {
+  create(nftData: Partial<NFTEntity>): Promise<NFTEntity> {
     const nft = this.nftRepository.create(nftData)
     return this.nftRepository.save(nft)
   }
 
-  async update(id: number, nftData: Partial<NFT>): Promise<NFT | null> {
+  async update(id: number, nftData: Partial<NFTEntity>): Promise<NFTEntity | null> {
     await this.nftRepository.update(id, nftData)
     return this.findOne(id)
   }

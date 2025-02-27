@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
-export class NFT {
+export class NFTEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
