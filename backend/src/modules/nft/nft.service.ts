@@ -70,7 +70,6 @@ export class NftService implements OnModuleInit {
       ]
 
       await this.nftRepository.save(fakeNFTs)
-      console.log('Fake NFTs inserted')
     }
   }
 }
