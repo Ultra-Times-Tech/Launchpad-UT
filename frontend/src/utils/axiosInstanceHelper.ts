@@ -11,10 +11,10 @@ export const apiRequestor = axios.create({
   baseURL: apiUrl,
   headers: {
     'Content-Type': 'application/json',
-    Accept: 'application/json',
+    'Accept': 'application/json',
   },
   timeout: 15000,
-  withCredentials: true,
+  withCredentials: false, // Set back to false since we're handling CORS on the server side
 })
 
 apiRequestor.interceptors.request.use(

@@ -7,10 +7,11 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule)
 
+  // Configure CORS
   app.enableCors({
-    origin: ['https://launchpad-ut.vercel.app', 'http://localhost:5173', 'https://launchpad-ut-backend.vercel.app'],
+    origin: 'https://launchpad-ut.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    credentials: true,
+    credentials: false,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     exposedHeaders: ['Content-Disposition'],
     preflightContinue: false,
