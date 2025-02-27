@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppDataSource } from 'src/ormconfig';
-import { NftModule } from 'src/modules/nft/nft.module';
+import { AppDataSource } from '../ormconfig';
+import { NftModule } from '../modules/nft/nft.module';
 
 @Module({
   imports: [
