@@ -27,7 +27,7 @@ function Header() {
               Home
             </Link>
             <Link to='/collections' className='text-white hover:text-primary-300 transition-colors'>
-              Categories
+              Collections
             </Link>
             <Link to='/authors' className='text-white hover:text-primary-300 transition-colors'>
               Authors

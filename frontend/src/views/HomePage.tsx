@@ -32,7 +32,6 @@ interface NFTCollection {
   date: string
   mintDate: string
   buttonText: string
-  collectionId?: number // ID to link to the collection page
 }
 
 function HomePage() {
@@ -70,8 +69,6 @@ function HomePage() {
       date: 'Mar 25, 2023',
       mintDate: 'Mar 25, 2023',
       buttonText: 'COMING SOON',
-      // This collection will show all four factories
-      collectionId: 0, // Special case for collections page
     },
     {
       id: 2,
@@ -82,7 +79,6 @@ function HomePage() {
       date: 'Feb 18, 2023',
       mintDate: 'Feb 18, 2023',
       buttonText: 'ACCÈS AU MINT',
-      collectionId: 2, // Links to Factory Artifact
     },
     {
       id: 3,
@@ -93,7 +89,6 @@ function HomePage() {
       date: 'Mar 12, 2022',
       mintDate: 'Mar 12, 2022 • 14 min read',
       buttonText: 'ACCÈS AU MINT',
-      collectionId: 3, // Links to Factory Characters
     },
   ]
 
@@ -225,12 +220,10 @@ function HomePage() {
                   <p className='text-gray-300 text-sm mb-4'>{collection.description}</p>
                   <div className='flex justify-center'>
                     {collection.id === 1 ? (
-                      <Link to='/collections' className='bg-dark-700 text-primary-300 font-bold py-2 px-6 rounded-lg transition duration-200 text-sm'>
-                        {collection.buttonText}
-                      </Link>
+                      <button className='bg-dark-700 text-primary-300 font-bold py-2 px-6 rounded-lg transition duration-200 text-sm'>{collection.buttonText}</button>
                     ) : (
-                      <Link to={`/collections/${collection.collectionId}`} className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200 text-sm'>
-                        {collection.buttonText}
+                      <Link to={`/collection/${collection.id}`} className='block'>
+                        <button className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200 text-sm'>{collection.buttonText}</button>
                       </Link>
                     )}
                   </div>
@@ -240,9 +233,7 @@ function HomePage() {
           </div>
 
           <div className='flex justify-center mt-8'>
-            <Link to='/collections' className='bg-dark-800 hover:bg-dark-700 text-gray-300 font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>
-              LOAD MORE COLLECTIONS
-            </Link>
+            <button className='bg-dark-800 hover:bg-dark-700 text-gray-300 font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>LOAD MORE COLLECTIONS</button>
           </div>
         </div>
       </div>

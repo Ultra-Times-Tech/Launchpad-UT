@@ -3,6 +3,7 @@ import './App.css';
 import HomePage from './views/HomePage';
 import CollectionsPage from './views/CollectionsPage';
 import CollectionDetailsPage from './views/CollectionDetailsPage';
+import MintPage from './views/MintPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
@@ -14,7 +15,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/collections" element={<CollectionsPage />} />
-          <Route path="/collections/:id" element={<CollectionDetailsPage />} />
+          <Route path="/collection/:id" element={<CollectionDetailsPage />} />
+          <Route path="/mint/:category/:id" element={<MintPage />} />
         </Routes>
       </main>
       <Footer />

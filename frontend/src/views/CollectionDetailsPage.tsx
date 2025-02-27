@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {useParams, Link} from 'react-router-dom'
+import {useParams, Link, useNavigate} from 'react-router-dom'
 import {getAssetUrl} from '../utils/imageHelper'
 
 interface Collection {
@@ -14,6 +14,17 @@ interface Collection {
   items: CollectionItem[]
   features: string[]
   story: string
+  categories: Category[]
+}
+
+interface Category {
+  id: number
+  name: string
+  description: string
+  image: string
+  mintPrice: string
+  supply: number
+  minted: number
 }
 
 interface CollectionItem {
@@ -29,6 +40,7 @@ function CollectionDetailsPage() {
   const [collection, setCollection] = useState<Collection | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'items' | 'story' | 'features'>('items')
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Simulate fetching collection data
@@ -50,6 +62,10 @@ function CollectionDetailsPage() {
 
     fetchCollection()
   }, [id])
+
+  const handleMintAccess = (categoryId: number) => {
+    navigate(`/mint/${categoryId}/${id}`)
+  }
 
   if (loading) {
     return (
@@ -85,6 +101,7 @@ function CollectionDetailsPage() {
             <span className='bg-primary-600 px-3 py-1 rounded-full text-sm font-semibold'>{collection.totalItems} Items</span>
             <span className='bg-green-600 px-3 py-1 rounded-full text-sm font-semibold'>Floor: {collection.floorPrice}</span>
           </div>
+          <p className='text-sm text-gray-300'>by {collection.creator}</p>
         </div>
       </div>
 
@@ -145,59 +162,66 @@ function CollectionDetailsPage() {
           </div>
         </div>
 
-        {/* Tab Content */}
+        {/* Categories Section */}
         <div className='mb-12'>
-          {activeTab === 'items' && (
-            <div>
-              <h2 className='text-2xl font-bold mb-6 text-primary-300'>Collection Items</h2>
-              <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-                {collection.items.map(item => (
-                  <div key={item.id} className='bg-dark-800 rounded-xl overflow-hidden hover:shadow-lg transition duration-300'>
-                    <div className='relative'>
-                      <img src={item.image} alt={item.name} className='w-full h-48 object-cover' />
-                      <span className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold ${item.rarity === 'Legendary' ? 'bg-yellow-500 text-black' : item.rarity === 'Epic' ? 'bg-purple-500' : item.rarity === 'Rare' ? 'bg-blue-500' : 'bg-gray-500'}`}>{item.rarity}</span>
-                    </div>
-                    <div className='p-4'>
-                      <h3 className='font-bold mb-2 text-white'>{item.name}</h3>
-                      <div className='flex justify-between items-center'>
-                        <span className='text-green-400'>{item.price}</span>
-                        <button className='bg-primary-500 hover:bg-primary-600 text-white text-sm font-bold py-1 px-3 rounded transition duration-200'>View</button>
-                      </div>
-                    </div>
+          <h2 className='text-2xl font-bold mb-6 text-primary-300'>Categories</h2>
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6'>
+            {collection.categories.map(category => (
+              <div key={category.id} className='bg-dark-800 rounded-xl overflow-hidden'>
+                <div className='p-4'>
+                  <h3 className='text-xl font-bold mb-2 text-primary-300'>{category.name}</h3>
+                  <p className='text-sm text-gray-300 mb-4'>{category.description}</p>
+                  <div className='flex justify-between items-center mb-2'>
+                    <span className='text-gray-400 text-sm'>Mint Price:</span>
+                    <span className='text-primary-300 font-semibold'>{category.mintPrice}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'story' && (
-            <div>
-              <h2 className='text-2xl font-bold mb-6 text-primary-300'>Collection Story</h2>
-              <div className='bg-dark-800 rounded-xl p-8'>
-                <p className='text-gray-300 mb-6 leading-relaxed'>{collection.story}</p>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mt-8'>
-                  <img src={`https://picsum.photos/800/500?random=${collection.id}1`} alt='Story illustration' className='w-full h-64 object-cover rounded-lg' />
-                  <img src={`https://picsum.photos/800/500?random=${collection.id}2`} alt='Story illustration' className='w-full h-64 object-cover rounded-lg' />
+                  <div className='flex justify-between items-center mb-2'>
+                    <span className='text-gray-400 text-sm'>Total Supply:</span>
+                    <span className='text-white font-semibold'>{category.supply}</span>
+                  </div>
+                  <div className='w-full bg-dark-700 rounded-full h-2.5 mb-2'>
+                    <div className='bg-primary-500 h-2.5 rounded-full' style={{width: `${(category.minted / category.supply) * 100}%`}}></div>
+                  </div>
+                  <div className='flex justify-between items-center mb-4 text-sm'>
+                    <span className='text-gray-400'>{category.minted} minted</span>
+                    <span className='text-gray-400'>Total: {category.supply}</span>
+                  </div>
+                  <button onClick={() => handleMintAccess(category.id)} className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200'>
+                    ACCÈS AU MINT
+                  </button>
                 </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        </div>
 
-          {activeTab === 'features' && (
-            <div>
-              <h2 className='text-2xl font-bold mb-6 text-primary-300'>Collection Features</h2>
-              <div className='bg-dark-800 rounded-xl p-8'>
-                <ul className='space-y-4'>
-                  {collection.features.map((feature, index) => (
-                    <li key={index} className='flex items-start'>
-                      <span className='bg-primary-600 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5'>{index + 1}</span>
-                      <p className='text-gray-300'>{feature}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+        {/* Marketing Sections */}
+        <div className='container mx-auto px-4 py-8 mb-12'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+            <div className='bg-dark-800 p-6 rounded-xl'>
+              <h3 className='text-xl font-bold mb-4 text-primary-300'>Info marketing sur la collection</h3>
+              <p className='text-gray-300 mb-4'>Info marketing sur la collection, les utilités, les grades, table...</p>
+              <p className='text-primary-300 font-semibold'>et tous sont en VIP</p>
             </div>
-          )}
+
+            <div className='flex items-center justify-center'>
+              <img src='https://picsum.photos/400/300?random=10' alt='VIP Marketing' className='rounded-xl w-full h-48 object-cover' />
+            </div>
+          </div>
+        </div>
+
+        <div className='container mx-auto px-4 py-8 mb-12'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+            <div className='flex items-center justify-center'>
+              <img src='https://picsum.photos/400/300?random=11' alt='VIP Marketing' className='rounded-xl w-full h-48 object-cover' />
+            </div>
+
+            <div className='bg-dark-800 p-6 rounded-xl'>
+              <h3 className='text-xl font-bold mb-4 text-primary-300'>Info marketing sur la collection</h3>
+              <p className='text-gray-300 mb-4'>Info marketing sur la collection, les utilités, les grades, table...</p>
+              <p className='text-primary-300 font-semibold'>et tous sont en VIP</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -209,9 +233,9 @@ function getMockCollection(id: number): Collection {
   const collections = [
     {
       id: 1,
-      name: 'Factory Arsenal',
+      name: 'Vox-in-Time',
       description: 'A collection of rare weapons and equipment from the future, featuring unique designs and powerful capabilities.',
-      image: '/banners/factory-arsenal.png',
+      image: '/banners/vit-banner.png',
       totalItems: 1000,
       floorPrice: '0.5 ETH',
       creator: 'Ultra Times Studios',
@@ -219,6 +243,44 @@ function getMockCollection(id: number): Collection {
       story:
         'In the year 2150, the Ultra Times Corporation revolutionized warfare with their advanced weapons technology. The Factory Arsenal collection represents the pinnacle of their achievements, featuring weapons that combine cutting-edge technology with artistic design. Each weapon in this collection has been meticulously crafted to reflect both form and function, with unique attributes that make them valuable not just as digital collectibles but as functional items within the Ultra Times ecosystem. The story of Factory Arsenal begins in the research labs of Ultra Times, where brilliant engineers and designers worked tirelessly to create weapons that would change the course of history. These weapons were not just tools of destruction, but works of art that reflected the cultural and technological advancements of their time. Now, these legendary weapons are available as NFTs, allowing collectors to own a piece of this fictional future history.',
       features: ['Each weapon has unique attributes and power levels', 'Weapons can be used in the Ultra Times gaming ecosystem', 'Rare and legendary weapons include animated visual effects', 'Owners receive exclusive access to special in-game events', 'Limited edition weapons with enhanced capabilities', 'Blockchain-verified ownership and authenticity'],
+      categories: [
+        {
+          id: 1,
+          name: 'Personnages',
+          description: 'Donec nec ante nisi. Vestibulum tincidunt lectus sed magna.',
+          image: 'https://picsum.photos/400/300?random=1',
+          mintPrice: '0.5 UOS',
+          supply: 100,
+          minted: 45,
+        },
+        {
+          id: 2,
+          name: 'Arsenal',
+          description: 'Morbi eget mattis vel felis sodales commodo tempor magna.',
+          image: 'https://picsum.photos/400/300?random=2',
+          mintPrice: '0.8 UOS',
+          supply: 150,
+          minted: 23,
+        },
+        {
+          id: 3,
+          name: 'Artifacts',
+          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          image: 'https://picsum.photos/400/300?random=3',
+          mintPrice: '1.2 UOS',
+          supply: 75,
+          minted: 62,
+        },
+        {
+          id: 4,
+          name: 'Power boosters',
+          description: 'Vivamus feugiat verius accumsan. Proin ac orci sed mattis.',
+          image: 'https://picsum.photos/400/300?random=4',
+          mintPrice: '0.3 UOS',
+          supply: 200,
+          minted: 89,
+        },
+      ],
       items: [
         {
           id: 101,
@@ -280,7 +342,7 @@ function getMockCollection(id: number): Collection {
     },
     {
       id: 2,
-      name: 'Factory Artifact',
+      name: 'Ultra Street-Cubism Discover',
       description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations.',
       image: '/banners/factory-artifact.png',
       totalItems: 500,
@@ -290,6 +352,44 @@ function getMockCollection(id: number): Collection {
       story:
         'Throughout human history, ancient civilizations have created artifacts of immense power and mystery. The Factory Artifact collection brings these legendary items to life as digital collectibles. Each artifact in this collection has a unique history and set of powers, drawn from mythologies and legends from around the world. From the Amulet of Anubis to the Chalice of Immortality, these artifacts represent the pinnacle of ancient craftsmanship and mystical knowledge. The Ultra Times archaeological team has spent decades researching and documenting these artifacts, creating detailed digital recreations that capture their essence and power. Now, collectors can own these pieces of history and unlock their potential within the Ultra Times universe.',
       features: ['Artifacts based on real-world mythologies and legends', 'Each artifact has a unique backstory and lore', 'Artifacts provide special abilities in Ultra Times games', 'Detailed 3D models with intricate designs', 'Artifact combinations unlock hidden features', 'Ownership grants access to exclusive artifact lore'],
+      categories: [
+        {
+          id: 1,
+          name: 'Personnages',
+          description: 'Donec nec ante nisi. Vestibulum tincidunt lectus sed magna.',
+          image: 'https://picsum.photos/400/300?random=1',
+          mintPrice: '0.5 UOS',
+          supply: 100,
+          minted: 45,
+        },
+        {
+          id: 2,
+          name: 'Arsenal',
+          description: 'Morbi eget mattis vel felis sodales commodo tempor magna.',
+          image: 'https://picsum.photos/400/300?random=2',
+          mintPrice: '0.8 UOS',
+          supply: 150,
+          minted: 23,
+        },
+        {
+          id: 3,
+          name: 'Artifacts',
+          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          image: 'https://picsum.photos/400/300?random=3',
+          mintPrice: '1.2 UOS',
+          supply: 75,
+          minted: 62,
+        },
+        {
+          id: 4,
+          name: 'Power boosters',
+          description: 'Vivamus feugiat verius accumsan. Proin ac orci sed mattis.',
+          image: 'https://picsum.photos/400/300?random=4',
+          mintPrice: '0.3 UOS',
+          supply: 200,
+          minted: 89,
+        },
+      ],
       items: [
         {
           id: 201,
@@ -351,7 +451,7 @@ function getMockCollection(id: number): Collection {
     },
     {
       id: 3,
-      name: 'Factory Characters',
+      name: 'Crypto Punks Edition',
       description: 'A collection featuring unique characters with different abilities, backgrounds, and stories from the Ultra Times universe.',
       image: '/banners/factory-characters.png',
       totalItems: 750,
@@ -361,6 +461,44 @@ function getMockCollection(id: number): Collection {
       story:
         'The Ultra Times universe is home to countless unique characters, each with their own stories, abilities, and destinies. The Factory Characters collection brings these diverse individuals to life as digital collectibles. From brave heroes to cunning villains, mystical beings to technological wonders, this collection represents the rich tapestry of personalities that populate the Ultra Times narrative. Each character has been carefully designed with a detailed backstory, unique visual style, and special abilities that make them valuable within the Ultra Times ecosystem. Collectors can own these characters and use them in various Ultra Times games and experiences, unlocking new storylines and gameplay possibilities.',
       features: ['Characters with unique abilities and attributes', 'Detailed character backstories and lore', 'Characters can be used in Ultra Times games', 'Different character classes with special abilities', 'Character progression and customization', 'Limited edition characters with unique storylines'],
+      categories: [
+        {
+          id: 1,
+          name: 'Personnages',
+          description: 'Donec nec ante nisi. Vestibulum tincidunt lectus sed magna.',
+          image: 'https://picsum.photos/400/300?random=1',
+          mintPrice: '0.5 UOS',
+          supply: 100,
+          minted: 45,
+        },
+        {
+          id: 2,
+          name: 'Arsenal',
+          description: 'Morbi eget mattis vel felis sodales commodo tempor magna.',
+          image: 'https://picsum.photos/400/300?random=2',
+          mintPrice: '0.8 UOS',
+          supply: 150,
+          minted: 23,
+        },
+        {
+          id: 3,
+          name: 'Artifacts',
+          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+          image: 'https://picsum.photos/400/300?random=3',
+          mintPrice: '1.2 UOS',
+          supply: 75,
+          minted: 62,
+        },
+        {
+          id: 4,
+          name: 'Power boosters',
+          description: 'Vivamus feugiat verius accumsan. Proin ac orci sed mattis.',
+          image: 'https://picsum.photos/400/300?random=4',
+          mintPrice: '0.3 UOS',
+          supply: 200,
+          minted: 89,
+        },
+      ],
       items: [
         {
           id: 301,
@@ -417,77 +555,6 @@ function getMockCollection(id: number): Collection {
           image: 'https://picsum.photos/400/400?random=308',
           rarity: 'Common',
           price: '0.6 ETH',
-        },
-      ],
-    },
-    {
-      id: 4,
-      name: 'Factory Power Booster',
-      description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem.',
-      image: '/banners/factory-powerbooster.png',
-      totalItems: 600,
-      floorPrice: '0.75 ETH',
-      creator: 'Ultra Times Labs',
-      releaseDate: 'June 5, 2025',
-      story:
-        'In the competitive world of Ultra Times, power boosters provide the edge that can mean the difference between victory and defeat. The Factory Power Booster collection features a range of digital items that enhance abilities, unlock new powers, and provide strategic advantages within the Ultra Times ecosystem. Developed by the brilliant minds at Ultra Times Labs, these power boosters represent the cutting edge of digital enhancement technology. Each booster has been carefully balanced to provide significant advantages without disrupting the overall game balance. From temporary stat boosts to permanent ability unlocks, these power boosters offer a variety of ways to customize and enhance your Ultra Times experience.',
-      features: ['Boosters provide temporary or permanent enhancements', 'Different booster types for various gameplay styles', 'Stackable effects for customized enhancement', 'Rare boosters with unique visual effects', 'Boosters can be combined to create more powerful effects', 'Limited edition boosters with exclusive abilities'],
-      items: [
-        {
-          id: 401,
-          name: 'Speed Amplifier',
-          image: 'https://picsum.photos/400/400?random=401',
-          rarity: 'Common',
-          price: '0.3 ETH',
-        },
-        {
-          id: 402,
-          name: 'Strength Enhancer',
-          image: 'https://picsum.photos/400/400?random=402',
-          rarity: 'Rare',
-          price: '0.8 ETH',
-        },
-        {
-          id: 403,
-          name: 'Intelligence Booster',
-          image: 'https://picsum.photos/400/400?random=403',
-          rarity: 'Epic',
-          price: '1.4 ETH',
-        },
-        {
-          id: 404,
-          name: 'Ultimate Power Core',
-          image: 'https://picsum.photos/400/400?random=404',
-          rarity: 'Legendary',
-          price: '2.5 ETH',
-        },
-        {
-          id: 405,
-          name: 'Stealth Module',
-          image: 'https://picsum.photos/400/400?random=405',
-          rarity: 'Rare',
-          price: '0.9 ETH',
-        },
-        {
-          id: 406,
-          name: 'Defense Matrix',
-          image: 'https://picsum.photos/400/400?random=406',
-          rarity: 'Common',
-          price: '0.4 ETH',
-        },
-        {
-          id: 407,
-          name: 'Energy Catalyst',
-          image: 'https://picsum.photos/400/400?random=407',
-          rarity: 'Epic',
-          price: '1.6 ETH',
-        },
-        {
-          id: 408,
-          name: 'Time Dilator',
-          image: 'https://picsum.photos/400/400?random=408',
-          rarity: 'Legendary',
-          price: '3.0 ETH',
         },
       ],
     },
