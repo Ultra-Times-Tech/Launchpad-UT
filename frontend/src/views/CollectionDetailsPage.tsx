@@ -53,9 +53,9 @@ function CollectionDetailsPage() {
 
   if (loading) {
     return (
-      <div className='min-h-screen bg-gray-900 text-white flex items-center justify-center'>
+      <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
         <div className='flex flex-col items-center'>
-          <div className='w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin'></div>
+          <div className='w-16 h-16 border-t-4 border-primary-500 border-solid rounded-full animate-spin'></div>
           <p className='mt-4 text-xl'>Loading collection...</p>
         </div>
       </div>
@@ -64,10 +64,10 @@ function CollectionDetailsPage() {
 
   if (!collection) {
     return (
-      <div className='min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center'>
+      <div className='min-h-screen bg-dark-950 text-white flex flex-col items-center justify-center'>
         <h2 className='text-2xl font-bold mb-4'>Collection Not Found</h2>
         <p className='mb-6'>The collection you're looking for doesn't exist or has been removed.</p>
-        <Link to='/collections' className='bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200'>
+        <Link to='/collections' className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200'>
           Back to Collections
         </Link>
       </div>
@@ -75,34 +75,34 @@ function CollectionDetailsPage() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-900 text-white'>
+    <div className='min-h-screen bg-dark-950 text-white'>
       {/* Hero Banner */}
       <div className='relative h-96 w-full'>
         <img src={getAssetUrl(collection.image)} alt={collection.name} className='w-full h-full object-cover' />
-        <div className='absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent flex flex-col items-center justify-end pb-12'>
-          <h1 className='text-5xl font-bold mb-4 text-center'>{collection.name}</h1>
+        <div className='absolute inset-0 bg-gradient-to-t from-dark-950 to-transparent flex flex-col items-center justify-end pb-12'>
+          <h1 className='text-5xl font-bold mb-4 text-center text-primary-300'>{collection.name}</h1>
           <div className='flex items-center space-x-4 mb-4'>
-            <span className='bg-blue-600 px-3 py-1 rounded-full text-sm font-semibold'>{collection.totalItems} Items</span>
+            <span className='bg-primary-600 px-3 py-1 rounded-full text-sm font-semibold'>{collection.totalItems} Items</span>
             <span className='bg-green-600 px-3 py-1 rounded-full text-sm font-semibold'>Floor: {collection.floorPrice}</span>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className='bg-gray-800 py-4 sticky top-0 z-10 shadow-lg'>
+      <div className='bg-dark-800 py-4 sticky top-0 z-10 shadow-lg'>
         <div className='container mx-auto px-4'>
           <div className='flex justify-between items-center'>
-            <Link to='/collections' className='text-white hover:text-blue-400 transition'>
+            <Link to='/collections' className='text-white hover:text-primary-300 transition'>
               ← Back to Collections
             </Link>
             <div className='flex space-x-6'>
-              <button onClick={() => setActiveTab('items')} className={`px-4 py-2 rounded-lg transition ${activeTab === 'items' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('items')} className={`px-4 py-2 rounded-lg transition ${activeTab === 'items' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white'}`}>
                 Items
               </button>
-              <button onClick={() => setActiveTab('story')} className={`px-4 py-2 rounded-lg transition ${activeTab === 'story' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('story')} className={`px-4 py-2 rounded-lg transition ${activeTab === 'story' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white'}`}>
                 Story
               </button>
-              <button onClick={() => setActiveTab('features')} className={`px-4 py-2 rounded-lg transition ${activeTab === 'features' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('features')} className={`px-4 py-2 rounded-lg transition ${activeTab === 'features' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white'}`}>
                 Features
               </button>
             </div>
@@ -113,24 +113,24 @@ function CollectionDetailsPage() {
       {/* Main Content */}
       <div className='container mx-auto px-4 py-12'>
         {/* Collection Info */}
-        <div className='bg-gray-800 rounded-xl p-8 mb-12'>
+        <div className='bg-dark-800 rounded-xl p-8 mb-12'>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
             <div className='md:col-span-2'>
-              <h2 className='text-2xl font-bold mb-4'>About {collection.name}</h2>
+              <h2 className='text-2xl font-bold mb-4 text-primary-300'>About {collection.name}</h2>
               <p className='text-gray-300 mb-6'>{collection.description}</p>
               <p className='text-gray-300 mb-6'>{collection.story.substring(0, 200)}...</p>
               <div className='grid grid-cols-2 gap-4'>
                 <div>
                   <h3 className='text-gray-400 text-sm'>Creator</h3>
-                  <p className='font-semibold'>{collection.creator}</p>
+                  <p className='font-semibold text-white'>{collection.creator}</p>
                 </div>
                 <div>
                   <h3 className='text-gray-400 text-sm'>Release Date</h3>
-                  <p className='font-semibold'>{collection.releaseDate}</p>
+                  <p className='font-semibold text-white'>{collection.releaseDate}</p>
                 </div>
                 <div>
                   <h3 className='text-gray-400 text-sm'>Total Items</h3>
-                  <p className='font-semibold'>{collection.totalItems}</p>
+                  <p className='font-semibold text-white'>{collection.totalItems}</p>
                 </div>
                 <div>
                   <h3 className='text-gray-400 text-sm'>Floor Price</h3>
@@ -139,7 +139,7 @@ function CollectionDetailsPage() {
               </div>
             </div>
             <div className='flex flex-col justify-center'>
-              <button className='w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200 mb-4'>View on Marketplace</button>
+              <button className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-4 px-6 rounded-lg transition duration-200 mb-4'>View on Marketplace</button>
               <button className='w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200'>Mint New Item</button>
             </div>
           </div>
@@ -149,19 +149,19 @@ function CollectionDetailsPage() {
         <div className='mb-12'>
           {activeTab === 'items' && (
             <div>
-              <h2 className='text-2xl font-bold mb-6'>Collection Items</h2>
+              <h2 className='text-2xl font-bold mb-6 text-primary-300'>Collection Items</h2>
               <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
                 {collection.items.map(item => (
-                  <div key={item.id} className='bg-gray-800 rounded-xl overflow-hidden hover:shadow-lg transition duration-300'>
+                  <div key={item.id} className='bg-dark-800 rounded-xl overflow-hidden hover:shadow-lg transition duration-300'>
                     <div className='relative'>
                       <img src={item.image} alt={item.name} className='w-full h-48 object-cover' />
                       <span className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold ${item.rarity === 'Legendary' ? 'bg-yellow-500 text-black' : item.rarity === 'Epic' ? 'bg-purple-500' : item.rarity === 'Rare' ? 'bg-blue-500' : 'bg-gray-500'}`}>{item.rarity}</span>
                     </div>
                     <div className='p-4'>
-                      <h3 className='font-bold mb-2'>{item.name}</h3>
+                      <h3 className='font-bold mb-2 text-white'>{item.name}</h3>
                       <div className='flex justify-between items-center'>
                         <span className='text-green-400'>{item.price}</span>
-                        <button className='bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-1 px-3 rounded transition duration-200'>View</button>
+                        <button className='bg-primary-500 hover:bg-primary-600 text-white text-sm font-bold py-1 px-3 rounded transition duration-200'>View</button>
                       </div>
                     </div>
                   </div>
@@ -172,8 +172,8 @@ function CollectionDetailsPage() {
 
           {activeTab === 'story' && (
             <div>
-              <h2 className='text-2xl font-bold mb-6'>Collection Story</h2>
-              <div className='bg-gray-800 rounded-xl p-8'>
+              <h2 className='text-2xl font-bold mb-6 text-primary-300'>Collection Story</h2>
+              <div className='bg-dark-800 rounded-xl p-8'>
                 <p className='text-gray-300 mb-6 leading-relaxed'>{collection.story}</p>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mt-8'>
                   <img src={`https://picsum.photos/800/500?random=${collection.id}1`} alt='Story illustration' className='w-full h-64 object-cover rounded-lg' />
@@ -185,12 +185,12 @@ function CollectionDetailsPage() {
 
           {activeTab === 'features' && (
             <div>
-              <h2 className='text-2xl font-bold mb-6'>Collection Features</h2>
-              <div className='bg-gray-800 rounded-xl p-8'>
+              <h2 className='text-2xl font-bold mb-6 text-primary-300'>Collection Features</h2>
+              <div className='bg-dark-800 rounded-xl p-8'>
                 <ul className='space-y-4'>
                   {collection.features.map((feature, index) => (
                     <li key={index} className='flex items-start'>
-                      <span className='bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5'>{index + 1}</span>
+                      <span className='bg-primary-600 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5'>{index + 1}</span>
                       <p className='text-gray-300'>{feature}</p>
                     </li>
                   ))}
