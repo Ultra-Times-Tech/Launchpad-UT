@@ -9,7 +9,7 @@ async function bootstrap() {
 
   // Configure CORS
   app.enableCors({
-    origin: 'https://launchpad-ut.vercel.app',
+    origin: ['https://launchpad-ut.vercel.app', 'http://localhost:5173', 'https://launchpad-ut-backend.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: false,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
