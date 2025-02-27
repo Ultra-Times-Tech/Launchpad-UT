@@ -17,14 +17,19 @@ interface NFT {
 function HomePage() {
   const [nfts, setNfts] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchNFTs = async () => {
       try {
+        console.log('Fetching NFTs from backend...');
         const response = await apiRequestor.get('/nfts');
+        console.log('NFTs response:', response.data);
         setNfts(response.data);
+        setError(null);
       } catch (error) {
         console.error('Error fetching NFTs:', error);
+        setError('Failed to load NFTs. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -36,7 +41,10 @@ function HomePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        Loading...
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
+          <p className="mt-4 text-xl">Loading NFTs...</p>
+        </div>
       </div>
     );
   }
@@ -50,6 +58,12 @@ function HomePage() {
           View Collections
         </Link>
       </header>
+
+      {error && (
+        <div className="bg-red-500 bg-opacity-20 border border-red-500 text-white p-4 rounded-lg mb-8">
+          <p>{error}</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {nfts.map((nft) => (

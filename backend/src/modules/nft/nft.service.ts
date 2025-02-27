@@ -1,10 +1,10 @@
-import {Injectable} from '@nestjs/common'
+import {Injectable, OnModuleInit} from '@nestjs/common'
 import {InjectRepository} from '@nestjs/typeorm'
 import {Repository} from 'typeorm'
 import {NFT} from './nft.entity'
 
 @Injectable()
-export class NftService {
+export class NftService implements OnModuleInit {
   constructor(
     @InjectRepository(NFT)
     private nftRepository: Repository<NFT>

@@ -1,7 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './config/app.module';
+import { AppDataSource } from './ormconfig';
 
 async function bootstrap() {
+  await AppDataSource.initialize();
+  
   const app = await NestFactory.create(AppModule);
   
   app.enableCors({
@@ -11,6 +14,7 @@ async function bootstrap() {
   });
   
   await app.listen(process.env.PORT ?? 3000);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap().catch((error) => {
   console.error('Error during bootstrap:', error);
