@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import {useEffect, useState} from 'react'
+import {Link} from 'react-router-dom'
 // Helpers
-import { apiRequestor } from '../utils/axiosInstanceHelper'
-import CollectionCard,{CollectionCardProps} from '../components/Card/CollectionCard'
+import {apiRequestor} from '../utils/axiosInstanceHelper'
+import FeaturedCollectionCard, {FeaturedCollectionCardProps} from '../components/Card/FeaturedCollectionCard'
 
 interface NFT {
   id: number
@@ -26,7 +26,7 @@ interface Article {
 
 function HomePage() {
   const [nfts, setNfts] = useState<NFT[]>([])
-  const [featuredCollections, setFeaturedCollections] = useState<CollectionCardProps[]>([])
+  const [featuredCollections, setFeaturedCollections] = useState<FeaturedCollectionCardProps[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -38,38 +38,44 @@ function HomePage() {
         const nftResponse = await apiRequestor.get('/nfts')
         console.log('NFTs response:', nftResponse.data)
         setNfts(nftResponse.data)
-        
+
         // Set featured collections (mock data for now)
         setFeaturedCollections([
           {
             id: 1,
             name: 'Vox-in-Time',
-            description: 'A collection of rare weapons and equipment from the future, featuring unique designs and powerful capabilities.',
+            description: 'Suspendisse pretium. Sed neque augue, mattis in posuere euis, sagittis...',
             image: '/banners/vit-banner.png',
-            artist: 'Ultra Times Studios',
+            artist: 'Ultra Times',
+            date: 'Mar 16, 2025',
             totalItems: 1000,
             floorPrice: '0.5 ETH',
+            comingSoon: true,
           },
           {
             id: 2,
             name: 'Ultra Street-Cubism Discover',
-            description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations.',
+            description: 'Nunc ex tortor, venenatis fermentum ipsum id, gravida lacinia cras...',
             image: '/banners/factory-artifact.png',
-            artist: 'Ultra Times Archaeology',
+            artist: 'Bob Jacob',
+            date: 'Feb 22, 2025',
             totalItems: 500,
             floorPrice: '0.8 ETH',
+            comingSoon: false,
           },
           {
             id: 3,
             name: 'Crypto Punks Edition',
-            description: 'A collection featuring unique characters with different abilities, backgrounds, and stories from the Ultra Times universe.',
+            description: 'Praesent lobortis, lorem id elementum vehicula, sapien ipsum tincidunt...',
             image: '/banners/factory-characters.png',
-            artist: 'Ultra Times Creative',
+            artist: 'John Alvarez',
+            date: 'Mar 10, 2025',
             totalItems: 750,
             floorPrice: '1.2 ETH',
+            comingSoon: false,
           },
         ])
-        
+
         setError(null)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -180,11 +186,11 @@ function HomePage() {
       <div className='container mx-auto px-4 py-12'>
         <div className='flex justify-between items-center mb-8'>
           <h2 className='text-2xl font-cabin font-bold text-primary-300'>Featured Collections</h2>
-          <Link to="/collections" className='text-gray-400 hover:text-white font-medium'>
+          <Link to='/collections' className='text-gray-400 hover:text-white font-medium'>
             View all collections →
           </Link>
         </div>
-        
+
         <div className='flex justify-between items-center mb-4'>
           <div className='flex space-x-6 font-cabin'>
             <button className='text-white font-medium border-b-2 border-primary-500'>All</button>
@@ -198,24 +204,13 @@ function HomePage() {
         {/* Collections Grid */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
           {featuredCollections.map(collection => (
-            <CollectionCard 
-              key={collection.id}
-              id={collection.id}
-              name={collection.name}
-              description={collection.description}
-              image={collection.image}
-              artist={collection.artist}
-              totalItems={collection.totalItems}
-              floorPrice={collection.floorPrice}
-            />
+            <FeaturedCollectionCard key={collection.id} id={collection.id} name={collection.name} description={collection.description} image={collection.image} artist={collection.artist} date={collection.date} totalItems={collection.totalItems} floorPrice={collection.floorPrice} comingSoon={collection.comingSoon} />
           ))}
         </div>
 
         <div className='flex justify-center mt-8'>
-          <Link to="/collections">
-            <button className='bg-dark-800 hover:bg-dark-700 text-gray-300 font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>
-              LOAD MORE COLLECTIONS
-            </button>
+          <Link to='/collections'>
+            <button className='bg-dark-800 hover:bg-dark-700 text-gray-300 font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>LOAD MORE COLLECTIONS</button>
           </Link>
         </div>
       </div>
