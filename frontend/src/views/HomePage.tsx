@@ -22,6 +22,17 @@ interface Collection {
   author: string
 }
 
+interface NFTCollection {
+  id: number
+  name: string
+  description: string
+  image: string
+  artist: string
+  date: string
+  mintDate: string
+  buttonText: string
+}
+
 function HomePage() {
   const [nfts, setNfts] = useState<NFT[]>([])
   const [loading, setLoading] = useState(true)
@@ -45,6 +56,40 @@ function HomePage() {
 
     fetchNFTs()
   }, [])
+
+  // NFT Collections data
+  const nftCollections: NFTCollection[] = [
+    {
+      id: 1,
+      name: 'Vox-in-Time',
+      description: 'Suspendisse potenti. Sed neque augue, mattis in posuere quis, sagittis...',
+      image: 'https://images.unsplash.com/photo-1645378999013-95abebf5f3c1?q=80&w=1470&auto=format&fit=crop',
+      artist: 'Ultra Times',
+      date: 'Mar 25, 2023',
+      mintDate: 'Mar 25, 2023',
+      buttonText: 'COMING SOON',
+    },
+    {
+      id: 2,
+      name: 'Ultra Street-Cubism Discover',
+      description: 'Nunc mi tortor, convallis fermentum ipsum id, gravida luctus orci...',
+      image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1374&auto=format&fit=crop',
+      artist: 'Alex Jones',
+      date: 'Feb 18, 2023',
+      mintDate: 'Feb 18, 2023',
+      buttonText: 'ACCÈS AU MINT',
+    },
+    {
+      id: 3,
+      name: 'Crypto Punks Edition',
+      description: 'Praesent lobortis, lorem et elementum vehicula, sapien ipsum tincidunt...',
+      image: 'https://images.unsplash.com/photo-1622547748225-3fc4abd2cca0?q=80&w=1632&auto=format&fit=crop',
+      artist: 'John Blades',
+      date: 'Mar 12, 2022',
+      mintDate: 'Mar 12, 2022 • 14 min read',
+      buttonText: 'ACCÈS AU MINT',
+    },
+  ]
 
   // Mock data for featured collections
   const featuredCollections = [
@@ -168,6 +213,9 @@ function HomePage() {
       {/* Featured Collections */}
       <div className='container mx-auto px-4 py-12'>
         <div className='flex justify-between items-center mb-8'>
+          <h2 className='text-2xl font-cabin font-bold text-primary-300'>NFT Collections</h2>
+        </div>
+        <div className='flex justify-between items-center mb-4'>
           <div className='flex space-x-6 font-cabin'>
             <button className='text-white font-medium border-b-2 border-primary-500'>All</button>
             <button className='text-gray-400 hover:text-white'>Art</button>
@@ -178,19 +226,31 @@ function HomePage() {
           <button className='text-gray-400 hover:text-white font-medium'>View all collections →</button>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-          {featuredCollections.map(collection => (
-            <div key={collection.id} className='bg-dark-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1'>
-              <div className='h-48 bg-dark-700 flex items-center justify-center'>
-                <img src={collection.image} alt={collection.title} className='w-full h-full object-cover' />
+        {/* NFT Collections - New Section based on the image */}
+        <div className='container mx-auto px-4 py-6'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+            {nftCollections.map(collection => (
+              <div key={collection.id} className='bg-dark-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300'>
+                <div className='h-48 bg-dark-700'>
+                  <img src={collection.image} alt={collection.name} className='w-full h-full object-cover' />
+                </div>
+                <div className='p-6'>
+                  <h3 className='text-xl font-cabin font-bold mb-2 text-primary-300'>{collection.name}</h3>
+                  <div className='flex items-center text-sm text-gray-400 mb-3'>
+                    <span>{collection.artist}</span>
+                    <span className='mx-2'>•</span>
+                    <span>{collection.date}</span>
+                  </div>
+                  <p className='text-gray-300 text-sm mb-4'>{collection.description}</p>
+                  <div className='flex justify-center'>{collection.id === 1 ? <button className='bg-dark-700 text-primary-300 font-bold py-2 px-6 rounded-lg transition duration-200 text-sm'>{collection.buttonText}</button> : <button className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200 text-sm'>{collection.buttonText}</button>}</div>
+                </div>
               </div>
-              <div className='p-6'>
-                <h3 className='text-xl font-cabin font-bold mb-2 text-primary-300'>{collection.title}</h3>
-                <p className='text-gray-400 mb-4 font-quicksand'>{collection.description}</p>
-                <button className='bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-4 rounded transition duration-300'>{collection.buttonText}</button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <div className='flex justify-center mt-8'>
+            <button className='bg-dark-800 hover:bg-dark-700 text-gray-300 font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>LOAD MORE COLLECTIONS</button>
+          </div>
         </div>
       </div>
 
