@@ -2,7 +2,6 @@ import axios from 'axios'
 
 const isProduction = import.meta.env.PROD
 
-// Use the correct API URL based on environment
 const apiUrl: string = isProduction ? 'https://launchpad-ut-backend.vercel.app/' : 'http://localhost:3000/'
 
 console.log('API URL:', apiUrl, 'Environment:', isProduction ? 'production' : 'development')
@@ -14,7 +13,7 @@ export const apiRequestor = axios.create({
     'Accept': 'application/json',
   },
   timeout: 15000,
-  withCredentials: false, // Set back to false since we're handling CORS on the server side
+  withCredentials: false,
 })
 
 apiRequestor.interceptors.request.use(
