@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug Frontend",
+      "url": "http://localhost:5173/launchpad-ut/",
+      "webRoot": "${workspaceFolder}/frontend",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./src/*": "${webRoot}/src/*"
+      },
+      "preLaunchTask": "start-frontend"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Backend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:debug"],
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}/backend",
+      "console": "integratedTerminal",
+      "restart": true,
+      "autoAttachChildProcesses": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Full Stack",
+      "configurations": ["Debug Frontend", "Debug Backend"]
+    }
+  ]
+}
