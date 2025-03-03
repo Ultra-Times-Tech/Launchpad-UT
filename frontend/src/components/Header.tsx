@@ -6,20 +6,6 @@ import WalletConnectButton from './Button/WalletConnectButton'
 function Header() {
   const [blockchainId, setBlockchainId] = useState<string | null>(null)
 
-  if (document.readyState !== 'complete') {
-    window.addEventListener('load', afterWindowLoaded)
-  } else {
-    afterWindowLoaded()
-  }
-
-  function afterWindowLoaded() {
-    if ('ultra' in window) {
-      console.log('Page load: Ultra Wallet is installed!')
-    } else {
-      console.log('Page load: No Ultra Wallet extension detected!')
-    }
-  }
-
   const handleWalletConnect = (id: string) => {
     setBlockchainId(id)
     console.log('Connected to Ultra wallet with blockchain ID:', id)
@@ -78,10 +64,7 @@ function Header() {
               </a>
             </div>
 
-            <WalletConnectButton 
-              onConnect={handleWalletConnect}
-              onDisconnect={handleWalletDisconnect}
-            />
+            <WalletConnectButton onConnect={handleWalletConnect} onDisconnect={handleWalletDisconnect} className='z-10' />
           </div>
         </div>
       </div>

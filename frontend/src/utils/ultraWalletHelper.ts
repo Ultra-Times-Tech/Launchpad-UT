@@ -123,6 +123,7 @@ export const useUltraWallet = () => {
   const [chainId, setChainId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [hasAttemptedEagerConnect, setHasAttemptedEagerConnect] = useState<boolean>(false)
 
   const isInstalled = useUltraWalletDetection()
 
@@ -165,8 +166,10 @@ export const useUltraWallet = () => {
 
   // Handle eager connection (connect without user prompt if already trusted)
   const eagerConnect = useCallback(async (): Promise<boolean> => {
+    if (hasAttemptedEagerConnect) return false
+    setHasAttemptedEagerConnect(true)
     return connect({onlyIfTrusted: true})
-  }, [connect])
+  }, [connect, hasAttemptedEagerConnect])
 
   // Handle wallet disconnection
   const disconnect = useCallback(async (): Promise<boolean> => {
@@ -289,12 +292,12 @@ export const useUltraWallet = () => {
     }
   }, [isInstalled, isConnected])
 
-  // Try eager connection on initial load
+  // Try eager connection on initial load - but only once
   useEffect(() => {
-    if (isInstalled && !isConnected) {
+    if (isInstalled && !isConnected && !hasAttemptedEagerConnect) {
       eagerConnect().catch(console.error)
     }
-  }, [isInstalled, isConnected, eagerConnect])
+  }, [isInstalled, isConnected, eagerConnect, hasAttemptedEagerConnect])
 
   return {
     isInstalled,
