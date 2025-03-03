@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
-import {useAlerts} from '../Alert/Alert'
+import useAlerts from '../../hooks/useAlert'
 
 interface WalletConnectProps {
   onConnect?: (blockchainId: string) => void
@@ -10,7 +10,7 @@ interface WalletConnectProps {
 
 const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconnect, className = ''}) => {
   const {isInstalled, isConnected, isLoading, error, blockchainId, connect, disconnect} = useUltraWallet()
-  const {showAlert} = useAlerts()
+  const {success, error: showError, info} = useAlerts()
   const [lastErrorMessage, setLastErrorMessage] = useState<string | null>(null)
   const [lastConnectedId, setLastConnectedId] = useState<string | null>(null)
 
@@ -19,23 +19,23 @@ const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconn
     if (isConnected && blockchainId && onConnect && blockchainId !== lastConnectedId) {
       onConnect(blockchainId)
       setLastConnectedId(blockchainId)
-      showAlert('Wallet connected successfully!', 'success')
+      success('Wallet connected successfully!')
     }
-  }, [isConnected, blockchainId, onConnect, lastConnectedId, showAlert])
+  }, [isConnected, blockchainId, onConnect, lastConnectedId, success])
 
   // Show error notification when error occurs, but prevent duplicates
   useEffect(() => {
     if (error && error !== lastErrorMessage) {
-      showAlert(error, 'error')
+      showError(error)
       setLastErrorMessage(error)
     }
-  }, [error, lastErrorMessage, showAlert])
+  }, [error, lastErrorMessage, showError])
 
   const handleConnect = async () => {
-    showAlert('Connecting to Ultra Wallet...', 'info', 10000)
-    const success = await connect()
+    info('Connecting to Ultra Wallet...', 10000)
+    const isConnected = await connect()
 
-    if (!success) {
+    if (!isConnected) {
       if (onDisconnect) {
         onDisconnect()
       }
@@ -43,11 +43,11 @@ const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconn
   }
 
   const handleDisconnect = async () => {
-    showAlert('Disconnecting from Ultra Wallet...', 'info', 10000)
-    const success = await disconnect()
+    info('Disconnecting from Ultra Wallet...', 10000)
+    const isDisconnected = await disconnect()
 
-    if (success) {
-      showAlert('Wallet disconnected successfully', 'success')
+    if (isDisconnected) {
+      success('Wallet disconnected successfully')
       setLastConnectedId(null)
       if (onDisconnect) {
         onDisconnect()
