@@ -102,19 +102,19 @@ export const AlertContainer: React.FC<AlertContainerProps> = ({position = 'top-r
   const getPositionClasses = () => {
     switch (position) {
       case 'top-right':
-        return 'top-4 right-4'
+        return 'top-20 right-1.5'
       case 'top-left':
-        return 'top-4 left-4'
+        return 'top-20 left-1'
       case 'bottom-right':
-        return 'bottom-4 right-4'
+        return 'bottom-4 right-1.5'
       case 'bottom-left':
-        return 'bottom-4 left-4'
+        return 'bottom-4 left-1.5'
       case 'top-center':
-        return 'top-4 left-1/2 transform -translate-x-1/2'
+        return 'top-20 left-1/2 transform -translate-x-1/2'
       case 'bottom-center':
         return 'bottom-4 left-1/2 transform -translate-x-1/2'
       default:
-        return 'top-4 right-4'
+        return 'top-20 right-1.5'
     }
   }
 
