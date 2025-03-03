@@ -7,7 +7,7 @@ interface WalletConnectProps {
   className?: string
 }
 
-const WalletConnect: React.FC<WalletConnectProps> = ({onConnect, onDisconnect, className = ''}) => {
+const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconnect, className = ''}) => {
   const {isInstalled, isConnected, isLoading, error, blockchainId, connect, disconnect} = useUltraWallet()
 
   const [showError, setShowError] = useState<boolean>(false)
@@ -81,4 +81,4 @@ const WalletConnect: React.FC<WalletConnectProps> = ({onConnect, onDisconnect, c
   )
 }
 
-export default WalletConnect
+export default WalletConnectButton

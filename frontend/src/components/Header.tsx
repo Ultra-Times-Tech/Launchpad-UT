@@ -1,7 +1,7 @@
 import {Link} from 'react-router-dom'
 import {useState} from 'react'
 import {getAssetUrl} from '../utils/imageHelper'
-import WalletConnect from './Button/WalletConnectButton'
+import WalletConnectButton from './Button/WalletConnectButton'
 
 function Header() {
   const [blockchainId, setBlockchainId] = useState<string | null>(null)
@@ -78,7 +78,7 @@ function Header() {
               </a>
             </div>
 
-            <WalletConnect 
+            <WalletConnectButton 
               onConnect={handleWalletConnect}
               onDisconnect={handleWalletDisconnect}
             />
