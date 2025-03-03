@@ -2,10 +2,6 @@ import {useContext, useCallback, useRef} from 'react'
 import {AlertContext, AlertType} from '../context/AlertContext'
 import {DEFAULT_ALERT_DURATION} from '../constants'
 
-/**
- * Enhanced hook for using alerts throughout the application
- * Provides additional utility functions and ensures only one alert is shown at a time
- */
 export const useAlerts = () => {
   const context = useContext(AlertContext)
   const timeoutRef = useRef<number | null>(null)

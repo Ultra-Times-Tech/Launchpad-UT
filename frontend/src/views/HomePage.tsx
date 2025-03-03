@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom'
 // Helpers
 import {apiRequestor} from '../utils/axiosInstanceHelper'
 import FeaturedCollectionCard, {FeaturedCollectionCardProps} from '../components/Card/FeaturedCollectionCard'
+import Slider from '../components/Slider/Slider'
 
 interface NFT {
   id: number
@@ -173,15 +174,8 @@ function HomePage() {
 
   return (
     <div className='min-h-screen bg-dark-950 text-white'>
-      {/* Hero Banner */}
-      <div className='bg-dark-900 text-white py-16'>
-        <div className='container mx-auto px-4 text-center'>
-          <h1 className='text-4xl md:text-5xl font-cabin font-bold mb-4 text-primary-300'>10 collections d'Uniq à ne pas rater</h1>
-          <p className='text-lg md:text-xl mb-8 max-w-3xl mx-auto font-quicksand'>Découvrez notre sélection exclusive de collections numériques créées par des artistes de renommée mondiale</p>
-          <button className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-8 rounded-full transition duration-300'>En savoir plus</button>
-        </div>
-      </div>
-
+      {/* Hero Banner Slider */}
+      <Slider title="10 collections d'Uniq à ne pas rater" description='Découvrez notre sélection exclusive de collections numériques créées par des artistes de renommée mondiale' buttonText='En savoir plus' onButtonClick={() => console.log('Button clicked')} />
       {/* Featured Collections */}
       <div className='container mx-auto px-4 py-12'>
         <div className='flex justify-between items-center mb-8'>
