@@ -168,8 +168,32 @@ export const useUltraWallet = () => {
   const eagerConnect = useCallback(async (): Promise<boolean> => {
     if (hasAttemptedEagerConnect) return false
     setHasAttemptedEagerConnect(true)
-    return connect({onlyIfTrusted: true})
-  }, [connect, hasAttemptedEagerConnect])
+
+    // Only try to connect silently, don't show any notifications for this
+    try {
+      if (!isInstalled || !window.ultra) {
+        return false
+      }
+
+      const response = await window.ultra.connect({onlyIfTrusted: true})
+      setBlockchainId(response.data.blockchainid)
+      setPublicKey(response.data.publicKey)
+      setIsConnected(true)
+
+      // Get chain ID after successful connection
+      try {
+        const chainResponse = await window.ultra.getChainId()
+        setChainId(chainResponse.data)
+      } catch (chainErr) {
+        console.error('Failed to get chain ID:', chainErr)
+      }
+
+      return true
+    } catch (err) {
+      console.log(err)
+      return false
+    }
+  }, [hasAttemptedEagerConnect, isInstalled])
 
   // Handle wallet disconnection
   const disconnect = useCallback(async (): Promise<boolean> => {

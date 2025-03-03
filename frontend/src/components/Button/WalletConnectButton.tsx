@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
 import useAlerts from '../../hooks/useAlert'
+import { DEFAULT_ALERT_DURATION } from '../../constants'
 
 interface WalletConnectProps {
   onConnect?: (blockchainId: string) => void
@@ -13,26 +14,32 @@ const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconn
   const {success, error: showError, info} = useAlerts()
   const [lastErrorMessage, setLastErrorMessage] = useState<string | null>(null)
   const [lastConnectedId, setLastConnectedId] = useState<string | null>(null)
+  const [userInitiated, setUserInitiated] = useState(false)
 
   // Call onConnect callback when connection is established
   useEffect(() => {
     if (isConnected && blockchainId && onConnect && blockchainId !== lastConnectedId) {
       onConnect(blockchainId)
       setLastConnectedId(blockchainId)
-      success('Wallet connected successfully!')
+
+      // Only show success notification if the connection was user-initiated
+      if (userInitiated) {
+        success('Wallet connected successfully!')
+      }
     }
-  }, [isConnected, blockchainId, onConnect, lastConnectedId, success])
+  }, [isConnected, blockchainId, onConnect, lastConnectedId, success, userInitiated])
 
   // Show error notification when error occurs, but prevent duplicates
   useEffect(() => {
-    if (error && error !== lastErrorMessage) {
+    if (error && error !== lastErrorMessage && userInitiated) {
       showError(error)
       setLastErrorMessage(error)
     }
-  }, [error, lastErrorMessage, showError])
+  }, [error, lastErrorMessage, showError, userInitiated])
 
   const handleConnect = async () => {
-    info('Connecting to Ultra Wallet...', 10000)
+    setUserInitiated(true)
+    info('Connecting to Ultra Wallet...', DEFAULT_ALERT_DURATION)
     const isConnected = await connect()
 
     if (!isConnected) {
@@ -43,7 +50,8 @@ const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconn
   }
 
   const handleDisconnect = async () => {
-    info('Disconnecting from Ultra Wallet...', 10000)
+    setUserInitiated(true)
+    info('Disconnecting from Ultra Wallet...', DEFAULT_ALERT_DURATION)
     const isDisconnected = await disconnect()
 
     if (isDisconnected) {
@@ -73,11 +81,11 @@ const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconn
 
   return (
     <div className={`relative ${className}`}>
-      <button onClick={isConnected ? handleDisconnect : handleConnect} disabled={isLoading || !isInstalled} className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${getButtonStyles()}`}>
+      <button onClick={isConnected ? handleDisconnect : handleConnect} disabled={isLoading || !isInstalled} className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 w-[200px] h-[40px] flex items-center justify-center ${getButtonStyles()}`}>
         {!isInstalled && 'Ultra Wallet Not Installed'}
         {isInstalled && isLoading && 'Processing...'}
         {isInstalled && !isLoading && isConnected && (
-          <div className='flex items-center'>
+          <div className='flex items-center justify-center w-full'>
             <div className='w-2 h-2 bg-green-300 rounded-full mr-2 animate-pulse'></div>
             <span>Wallet Connected</span>
           </div>
