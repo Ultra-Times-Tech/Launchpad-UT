@@ -5,6 +5,20 @@ import {getAssetUrl} from '../utils/imageHelper'
 function Header() {
   const [isWalletConnected, setIsWalletConnected] = useState(false)
 
+  if (document.readyState !== 'complete') {
+    window.addEventListener('load', afterWindowLoaded)
+  } else {
+    afterWindowLoaded()
+  }
+
+  function afterWindowLoaded() {
+    if ('ultra' in window) {
+      console.log('Page load: Ultra Wallet is installed!')
+    } else {
+      console.log('Page load: No Ultra Wallet extension detected!')
+    }
+  }
+
   const handleConnectWallet = () => {
     // This would be replaced with actual Ultra wallet connection logic
     setIsWalletConnected(true)
