@@ -17,22 +17,48 @@ interface TrendingCollectionsProps {
 
 function TrendingCollections({collections}: TrendingCollectionsProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [slidesPerView, setSlidesPerView] = useState(4)
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      if (width < 640) {
+        // Mobile
+        setSlidesPerView(1)
+      } else if (width < 1024) {
+        // Tablet
+        setSlidesPerView(2)
+      } else if (width < 1280) {
+        // Small Desktop
+        setSlidesPerView(3)
+      } else {
+        // Large Desktop
+        setSlidesPerView(4)
+      }
+    }
+
+    handleResize() // Initial check
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex(current => (current + 1) % (collections.length - 3))
+      setCurrentIndex(current => (current + 1) % (collections.length - (slidesPerView - 1)))
     }, 7000)
 
     return () => clearInterval(interval)
-  }, [collections.length])
+  }, [collections.length, slidesPerView])
 
   const nextSlide = () => {
-    setCurrentIndex(current => (current + 1) % (collections.length - 3))
+    setCurrentIndex(current => (current + 1) % (collections.length - (slidesPerView - 1)))
   }
 
   const prevSlide = () => {
-    setCurrentIndex(current => (current - 1 + (collections.length - 3)) % (collections.length - 3))
+    setCurrentIndex(current => (current - 1 + (collections.length - (slidesPerView - 1))) % (collections.length - (slidesPerView - 1)))
   }
+
+  const slideWidth = 100 / slidesPerView
 
   return (
     <div className='bg-dark-900 py-16'>
@@ -54,10 +80,10 @@ function TrendingCollections({collections}: TrendingCollectionsProps) {
             </svg>
           </button>
 
-          <div className='flex transition-transform duration-700 ease-out' style={{transform: `translateX(-${currentIndex * 25}%)`}}>
+          <div className='flex transition-transform duration-700 ease-out' style={{transform: `translateX(-${currentIndex * slideWidth}%)`}}>
             {[...collections, ...collections].map((collection, index) => (
-              <div key={`${collection.id}-${index}`} className='w-1/4 flex-shrink-0 px-3 h-full'>
-                <div className='h-full collection-hover'>
+              <div key={`${collection.id}-${index}`} style={{width: `${slideWidth}%`}} className='flex-shrink-0 px-3'>
+                <div className='collection-hover'>
                   <CollectionCard {...collection} />
                 </div>
               </div>
@@ -65,13 +91,8 @@ function TrendingCollections({collections}: TrendingCollectionsProps) {
           </div>
 
           <div className='flex justify-center mt-8 space-x-2'>
-            {Array.from({length: collections.length - 3}).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${currentIndex === index ? 'bg-primary-500 w-4' : 'bg-dark-700 hover:bg-dark-600'}`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
+            {Array.from({length: collections.length - (slidesPerView - 1)}).map((_, index) => (
+              <button key={index} onClick={() => setCurrentIndex(index)} className={`w-2 h-2 rounded-full transition-all duration-300 ${currentIndex === index ? 'bg-primary-500 w-4' : 'bg-dark-700 hover:bg-dark-600'}`} aria-label={`Go to slide ${index + 1}`} />
             ))}
           </div>
         </div>
