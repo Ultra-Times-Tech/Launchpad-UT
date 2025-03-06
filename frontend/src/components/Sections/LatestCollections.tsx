@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react'
-import Mint from '../Card/MintActivity'
+import MintCard from '../Card/MintCard'
 
 interface FeaturedCollection {
   id: number
@@ -60,7 +60,7 @@ function LatestCollections({latestCollections, mintActivities}: LatestCollection
           <h3 className='text-lg sm:text-xl font-cabin font-bold mb-4 sm:mb-6 text-primary-300 px-2'>Mint Activities</h3>
           <div className='space-y-4 h-[calc(100%-3rem)] sm:h-[calc(100%-3.5rem)] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-dark-700 scrollbar-track-transparent hover:scrollbar-thumb-primary-500/50'>
             {mintActivities.map(activity => (
-              <Mint key={activity.id} {...activity} />
+              <MintCard key={activity.id} {...activity} />
             ))}
           </div>
         </div>

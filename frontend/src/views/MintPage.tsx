@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import {useParams, Link} from 'react-router-dom'
-import Mint from '../components/Card/MintActivity'
+import MintCard from '../components/Card/MintCard'
 
 interface MintItem {
   id: number
@@ -60,9 +60,7 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
             </svg>
           </button>
           <div className='absolute bottom-4 right-4'>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${mint.rarity === 'Legendary' ? 'bg-yellow-500/20 text-yellow-300' : mint.rarity === 'Rare' ? 'bg-blue-500/20 text-blue-300' : 'bg-gray-500/20 text-gray-300'}`}>
-              {mint.rarity}
-            </span>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${mint.rarity === 'Legendary' ? 'bg-yellow-500/20 text-yellow-300' : mint.rarity === 'Rare' ? 'bg-blue-500/20 text-blue-300' : 'bg-gray-500/20 text-gray-300'}`}>{mint.rarity}</span>
           </div>
         </div>
         <div className='p-6 space-y-4'>
@@ -76,7 +74,7 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
               <span className='text-gray-400'>Price</span>
               <span className='text-white font-medium'>{mint.price}</span>
             </div>
-            
+
             <div className='flex justify-between items-center text-sm'>
               <span className='text-gray-400'>Minted by</span>
               <div className='flex items-center space-x-2'>
@@ -93,11 +91,7 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
             <div className='pt-3 border-t border-dark-700'>
               <div className='flex justify-between items-center text-sm'>
                 <span className='text-gray-400'>Transaction</span>
-                <a 
-                  href={`https://explorer.ultra.io/tx/${mint.transactionHash}`} 
-                  target='_blank' 
-                  rel='noopener noreferrer' 
-                  className='text-primary-300 hover:text-primary-400 transition-colors'>
+                <a href={`https://explorer.ultra.io/tx/${mint.transactionHash}`} target='_blank' rel='noopener noreferrer' className='text-primary-300 hover:text-primary-400 transition-colors'>
                   {shortenHash(mint.transactionHash)} ↗
                 </a>
               </div>
@@ -154,79 +148,23 @@ function MintPage() {
             {name: 'Phase publique', active: false, date: 'Public: 21 mars 2025'},
           ])
 
-          setMintedItems([
-            {
-              id: 1,
-              name: 'Personnage #45',
-              image: 'https://picsum.photos/200/200?random=1',
-              price: '0.5 UOS',
-              timestamp: '2 minutes ago',
-              minter: {
-                address: '0x1234567890abcdef1234567890abcdef12345678',
-                username: 'CryptoWhale'
-              },
-              transactionHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-              tokenId: '#1234',
-              rarity: 'Legendary'
+          // Add more minted items
+          const mockMintedItems = Array.from({length: 10}, (_, index) => ({
+            id: index + 1,
+            name: `Personnage #${45 - index}`,
+            image: `https://picsum.photos/200/200?random=${index + 1}`,
+            price: '0.5 UOS',
+            timestamp: `${index * 3 + 2} minutes ago`,
+            minter: {
+              address: `0x${Math.random().toString(16).slice(2)}abcdef${Math.random().toString(16).slice(2)}`,
+              username: ['CryptoWhale', 'NFTHunter', 'PixelMaster', 'ArtCollector', 'CryptoArtist', 'BlockchainGuru', 'TokenMaster', 'DigitalCollector', 'NFTEnthusiast', 'CryptoKing'][index],
             },
-            {
-              id: 2,
-              name: 'Personnage #46',
-              image: 'https://picsum.photos/200/200?random=2',
-              price: '0.5 UOS',
-              timestamp: '5 minutes ago',
-              minter: {
-                address: '0x2345678901abcdef2345678901abcdef23456789',
-                username: 'NFTHunter'
-              },
-              transactionHash: '0xbcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678901',
-              tokenId: '#1235',
-              rarity: 'Rare'
-            },
-            {
-              id: 3,
-              name: 'Personnage #47',
-              image: 'https://picsum.photos/200/200?random=3',
-              price: '0.5 UOS',
-              timestamp: '8 minutes ago',
-              minter: {
-                address: '0x3456789012abcdef3456789012abcdef34567890',
-                username: 'PixelMaster'
-              },
-              transactionHash: '0xcdef1234567890abcdef1234567890abcdef1234567890abcdef123456789012',
-              tokenId: '#1236',
-              rarity: 'Common'
-            },
-            {
-              id: 4,
-              name: 'Personnage #48',
-              image: 'https://picsum.photos/200/200?random=4',
-              price: '0.5 UOS',
-              timestamp: '12 minutes ago',
-              minter: {
-                address: '0x4567890123abcdef4567890123abcdef45678901',
-                username: 'ArtCollector'
-              },
-              transactionHash: '0xdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890123',
-              tokenId: '#1237',
-              rarity: 'Legendary'
-            },
-            {
-              id: 5,
-              name: 'Personnage #49',
-              image: 'https://picsum.photos/200/200?random=5',
-              price: '0.5 UOS',
-              timestamp: '15 minutes ago',
-              minter: {
-                address: '0x5678901234abcdef5678901234abcdef56789012',
-                username: 'CryptoArtist'
-              },
-              transactionHash: '0xef1234567890abcdef1234567890abcdef1234567890abcdef12345678901234',
-              tokenId: '#1238',
-              rarity: 'Rare'
-            }
-          ])
+            transactionHash: `0x${Math.random().toString(16).slice(2)}abcdef${Math.random().toString(16).slice(2)}`,
+            tokenId: `#${1234 + index}`,
+            rarity: ['Legendary', 'Rare', 'Common'][Math.floor(Math.random() * 3)],
+          }))
 
+          setMintedItems(mockMintedItems)
           setLoading(false)
         }, 800)
       } catch (error) {
@@ -284,9 +222,13 @@ function MintPage() {
       <div className='bg-dark-900 py-3 border-b border-dark-700'>
         <div className='container mx-auto px-4'>
           <div className='flex items-center text-sm'>
-            <Link to='/' className='text-gray-400 hover:text-primary-300 transition-colors'>Homepage</Link>
+            <Link to='/' className='text-gray-400 hover:text-primary-300 transition-colors'>
+              Homepage
+            </Link>
             <span className='mx-2 text-gray-600'>/</span>
-            <Link to={`/collection/${id}`} className='text-gray-400 hover:text-primary-300 transition-colors'>{factory.collectionName}</Link>
+            <Link to={`/collection/${id}`} className='text-gray-400 hover:text-primary-300 transition-colors'>
+              {factory.collectionName}
+            </Link>
             <span className='mx-2 text-gray-600'>/</span>
             <span className='text-primary-300'>{factory.name}</span>
           </div>
@@ -295,71 +237,129 @@ function MintPage() {
 
       {/* Main Content */}
       <div className='container mx-auto px-4 py-8'>
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+        <div className='grid grid-cols-1 lg:grid-cols-12 gap-8'>
           {/* Left Column - Image */}
-          <div className='lg:col-span-2'>
-            <div className='bg-dark-800 rounded-xl overflow-hidden shadow-lg backdrop-blur-sm border border-dark-700 max-w-2xl mx-auto'>
-              <div className='aspect-w-4 aspect-h-3'>
-                <img src='https://picsum.photos/600/600?random=10' alt={factory.name} className='w-full h-full object-cover' />
+          <div className='lg:col-span-8'>
+            <div className='bg-dark-800 rounded-xl overflow-hidden shadow-lg backdrop-blur-sm border border-dark-700'>
+              <div className='aspect-w-16 aspect-h-9'>
+                <img src='https://picsum.photos/800/450?random=10' alt={factory.name} className='w-full h-full object-cover' />
+              </div>
+              <div className='p-6'>
+                <h2 className='text-2xl font-bold text-primary-300 mb-4'>{factory.name}</h2>
+                <p className='text-gray-300'>{factory.description}</p>
               </div>
             </div>
           </div>
 
           {/* Right Column - Mint Info */}
-          <div className='bg-dark-800 rounded-xl p-6 shadow-lg backdrop-blur-sm border border-dark-700 h-fit'>
-            {/* Progress Bar */}
-            <div className='mb-6'>
-              <div className='flex justify-between items-center mb-2'>
-                <span className='text-gray-300 font-medium'>Mint Progress</span>
-                <span className='text-primary-300 font-medium'>{factory.minted}/{factory.supply}</span>
-              </div>
-              <div className='w-full bg-dark-700 rounded-full h-2.5'>
-                <div className='bg-gradient-to-r from-primary-400 to-primary-600 h-2.5 rounded-full transition-all duration-500' style={{width: `${(factory.minted / factory.supply) * 100}%`}}></div>
-              </div>
-              <div className='text-center mt-2'>
-                <span className='bg-primary-600/30 text-primary-300 px-3 py-1 rounded-full text-xs font-medium'>Phase private active</span>
-              </div>
-            </div>
-
-            {/* Mint Amount Selector */}
-            <div className='space-y-4'>
-              <div className='flex justify-between items-center'>
-                <span className='text-gray-300'>Mint Amount</span>
-                <div className='flex items-center space-x-3'>
-                  <button onClick={decrementMintAmount} className='w-8 h-8 flex items-center justify-center bg-dark-600 hover:bg-dark-500 rounded-lg text-white transition-colors'>-</button>
-                  <span className='text-white font-bold text-lg w-8 text-center'>{mintAmount}</span>
-                  <button onClick={incrementMintAmount} className='w-8 h-8 flex items-center justify-center bg-dark-600 hover:bg-dark-500 rounded-lg text-white transition-colors'>+</button>
+          <div className='lg:col-span-4'>
+            <div className='bg-dark-800 rounded-xl p-6 shadow-lg backdrop-blur-sm border border-dark-700 sticky top-4'>
+              {/* Progress Bar */}
+              <div className='mb-6'>
+                <div className='flex justify-between items-center mb-2'>
+                  <span className='text-gray-300 font-medium'>Mint Progress</span>
+                  <span className='text-primary-300 font-medium'>
+                    {factory.minted}/{factory.supply}
+                  </span>
+                </div>
+                <div className='w-full bg-dark-700 rounded-full h-2.5'>
+                  <div className='bg-gradient-to-r from-primary-400 to-primary-600 h-2.5 rounded-full transition-all duration-500' style={{width: `${(factory.minted / factory.supply) * 100}%`}}></div>
+                </div>
+                <div className='text-center mt-2'>
+                  <span className='bg-primary-600/30 text-primary-300 px-3 py-1 rounded-full text-xs font-medium'>Phase private active</span>
                 </div>
               </div>
 
-              <div className='flex justify-between items-center text-sm'>
-                <span className='text-gray-400'>Price per item:</span>
-                <span className='text-primary-300 font-medium'>{factory.mintPrice}</span>
-              </div>
-
-              <div className='flex justify-between items-center'>
-                <span className='text-gray-400'>Total price:</span>
-                <span className='text-primary-300 font-bold text-xl'>{parseFloat(factory.mintPrice) * mintAmount} UOS</span>
-              </div>
-
-              <button onClick={handleMint} className='w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 shadow-lg transform hover:translate-y-[-2px]'>
-                MINT NOW
-              </button>
-            </div>
-
-            {/* Mint Phases */}
-            <div className='mt-6 pt-6 border-t border-dark-700'>
-              <h3 className='font-bold text-sm text-primary-300 mb-3'>Mint Phases</h3>
-              <div className='space-y-3'>
-                {phases.map((phase, index) => (
-                  <div key={index} className='flex items-center'>
-                    <div className={`w-3 h-3 rounded-full mr-3 ${phase.active ? 'bg-green-500 animate-pulse' : 'bg-gray-600'}`}></div>
-                    <div>
-                      <h4 className={`text-sm font-medium ${phase.active ? 'text-white' : 'text-gray-400'}`}>{phase.name}</h4>
-                      <p className='text-gray-400 text-xs'>{phase.date}</p>
-                    </div>
+              {/* Mint Amount Selector */}
+              <div className='space-y-4'>
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-300'>Mint Amount</span>
+                  <div className='flex items-center space-x-3'>
+                    <button onClick={decrementMintAmount} className='w-8 h-8 flex items-center justify-center bg-dark-600 hover:bg-dark-500 rounded-lg text-white transition-colors'>
+                      -
+                    </button>
+                    <span className='text-white font-bold text-lg w-8 text-center'>{mintAmount}</span>
+                    <button onClick={incrementMintAmount} className='w-8 h-8 flex items-center justify-center bg-dark-600 hover:bg-dark-500 rounded-lg text-white transition-colors'>
+                      +
+                    </button>
                   </div>
-                ))}
+                </div>
+
+                <div className='flex justify-between items-center text-sm'>
+                  <span className='text-gray-400'>Price per item:</span>
+                  <span className='text-primary-300 font-medium'>{factory.mintPrice}</span>
+                </div>
+
+                <div className='flex justify-between items-center'>
+                  <span className='text-gray-400'>Total price:</span>
+                  <span className='text-primary-300 font-bold text-xl'>{parseFloat(factory.mintPrice) * mintAmount} UOS</span>
+                </div>
+
+                <button onClick={handleMint} className='w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 shadow-lg transform hover:translate-y-[-2px]'>
+                  MINT NOW
+                </button>
+              </div>
+
+              {/* Mint Phases */}
+              <div className='mt-6 pt-6 border-t border-dark-700'>
+                <h3 className='font-bold text-sm text-primary-300 mb-3'>Mint Phases</h3>
+                <div className='space-y-3'>
+                  {phases.map((phase, index) => (
+                    <div key={index} className='flex items-center'>
+                      <div className={`w-3 h-3 rounded-full mr-3 ${phase.active ? 'bg-green-500 animate-pulse' : 'bg-gray-600'}`}></div>
+                      <div>
+                        <h4 className={`text-sm font-medium ${phase.active ? 'text-white' : 'text-gray-400'}`}>{phase.name}</h4>
+                        <p className='text-gray-400 text-xs'>{phase.date}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Marketing & Roadmap Section */}
+        <div className='mt-12 grid grid-cols-1 md:grid-cols-2 gap-8'>
+          <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300'>
+            <div className='relative h-48 mb-4 rounded-lg overflow-hidden'>
+              <img src='https://picsum.photos/500/300?random=20' alt='Marketing' className='w-full h-full object-cover' />
+              <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent'></div>
+            </div>
+            <h3 className='text-xl font-bold text-primary-300 mb-2'>Exclusive Benefits</h3>
+            <p className='text-gray-300'>Discover the exclusive benefits reserved for holders of this factory.</p>
+          </div>
+
+          <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300'>
+            <h3 className='text-xl font-bold text-primary-300 mb-4'>Roadmap</h3>
+            <div className='relative pl-8 before:content-[""] before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-primary-600'>
+              <div className='mb-6 relative'>
+                <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
+                  <span className='text-white text-xs font-bold'>1</span>
+                </div>
+                <h4 className='text-white font-bold mb-1'>Collection Launch</h4>
+                <p className='text-gray-400 text-sm'>January 2025</p>
+              </div>
+              <div className='mb-6 relative'>
+                <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
+                  <span className='text-white text-xs font-bold'>2</span>
+                </div>
+                <h4 className='text-white font-bold mb-1'>Game Integration</h4>
+                <p className='text-gray-400 text-sm'>March 2025</p>
+              </div>
+              <div className='mb-6 relative'>
+                <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
+                  <span className='text-white text-xs font-bold'>3</span>
+                </div>
+                <h4 className='text-white font-bold mb-1'>Exclusive Events</h4>
+                <p className='text-gray-400 text-sm'>June 2025</p>
+              </div>
+              <div className='relative'>
+                <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
+                  <span className='text-white text-xs font-bold'>4</span>
+                </div>
+                <h4 className='text-white font-bold mb-1'>New Features</h4>
+                <p className='text-gray-400 text-sm'>September 2025</p>
               </div>
             </div>
           </div>
@@ -370,19 +370,15 @@ function MintPage() {
           <div className='flex justify-between items-center mb-6'>
             <h2 className='text-2xl font-bold text-primary-300'>Recently Minted</h2>
             <div className='flex items-center space-x-2'>
-              <button 
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className={`p-2 rounded-lg ${currentPage === 1 ? 'text-gray-600 cursor-not-allowed' : 'text-primary-300 hover:bg-dark-800'}`}>
+              <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className={`p-2 rounded-lg ${currentPage === 1 ? 'text-gray-600 cursor-not-allowed' : 'text-primary-300 hover:bg-dark-800'}`}>
                 <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
                 </svg>
               </button>
-              <span className='text-gray-400 text-sm'>Page {currentPage} of {totalPages}</span>
-              <button 
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className={`p-2 rounded-lg ${currentPage === totalPages ? 'text-gray-600 cursor-not-allowed' : 'text-primary-300 hover:bg-dark-800'}`}>
+              <span className='text-gray-400 text-sm'>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className={`p-2 rounded-lg ${currentPage === totalPages ? 'text-gray-600 cursor-not-allowed' : 'text-primary-300 hover:bg-dark-800'}`}>
                 <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
                 </svg>
@@ -392,7 +388,7 @@ function MintPage() {
           <div className='space-y-4'>
             {currentMints.map(mint => (
               <div key={mint.id} onClick={() => setSelectedMint(mint)} className='cursor-pointer'>
-                <Mint {...mint} collectionName={factory.collectionName} itemName={factory.name} />
+                <MintCard {...mint} collectionName={factory.collectionName} itemName={factory.name} />
               </div>
             ))}
           </div>
@@ -400,9 +396,7 @@ function MintPage() {
       </div>
 
       {/* Mint Details Modal */}
-      {selectedMint && (
-        <MintDetailsModal mint={selectedMint} onClose={() => setSelectedMint(null)} />
-      )}
+      {selectedMint && <MintDetailsModal mint={selectedMint} onClose={() => setSelectedMint(null)} />}
     </div>
   )
 }

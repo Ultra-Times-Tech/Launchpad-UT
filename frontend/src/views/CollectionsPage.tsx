@@ -7,7 +7,7 @@ function CollectionsPage() {
   const [collections, setCollections] = useState<CollectionCardProps[]>([])
   const [loading, setLoading] = useState(true)
 
-  const collectionsPerPage = 12
+  const collectionsPerPage = 9
   const totalPages = Math.ceil(collections.length / collectionsPerPage)
 
   // Get current collections for pagination
@@ -79,7 +79,7 @@ function CollectionsPage() {
 
       {/* Collections Grid */}
       <div className='container mx-auto px-4 py-12'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>
           {currentCollections.map(collection => (
             <CollectionCard 
               key={collection.id}
@@ -137,7 +137,7 @@ function generateMockCollections(count: number): CollectionCardProps[] {
     {
       id: 1,
       name: 'Vox-in-Time',
-      description: 'A collection of rare weapons and equipment from the future, featuring unique designs and powerful capabilities.',
+      description: 'A collection of rare weapons and equipment from the future, featuring unique designs and powerful capabilities that will revolutionize the gaming experience.',
       image: '/banners/vit-banner.png',
       artist: 'Ultra Times Studios',
       totalItems: 1000,
@@ -146,7 +146,7 @@ function generateMockCollections(count: number): CollectionCardProps[] {
     {
       id: 2,
       name: 'Ultra Street-Cubism Discover',
-      description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations.',
+      description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations, each with its own unique story and power.',
       image: '/banners/factory-artifact.png',
       artist: 'Ultra Times Archaeology',
       totalItems: 500,
@@ -155,7 +155,7 @@ function generateMockCollections(count: number): CollectionCardProps[] {
     {
       id: 3,
       name: 'Crypto Punks Edition',
-      description: 'A collection featuring unique characters with different abilities, backgrounds, and stories from the Ultra Times universe.',
+      description: 'A collection featuring unique characters with different abilities, backgrounds, and stories from the Ultra Times universe, ready to be discovered.',
       image: '/banners/factory-characters.png',
       artist: 'Ultra Times Creative',
       totalItems: 750,
@@ -164,7 +164,7 @@ function generateMockCollections(count: number): CollectionCardProps[] {
     {
       id: 4,
       name: 'Factory Power Booster',
-      description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem.',
+      description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
       image: '/banners/factory-powerbooster.png',
       artist: 'Ultra Times Labs',
       totalItems: 600,

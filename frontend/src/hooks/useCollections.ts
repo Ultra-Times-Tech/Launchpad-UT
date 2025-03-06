@@ -235,7 +235,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 1,
     name: 'Digital Dreams',
-    description: 'Experience the future of digital art with this unique collection',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=11',
     artist: 'Digital Dreamers',
     totalItems: 500,
@@ -244,7 +244,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 2,
     name: 'Cyber Warriors',
-    description: 'Join the elite force of cyber warriors in this exclusive collection',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=12',
     artist: 'Cyber Labs',
     totalItems: 750,
@@ -253,7 +253,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 3,
     name: 'Nature Redux',
-    description: 'A digital interpretation of natural wonders',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=13',
     artist: 'Green Digital',
     totalItems: 300,
@@ -262,7 +262,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 4,
     name: 'Meta Beings',
-    description: 'Discover unique digital beings from the metaverse',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=14',
     artist: 'Meta Creators',
     totalItems: 1000,
@@ -271,7 +271,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 5,
     name: 'Space Odyssey',
-    description: 'Embark on a journey through digital space',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=15',
     artist: 'Space Labs',
     totalItems: 600,
@@ -280,7 +280,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 6,
     name: 'Pixel Masters',
-    description: 'Classic pixel art reimagined for the blockchain',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=16',
     artist: 'Pixel Art Studio',
     totalItems: 800,
@@ -289,7 +289,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 7,
     name: 'Future Funk',
-    description: 'Where music meets visual art in the digital realm',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=17',
     artist: 'Funk Factory',
     totalItems: 400,
@@ -298,7 +298,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 8,
     name: 'Crystal Kingdoms',
-    description: 'Explore magical realms made of digital crystals',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=18',
     artist: 'Crystal Arts',
     totalItems: 550,
@@ -307,7 +307,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 9,
     name: 'Tech Totems',
-    description: 'Ancient wisdom meets modern technology',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=19',
     artist: 'Digital Shamans',
     totalItems: 450,
@@ -316,7 +316,7 @@ export const trendingCollections: TrendingCollection[] = [
   {
     id: 10,
     name: 'Ocean Protocol',
-    description: 'Digital art inspired by the depths of the ocean',
+    description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
     image: 'https://picsum.photos/400/300?random=20',
     artist: 'Ocean Labs',
     totalItems: 700,

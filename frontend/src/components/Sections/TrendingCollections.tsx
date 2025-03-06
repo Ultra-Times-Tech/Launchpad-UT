@@ -33,7 +33,7 @@ function TrendingCollections({collections}: TrendingCollectionsProps) {
         setSlidesPerView(3)
       } else {
         // Large Desktop
-        setSlidesPerView(4)
+        setSlidesPerView(3)
       }
     }
 

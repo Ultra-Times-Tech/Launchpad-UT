@@ -9,7 +9,7 @@ export interface MintProps {
   image: string
 }
 
-function Mint({collectionName, itemName, price, timestamp, image}: MintProps) {
+function MintCard({collectionName, itemName, price, timestamp, image}: MintProps) {
   return (
     <div className='group relative bg-dark-800 bg-opacity-50 p-5 rounded-2xl hover:bg-opacity-70 transition-all duration-300 backdrop-blur-sm border border-dark-700 hover:border-primary-500 hover:shadow-lg hover:shadow-primary-500/10'>
       <div className='flex items-center space-x-5'>
@@ -49,4 +49,4 @@ function Mint({collectionName, itemName, price, timestamp, image}: MintProps) {
   )
 }
 
-export default Mint
+export default MintCard
