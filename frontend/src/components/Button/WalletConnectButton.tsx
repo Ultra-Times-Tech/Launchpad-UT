@@ -52,7 +52,7 @@ const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconn
     const isDisconnected = await disconnect()
 
     if (isDisconnected) {
-      success('Wallet disconnected successfully')
+      success('Wallet disconnected successfully!')
       setLastConnectedId(null)
       if (onDisconnect) {
         onDisconnect()

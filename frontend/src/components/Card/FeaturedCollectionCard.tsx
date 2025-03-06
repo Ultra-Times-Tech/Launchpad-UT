@@ -46,8 +46,8 @@ function FeaturedCollectionCard({ id, name, description, image, artist, date, to
         <Link to={`/collection/${id}`} className="block w-full">
           <button className={`w-full font-medium py-2 px-4 rounded-lg transition duration-200 text-sm ${
             comingSoon 
-              ? 'bg-dark-700 text-gray-400 cursor-default' 
-              : 'bg-dark-700 hover:bg-primary-600 text-gray-300 hover:text-white'
+              ? 'bg-primary-700 text-white cursor-default' 
+              : 'bg-primary-500 hover:bg-primary-700 text-white'
           }`}>
             {comingSoon ? 'COMING SOON' : 'ACCÈS AU MINT'}
           </button>

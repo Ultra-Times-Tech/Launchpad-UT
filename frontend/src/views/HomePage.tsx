@@ -204,7 +204,7 @@ function HomePage() {
 
         <div className='flex justify-center mt-8'>
           <Link to='/collections'>
-            <button className='bg-dark-800 hover:bg-dark-700 text-gray-300 font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>LOAD MORE COLLECTIONS</button>
+            <button className='bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>LOAD MORE COLLECTIONS</button>
           </Link>
         </div>
       </div>
