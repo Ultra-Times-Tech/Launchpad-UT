@@ -6,12 +6,12 @@ import WalletConnectButton from './Button/WalletConnectButton'
 function Header() {
   const [blockchainId, setBlockchainId] = useState<string | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768)
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024)
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768)
-      if (window.innerWidth >= 768) {
+      setIsMobileView(window.innerWidth < 1024)
+      if (window.innerWidth >= 1024) {
         setIsMenuOpen(false)
       }
     }
@@ -52,7 +52,7 @@ function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className='hidden md:flex items-center space-x-4 lg:space-x-8 font-quicksand'>
+          <nav className='hidden lg:flex items-center space-x-4 xl:space-x-8 font-quicksand'>
             <Link to='/' className='text-white hover:text-primary-300 transition-colors px-2'>
               Home
             </Link>
@@ -71,8 +71,8 @@ function Header() {
           </nav>
 
           {/* Desktop Social & Wallet */}
-          <div className='hidden md:flex items-center space-x-4'>
-            <div className='flex items-center space-x-2 lg:space-x-4'>
+          <div className='hidden lg:flex items-center space-x-4'>
+            <div className='flex items-center space-x-2 xl:space-x-4'>
               <a href='https://twitter.com' target='_blank' rel='noopener noreferrer' className='text-gray-400 hover:text-primary-300 transition-colors p-2'>
                 <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' viewBox='0 0 24 24'>
                   <path d='M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z' />
@@ -96,7 +96,7 @@ function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={toggleMenu}
-            className='md:hidden p-2 rounded-lg hover:bg-dark-800 transition-colors'
+            className='lg:hidden p-2 rounded-lg hover:bg-dark-800 transition-colors z-50'
             aria-label='Toggle menu'>
             <svg
               className='w-6 h-6'
@@ -117,17 +117,17 @@ function Header() {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div 
-          className='fixed inset-0 bg-dark-950 bg-opacity-50 z-40 md:hidden'
+          className='fixed inset-0 bg-dark-950 bg-opacity-50 z-40 lg:hidden'
           onClick={closeMenu}
         />
       )}
 
       {/* Mobile Menu Panel */}
       <div
-        className={`absolute top-16 left-0 right-0 bg-dark-900 border-b border-dark-700 transition-all duration-300 ease-in-out md:hidden ${
-          isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        className={`fixed top-16 left-0 right-0 bg-dark-900 border-b border-dark-700 transition-all duration-300 ease-in-out lg:hidden z-40 ${
+          isMenuOpen ? 'translate-y-0 opacity-100 visible' : 'translate-y-[-100%] opacity-0 invisible'
         }`}>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 py-4'>
           <nav className='flex flex-col space-y-4'>
             <Link to='/' onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>
               Home

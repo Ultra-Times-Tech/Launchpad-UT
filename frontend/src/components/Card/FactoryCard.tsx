@@ -20,33 +20,29 @@ function FactoryCard({ id, collectionId, name, description, image, mintPrice, su
           alt={name} 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent"></div>
       </div>
       
       <div className="p-4">
-        <h3 className="text-xl font-bold mb-2 text-primary-300">{name}</h3>
-        <p className="text-sm text-gray-300 mb-4">{description}</p>
+        <h3 className="text-xl font-bold text-primary-300 mb-2">{name}</h3>
+        <p className="text-sm text-gray-300 mb-4 line-clamp-2">{description}</p>
         
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-gray-400 text-sm">Mint Price:</span>
-          <span className="text-primary-300 font-semibold">{mintPrice}</span>
-        </div>
-        
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-gray-400 text-sm">Total Supply:</span>
-          <span className="text-white font-semibold">{supply}</span>
-        </div>
-        
-        <div className="w-full bg-dark-700 rounded-full h-2.5 mb-2">
-          <div 
-            className="bg-primary-500 h-2.5 rounded-full" 
-            style={{ width: `${(minted / supply) * 100}%` }}
-          ></div>
-        </div>
-        
-        <div className="flex justify-between items-center mb-4 text-sm">
-          <span className="text-gray-400">{minted} minted</span>
-          <span className="text-gray-400">Total: {supply}</span>
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center justify-end space-x-1 text-sm">
+            <span className="text-gray-400">Mint Price:</span>
+            <span className="text-primary-300 font-medium">{mintPrice}</span>
+          </div>
+          
+          <div className="w-full bg-dark-700 rounded-full h-2">
+            <div 
+              className="bg-primary-500 h-2 rounded-full" 
+              style={{ width: `${(minted / supply) * 100}%` }}
+            ></div>
+          </div>
+          
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">{minted} minted</span>
+            <span className="text-gray-400">Total supply: {supply}</span>
+          </div>
         </div>
         
         <Link to={`/mint/${id}/${collectionId}`} className="block w-full">

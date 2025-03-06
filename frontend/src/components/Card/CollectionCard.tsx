@@ -11,7 +11,7 @@ export interface CollectionCardProps {
   floorPrice: string
 }
 
-function CollectionCard({ id, name, description, image, artist, totalItems, floorPrice }: CollectionCardProps) {
+function CollectionCard({ id, name, description, image, artist }: CollectionCardProps) {
   return (
     <div className="bg-dark-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300">
       <div className="relative">
@@ -20,16 +20,6 @@ function CollectionCard({ id, name, description, image, artist, totalItems, floo
           alt={name} 
           className="w-full h-48 object-cover"
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-dark-900 to-transparent p-4">
-          <div className="flex items-center space-x-2">
-            <span className="bg-primary-600/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold">
-              {totalItems} Items
-            </span>
-            <span className="bg-green-600/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold">
-              Floor: {floorPrice}
-            </span>
-          </div>
-        </div>
       </div>
       
       <div className="p-4">
