@@ -195,8 +195,8 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Collections Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+        {/* Collections Grid - Updated for tablet responsiveness */}
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
           {featuredCollections.map(collection => (
             <FeaturedCollectionCard key={collection.id} id={collection.id} name={collection.name} description={collection.description} image={collection.image} artist={collection.artist} date={collection.date} totalItems={collection.totalItems} floorPrice={collection.floorPrice} comingSoon={collection.comingSoon} />
           ))}
@@ -254,7 +254,7 @@ function HomePage() {
           <button className='text-gray-400 hover:text-white font-medium'>View all articles →</button>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
           {newestArticles.map(article => (
             <div key={article.id} className='bg-dark-800 border border-dark-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1'>
               <div className='h-48 bg-dark-700 flex items-center justify-center'>

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { getAssetUrl } from '../utils/imageHelper'
+import {useEffect, useState} from 'react'
+import {useParams, Link} from 'react-router-dom'
+import {getAssetUrl} from '../utils/imageHelper'
 import FactoryCard, {FactoryCardProps} from '../components/Card/FactoryCard'
 
 interface Collection {
@@ -18,7 +18,7 @@ interface Collection {
 }
 
 function CollectionDetailsPage() {
-  const { id } = useParams<{ id: string }>()
+  const {id} = useParams<{id: string}>()
   const [collection, setCollection] = useState<Collection | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'story' | 'features'>('story')
@@ -29,7 +29,6 @@ function CollectionDetailsPage() {
       setLoading(true)
       try {
         // In a real app, this would be an API call
-        // For now, we'll use mock data based on the ID
         setTimeout(() => {
           const mockCollection = getMockCollection(Number(id))
           setCollection(mockCollection)
@@ -90,16 +89,10 @@ function CollectionDetailsPage() {
               ← Back to Collections
             </Link>
             <div className='flex space-x-6'>
-              <button 
-                onClick={() => setActiveTab('story')} 
-                className={`px-4 py-2 rounded-lg transition ${activeTab === 'story' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white'}`}
-              >
+              <button onClick={() => setActiveTab('story')} className={`px-4 py-2 rounded-lg transition ${activeTab === 'story' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white'}`}>
                 Story
               </button>
-              <button 
-                onClick={() => setActiveTab('features')} 
-                className={`px-4 py-2 rounded-lg transition ${activeTab === 'features' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white'}`}
-              >
+              <button onClick={() => setActiveTab('features')} className={`px-4 py-2 rounded-lg transition ${activeTab === 'features' ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white'}`}>
                 Features
               </button>
             </div>
@@ -115,14 +108,14 @@ function CollectionDetailsPage() {
             <div className='md:col-span-3'>
               <h2 className='text-2xl font-bold mb-4 text-primary-300'>About {collection.name}</h2>
               <p className='text-gray-300 mb-6'>{collection.description}</p>
-              
+
               {activeTab === 'story' && (
                 <div className='mb-6'>
                   <h3 className='text-xl font-bold mb-3 text-primary-300'>Story</h3>
                   <p className='text-gray-300'>{collection.story}</p>
                 </div>
               )}
-              
+
               {activeTab === 'features' && (
                 <div className='mb-6'>
                   <h3 className='text-xl font-bold mb-3 text-primary-300'>Features</h3>
@@ -133,7 +126,7 @@ function CollectionDetailsPage() {
                   </ul>
                 </div>
               )}
-              
+
               <div className='grid grid-cols-2 gap-4 mt-6'>
                 <div>
                   <h3 className='text-gray-400 text-sm'>Creator</h3>
@@ -158,19 +151,9 @@ function CollectionDetailsPage() {
 
         {/* Factories Section */}
         <div className='mb-12'>
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
             {collection.factories.map(factory => (
-              <FactoryCard 
-                key={factory.id}
-                id={factory.id}
-                collectionId={collection.id}
-                name={factory.name}
-                description={factory.description}
-                image={factory.image}
-                mintPrice={factory.mintPrice}
-                supply={factory.supply}
-                minted={factory.minted}
-              />
+              <FactoryCard key={factory.id} id={factory.id} collectionId={collection.id} name={factory.name} description={factory.description} image={factory.image} mintPrice={factory.mintPrice} supply={factory.supply} minted={factory.minted} />
             ))}
           </div>
         </div>
@@ -264,7 +247,7 @@ function getMockCollection(id: number): Collection {
           supply: 200,
           minted: 89,
         },
-      ]
+      ],
     },
     {
       id: 2,
@@ -319,7 +302,7 @@ function getMockCollection(id: number): Collection {
           supply: 200,
           minted: 89,
         },
-      ]
+      ],
     },
     {
       id: 3,
@@ -374,7 +357,7 @@ function getMockCollection(id: number): Collection {
           supply: 200,
           minted: 89,
         },
-      ]
+      ],
     },
   ]
 
