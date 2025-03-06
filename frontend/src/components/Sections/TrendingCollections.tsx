@@ -56,8 +56,8 @@ function TrendingCollections({collections}: TrendingCollectionsProps) {
 
           <div className='flex transition-transform duration-700 ease-out' style={{transform: `translateX(-${currentIndex * 25}%)`}}>
             {[...collections, ...collections].map((collection, index) => (
-              <div key={`${collection.id}-${index}`} className='w-1/4 flex-shrink-0 px-3'>
-                <div className='collection-hover'>
+              <div key={`${collection.id}-${index}`} className='w-1/4 flex-shrink-0 px-3 h-full'>
+                <div className='h-full collection-hover'>
                   <CollectionCard {...collection} />
                 </div>
               </div>
