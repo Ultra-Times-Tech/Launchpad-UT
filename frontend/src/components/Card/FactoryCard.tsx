@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import {Link} from 'react-router-dom'
 
 export interface FactoryCardProps {
   id: number
@@ -11,44 +11,35 @@ export interface FactoryCardProps {
   minted: number
 }
 
-function FactoryCard({ id, collectionId, name, description, image, mintPrice, supply, minted }: FactoryCardProps) {
+function FactoryCard({id, collectionId, name, description, image, mintPrice, supply, minted}: FactoryCardProps) {
   return (
-    <div className="bg-dark-800 rounded-xl overflow-hidden">
-      <div className="relative h-40">
-        <img 
-          src={image} 
-          alt={name} 
-          className="w-full h-full object-cover"
-        />
+    <div className='bg-dark-800 rounded-xl overflow-hidden'>
+      <div className='relative h-40'>
+        <img src={image} alt={name} className='w-full h-full object-cover' />
       </div>
-      
-      <div className="p-4">
-        <h3 className="text-xl font-bold text-primary-300 mb-2">{name}</h3>
-        <p className="text-sm text-gray-300 mb-4 line-clamp-2">{description}</p>
-        
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center justify-end space-x-1 text-sm">
-            <span className="text-gray-400">Mint Price:</span>
-            <span className="text-primary-300 font-medium">{mintPrice}</span>
+
+      <div className='p-4'>
+        <h3 className='text-xl font-bold text-primary-300 mb-2'>{name}</h3>
+        <p className='text-sm text-gray-300 mb-4 line-clamp-2'>{description}</p>
+
+        <div className='space-y-2 mb-4'>
+          <div className='flex items-center justify-end space-x-1 text-sm'>
+            <span className='text-gray-400'>Mint Price:</span>
+            <span className='text-primary-300 font-medium'>{mintPrice}</span>
           </div>
-          
-          <div className="w-full bg-dark-700 rounded-full h-2">
-            <div 
-              className="bg-primary-500 h-2 rounded-full" 
-              style={{ width: `${(minted / supply) * 100}%` }}
-            ></div>
+
+          <div className='w-full bg-dark-700 rounded-full h-2'>
+            <div className='bg-primary-500 h-2 rounded-full' style={{width: `${(minted / supply) * 100}%`}}></div>
           </div>
-          
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-400">{minted} minted</span>
-            <span className="text-gray-400">Total supply: {supply}</span>
+
+          <div className='flex justify-between text-sm'>
+            <span className='text-gray-400'>{minted} minted</span>
+            <span className='text-gray-400'>Total supply: {supply}</span>
           </div>
         </div>
-        
-        <Link to={`/mint/${id}/${collectionId}`} className="block w-full">
-          <button className="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-            ACCÈS AU MINT
-          </button>
+
+        <Link to={`/mint/${id}/${collectionId}`} className='block w-full'>
+          <button className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200'>ACCÈS AU MINT</button>
         </Link>
       </div>
     </div>

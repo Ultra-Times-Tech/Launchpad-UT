@@ -94,39 +94,19 @@ function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={toggleMenu}
-            className='lg:hidden p-2 rounded-lg hover:bg-dark-800 transition-colors z-50'
-            aria-label='Toggle menu'>
-            <svg
-              className='w-6 h-6'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-              xmlns='http://www.w3.org/2000/svg'>
-              {isMenuOpen ? (
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
-              ) : (
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' />
-              )}
+          <button onClick={toggleMenu} className='lg:hidden p-2 rounded-lg hover:bg-dark-800 transition-colors z-50' aria-label='Toggle menu'>
+            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+              {isMenuOpen ? <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' /> : <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' />}
             </svg>
           </button>
         </div>
       </div>
 
       {/* Mobile Menu Overlay */}
-      {isMenuOpen && (
-        <div 
-          className='fixed inset-0 bg-dark-950 bg-opacity-50 z-40 lg:hidden'
-          onClick={closeMenu}
-        />
-      )}
+      {isMenuOpen && <div className='fixed inset-0 bg-dark-950 bg-opacity-50 z-40 lg:hidden' onClick={closeMenu} />}
 
       {/* Mobile Menu Panel */}
-      <div
-        className={`fixed top-16 left-0 right-0 bg-dark-900 border-b border-dark-700 transition-all duration-300 ease-in-out lg:hidden z-40 ${
-          isMenuOpen ? 'translate-y-0 opacity-100 visible' : 'translate-y-[-100%] opacity-0 invisible'
-        }`}>
+      <div className={`fixed top-16 left-0 right-0 bg-dark-900 border-b border-dark-700 transition-all duration-300 ease-in-out lg:hidden z-40 ${isMenuOpen ? 'translate-y-0 opacity-100 visible' : 'translate-y-[-100%] opacity-0 invisible'}`}>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 py-4'>
           <nav className='flex flex-col space-y-4'>
             <Link to='/' onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>

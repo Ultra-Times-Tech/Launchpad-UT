@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom'
 // Helpers
 import {apiRequestor} from '../utils/axiosInstanceHelper'
 import FeaturedCollectionCard, {FeaturedCollectionCardProps} from '../components/Card/FeaturedCollectionCard'
+import CollectionCard from '../components/Card/CollectionCard'
 import Slider from '../components/Slider/Slider'
 
 interface NFT {
@@ -16,13 +17,21 @@ interface NFT {
   minted: number
 }
 
-interface Article {
+interface MintActivity {
   id: number
-  title: string
+  collectionName: string
+  itemName: string
+  price: string
+  timestamp: string
+  image: string
+}
+
+interface FeaturedCollection {
+  id: number
+  name: string
   description: string
   image: string
-  date: string
-  author: string
+  artist: string
 }
 
 function HomePage() {
@@ -30,6 +39,130 @@ function HomePage() {
   const [featuredCollections, setFeaturedCollections] = useState<FeaturedCollectionCardProps[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [currentCollectionIndex, setCurrentCollectionIndex] = useState(0)
+
+  // Mock featured collections for the slider
+  const latestCollections: FeaturedCollection[] = [
+    {
+      id: 1,
+      name: 'Vox-in-Time',
+      description: 'A groundbreaking collection featuring futuristic digital art and unique characters',
+      image: 'https://picsum.photos/800/500?random=1',
+      artist: 'Ultra Times Studios',
+    },
+    {
+      id: 2,
+      name: 'Ultra Street-Cubism',
+      description: 'Where street art meets digital innovation in a stunning NFT collection',
+      image: 'https://picsum.photos/800/500?random=2',
+      artist: 'Digital Cubists',
+    },
+    {
+      id: 3,
+      name: 'Crypto Punks Edition',
+      description: 'The legendary collection reimagined for the Ultra ecosystem',
+      image: 'https://picsum.photos/800/500?random=3',
+      artist: 'CryptoPunk Labs',
+    },
+    {
+      id: 4,
+      name: 'Factory Arsenal',
+      description: 'Exclusive weapons and equipment from the future',
+      image: 'https://picsum.photos/800/500?random=4',
+      artist: 'Arsenal Studios',
+    },
+    {
+      id: 5,
+      name: 'Power Boosters',
+      description: 'Enhance your digital experience with unique power-ups',
+      image: 'https://picsum.photos/800/500?random=5',
+      artist: 'Power Labs',
+    },
+  ]
+
+  // Mock mint activities with images
+  const mintActivities: MintActivity[] = [
+    {
+      id: 1,
+      collectionName: 'Vox-in-Time',
+      itemName: 'Character #156',
+      price: '0.5 UOS',
+      timestamp: '2 minutes ago',
+      image: 'https://picsum.photos/100/100?random=6',
+    },
+    {
+      id: 2,
+      collectionName: 'Ultra Street-Cubism',
+      itemName: 'Artwork #89',
+      price: '0.8 UOS',
+      timestamp: '5 minutes ago',
+      image: 'https://picsum.photos/100/100?random=7',
+    },
+    {
+      id: 3,
+      collectionName: 'Crypto Punks',
+      itemName: 'Punk #2234',
+      price: '1.2 UOS',
+      timestamp: '8 minutes ago',
+      image: 'https://picsum.photos/100/100?random=8',
+    },
+    {
+      id: 4,
+      collectionName: 'Factory Arsenal',
+      itemName: 'Weapon #445',
+      price: '0.6 UOS',
+      timestamp: '12 minutes ago',
+      image: 'https://picsum.photos/100/100?random=9',
+    },
+    {
+      id: 5,
+      collectionName: 'Power Boosters',
+      itemName: 'Booster #78',
+      price: '0.3 UOS',
+      timestamp: '15 minutes ago',
+      image: 'https://picsum.photos/100/100?random=10',
+    },
+  ]
+
+  // Mock newest collections
+  const newestCollections = [
+    {
+      id: 1,
+      name: 'Digital Dreams',
+      description: 'Experience the future of digital art with this unique collection',
+      image: 'https://picsum.photos/400/300?random=11',
+      artist: 'Digital Dreamers',
+      totalItems: 500,
+      floorPrice: '0.4 ETH',
+    },
+    {
+      id: 2,
+      name: 'Cyber Warriors',
+      description: 'Join the elite force of cyber warriors in this exclusive collection',
+      image: 'https://picsum.photos/400/300?random=12',
+      artist: 'Cyber Labs',
+      totalItems: 750,
+      floorPrice: '0.6 ETH',
+    },
+    {
+      id: 3,
+      name: 'Nature Redux',
+      description: 'A digital interpretation of natural wonders',
+      image: 'https://picsum.photos/400/300?random=13',
+      artist: 'Green Digital',
+      totalItems: 300,
+      floorPrice: '0.3 ETH',
+    },
+    {
+      id: 4,
+      name: 'Meta Beings',
+      description: 'Discover unique digital beings from the metaverse',
+      image: 'https://picsum.photos/400/300?random=14',
+      artist: 'Meta Creators',
+      totalItems: 1000,
+      floorPrice: '0.5 ETH',
+    },
+  ]
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,77 +222,14 @@ function HomePage() {
     fetchData()
   }, [])
 
-  // Mock data for latest articles
-  const latestArticles: Article[] = [
-    {
-      id: 1,
-      title: '10 Life-Changing Books Everyone Should Read',
-      description: 'Discover the books that have transformed lives around the world',
-      image: 'https://picsum.photos/600/400?random=4',
-      date: 'Feb 28, 2025',
-      author: 'John Smith',
-    },
-  ]
+  // Auto-rotate collections every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentCollectionIndex(current => (current + 1) % latestCollections.length)
+    }, 10000)
 
-  // Mock data for newest articles
-  const newestArticles: Article[] = [
-    {
-      id: 1,
-      title: 'Exploring the Future of Digital Art and NFTs',
-      description: 'How NFTs Are Changing the Art World',
-      image: 'https://picsum.photos/400/300?random=5',
-      date: 'Feb 27, 2025',
-      author: 'Emma Johnson',
-    },
-    {
-      id: 2,
-      title: 'The Evolution of Blockchain Technology',
-      description: 'A Journey from Bitcoin to Smart Contracts',
-      image: 'https://picsum.photos/400/300?random=6',
-      date: 'Feb 26, 2025',
-      author: 'Michael Chen',
-    },
-    {
-      id: 3,
-      title: 'Understanding Web3 and Decentralized Applications',
-      description: 'The Next Generation of Internet',
-      image: 'https://picsum.photos/400/300?random=7',
-      date: 'Feb 25, 2025',
-      author: 'Sarah Williams',
-    },
-    {
-      id: 4,
-      title: 'Cryptocurrency Trading Strategies for Beginners',
-      description: 'Essential Tips for New Traders',
-      image: 'https://picsum.photos/400/300?random=8',
-      date: 'Feb 24, 2025',
-      author: 'David Rodriguez',
-    },
-  ]
-
-  // Mock data for most popular articles
-  const popularArticles = [
-    {
-      id: 1,
-      title: 'How to Create Your First NFT Collection',
-      date: 'Feb 20, 2025',
-    },
-    {
-      id: 2,
-      title: 'The Top 5 NFT Marketplaces in 2025',
-      date: 'Feb 18, 2025',
-    },
-    {
-      id: 3,
-      title: 'Understanding Gas Fees and How to Minimize Them',
-      date: 'Feb 15, 2025',
-    },
-    {
-      id: 4,
-      title: 'NFT Investment Strategies for Long-term Growth',
-      date: 'Feb 12, 2025',
-    },
-  ]
+    return () => clearInterval(interval)
+  }, [latestCollections.length])
 
   if (loading) {
     return (
@@ -172,10 +242,13 @@ function HomePage() {
     )
   }
 
+  const currentCollection = latestCollections[currentCollectionIndex]
+
   return (
     <div className='min-h-screen bg-dark-950 text-white'>
       {/* Hero Banner Slider */}
       <Slider title="10 collections d'Uniq à ne pas rater" description='Découvrez notre sélection exclusive de collections numériques créées par des artistes de renommée mondiale' buttonText='En savoir plus' onButtonClick={() => console.log('Button clicked')} />
+
       {/* Featured Collections */}
       <div className='container mx-auto px-4 py-12'>
         <div className='flex justify-between items-center mb-8'>
@@ -195,7 +268,7 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Collections Grid - Updated for tablet responsiveness */}
+        {/* Collections Grid */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
           {featuredCollections.map(collection => (
             <FeaturedCollectionCard key={collection.id} id={collection.id} name={collection.name} description={collection.description} image={collection.image} artist={collection.artist} date={collection.date} totalItems={collection.totalItems} floorPrice={collection.floorPrice} comingSoon={collection.comingSoon} />
@@ -209,36 +282,43 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Latest Articles */}
+      {/* Latest Collections and Mint Activities */}
       <div className='container mx-auto px-4 py-12'>
-        <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300'>Latest Articles</h2>
+        <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300'>Latest Collections</h2>
 
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+          {/* Featured Collection Slider */}
           <div className='md:col-span-2'>
-            {latestArticles.map(article => (
-              <div key={article.id} className='bg-dark-800 text-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1'>
-                <div className='relative h-64'>
-                  <img src={article.image} alt={article.title} className='w-full h-full object-cover' />
-                  <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent flex items-center justify-center'>
-                    <div className='text-center p-6'>
-                      <h3 className='text-2xl md:text-3xl font-cabin font-bold mb-2 text-primary-300'>{article.title}</h3>
-                      <p className='text-gray-300 mb-4 font-quicksand'>{article.description}</p>
-                    </div>
+            <div className='bg-dark-800 text-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300'>
+              <div className='relative' style={{height: '500px'}}>
+                <img src={currentCollection.image} alt={currentCollection.name} className='w-full h-full object-cover' />
+                <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent flex items-end justify-center'>
+                  <div className='text-center p-6 w-full'>
+                    <h3 className='text-2xl md:text-3xl font-cabin font-bold mb-2 text-primary-300'>{currentCollection.name}</h3>
+                    <p className='text-gray-300 mb-2 font-quicksand'>{currentCollection.description}</p>
+                    <p className='text-sm text-primary-300'>by {currentCollection.artist}</p>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
 
-          <div>
-            <h3 className='text-xl font-cabin font-bold mb-4 text-primary-300'>Most popular</h3>
-            <div className='space-y-4'>
-              {popularArticles.map(article => (
-                <div key={article.id} className='flex items-center space-x-4 bg-dark-800 p-3 rounded-lg hover:bg-dark-700 transition duration-300'>
-                  <div className='w-16 h-16 bg-dark-700 rounded-md flex-shrink-0'></div>
-                  <div>
-                    <h4 className='font-cabin font-medium text-primary-200'>{article.title}</h4>
-                    <p className='text-sm text-gray-400 font-quicksand'>{article.date}</p>
+          {/* Mint Activities */}
+          <div className='h-[500px] overflow-hidden'>
+            <h3 className='text-xl font-cabin font-bold mb-4 text-primary-300'>Mint Activities</h3>
+            <div className='space-y-4 h-full overflow-y-auto pr-2'>
+              {mintActivities.map(activity => (
+                <div key={activity.id} className='flex items-center space-x-4 bg-dark-800 p-3 rounded-lg hover:bg-dark-700 transition duration-300'>
+                  <div className='w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden'>
+                    <img src={activity.image} alt={activity.itemName} className='w-full h-full object-cover' />
+                  </div>
+                  <div className='flex-grow'>
+                    <h4 className='font-cabin font-medium text-primary-200'>{activity.itemName}</h4>
+                    <p className='text-sm text-gray-400 font-quicksand'>from {activity.collectionName}</p>
+                    <div className='flex justify-between items-center mt-1'>
+                      <span className='text-sm text-green-400'>{activity.price}</span>
+                      <span className='text-xs text-gray-500'>{activity.timestamp}</span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -247,28 +327,27 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Newest Articles */}
+      {/* Newest Collections */}
       <div className='container mx-auto px-4 py-12'>
         <div className='flex justify-between items-center mb-8'>
-          <h2 className='text-2xl font-cabin font-bold text-primary-300'>Newest Articles</h2>
-          <button className='text-gray-400 hover:text-white font-medium'>View all articles →</button>
+          <h2 className='text-2xl font-cabin font-bold text-primary-300'>Newest Collections</h2>
+          <Link to='/collections' className='text-gray-400 hover:text-white font-medium'>
+            View all collections →
+          </Link>
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-          {newestArticles.map(article => (
-            <div key={article.id} className='bg-dark-800 border border-dark-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1'>
-              <div className='h-48 bg-dark-700 flex items-center justify-center'>
-                <img src={article.image} alt={article.title} className='w-full h-full object-cover' />
-              </div>
-              <div className='p-4'>
-                <h3 className='font-cabin font-bold mb-2 text-primary-300'>{article.title}</h3>
-                <p className='text-sm text-gray-400 mb-3 font-quicksand'>{article.description}</p>
-                <div className='flex justify-between items-center text-xs text-gray-500 font-quicksand'>
-                  <span>{article.date}</span>
-                  <span>By {article.author}</span>
-                </div>
-              </div>
-            </div>
+          {newestCollections.map(collection => (
+            <CollectionCard
+              key={collection.id}
+              id={collection.id}
+              name={collection.name}
+              description={collection.description}
+              image={collection.image}
+              artist={collection.artist}
+              totalItems={collection.totalItems}
+              floorPrice={collection.floorPrice}
+            />
           ))}
         </div>
       </div>
