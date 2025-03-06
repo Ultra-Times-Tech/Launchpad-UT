@@ -4,6 +4,7 @@ import HomePage from './views/HomePage'
 import CollectionsPage from './views/CollectionsPage'
 import CollectionDetailsPage from './views/CollectionDetailsPage'
 import MintPage from './views/MintPage'
+import FactoryTestPage from './views/FactoryTestPage'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import {AlertContainer} from './components/Alert/Alert'
@@ -18,6 +19,7 @@ function App() {
           <Route path='/collections' element={<CollectionsPage />} />
           <Route path='/collection/:id' element={<CollectionDetailsPage />} />
           <Route path='/mint/:category/:id' element={<MintPage />} />
+          <Route path='/factory-test' element={<FactoryTestPage />} />
         </Routes>
       </main>
       <Footer />
