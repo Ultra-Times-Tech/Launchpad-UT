@@ -1,9 +1,6 @@
 import {useState, useEffect} from 'react'
 import CollectionCard, {CollectionCardProps} from '../components/Card/CollectionCard'
-
-type FilterCategory = 'art' | 'collectibles' | 'game-assets' | 'music' | 'photography' | 'sports'
-type SortOption = 'newest' | 'oldest' | 'price-high' | 'price-low' | 'popularity'
-type PriceRange = 'under-1' | '1-5' | '5-10' | 'above-10'
+import FilterBar, {FilterCategory, SortOption, PriceRange} from '../components/FilterBar/FilterBar'
 
 function CollectionsPage() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -121,103 +118,9 @@ function CollectionsPage() {
 
       {/* Main Content */}
       <div className='container mx-auto px-4 py-8'>
-        {/* Search and Filters Bar */}
-        <div className='bg-dark-800 rounded-xl p-6 mb-8'>
-          <div className='flex flex-col lg:flex-row gap-6'>
-            {/* Search */}
-            <div className='flex-1'>
-              <div className='relative'>
-                <input type='text' placeholder='Search collections...' value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className='w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:border-primary-500 pl-10' />
-                <svg className='absolute left-3 top-3.5 w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
-                </svg>
-              </div>
-            </div>
-
-            {/* Filters */}
-            <div className='flex flex-wrap gap-4'>
-              {/* Categories */}
-              <div className='relative group'>
-                <button className='px-4 py-2 bg-dark-900 rounded-lg border border-dark-700 hover:border-primary-500 transition-colors flex items-center gap-2'>
-                  <span>Categories</span>
-                  <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-                  </svg>
-                </button>
-                <div className='absolute z-10 mt-2 w-64 bg-dark-900 rounded-lg shadow-lg border border-dark-700 p-4 hidden group-hover:block'>
-                  <div className='space-y-2'>
-                    {['art', 'collectibles', 'game-assets', 'music', 'photography', 'sports'].map(category => (
-                      <label key={category} className='flex items-center space-x-2 cursor-pointer'>
-                        <input type='checkbox' checked={selectedCategories.has(category as FilterCategory)} onChange={() => handleCategoryToggle(category as FilterCategory)} className='form-checkbox h-4 w-4 text-primary-500 rounded border-dark-700 bg-dark-800 focus:ring-primary-500' />
-                        <span className='text-sm'>{category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Price Ranges */}
-              <div className='relative group'>
-                <button className='px-4 py-2 bg-dark-900 rounded-lg border border-dark-700 hover:border-primary-500 transition-colors flex items-center gap-2'>
-                  <span>Price Range</span>
-                  <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-                  </svg>
-                </button>
-                <div className='absolute z-10 mt-2 w-64 bg-dark-900 rounded-lg shadow-lg border border-dark-700 p-4 hidden group-hover:block'>
-                  <div className='space-y-2'>
-                    {[
-                      {value: 'under-1', label: 'Under 1 ETH'},
-                      {value: '1-5', label: '1 - 5 ETH'},
-                      {value: '5-10', label: '5 - 10 ETH'},
-                      {value: 'above-10', label: 'Above 10 ETH'},
-                    ].map(range => (
-                      <label key={range.value} className='flex items-center space-x-2 cursor-pointer'>
-                        <input type='checkbox' checked={selectedPriceRanges.has(range.value as PriceRange)} onChange={() => handlePriceRangeToggle(range.value as PriceRange)} className='form-checkbox h-4 w-4 text-primary-500 rounded border-dark-700 bg-dark-800 focus:ring-primary-500' />
-                        <span className='text-sm'>{range.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Sort By */}
-              <select value={sortBy} onChange={e => setSortBy(e.target.value as SortOption)} className='px-4 py-2 bg-dark-900 rounded-lg border border-dark-700 hover:border-primary-500 transition-colors appearance-none cursor-pointer'>
-                <option value='newest'>Newest First</option>
-                <option value='oldest'>Oldest First</option>
-                <option value='price-high'>Price: High to Low</option>
-                <option value='price-low'>Price: Low to High</option>
-                <option value='popularity'>Most Popular</option>
-              </select>
-
-              {/* Clear Filters */}
-              <button onClick={handleClearFilters} className='px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors'>
-                Clear Filters
-              </button>
-            </div>
-          </div>
-
-          {/* Selected Filters */}
-          {(selectedCategories.size > 0 || selectedPriceRanges.size > 0) && (
-            <div className='mt-4 flex flex-wrap gap-2'>
-              {Array.from(selectedCategories).map(category => (
-                <span key={category} className='px-3 py-1 bg-primary-500/20 text-primary-300 rounded-full text-sm flex items-center gap-2'>
-                  {category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')}
-                  <button onClick={() => handleCategoryToggle(category)} className='hover:text-white'>
-                    ×
-                  </button>
-                </span>
-              ))}
-              {Array.from(selectedPriceRanges).map(range => (
-                <span key={range} className='px-3 py-1 bg-primary-500/20 text-primary-300 rounded-full text-sm flex items-center gap-2'>
-                  {range.replace('-', ' to ').replace('under-', 'Under ').replace('above-', 'Above ')} ETH
-                  <button onClick={() => handlePriceRangeToggle(range)} className='hover:text-white'>
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
+        {/* Filter Bar */}
+        <div className='mb-8'>
+          <FilterBar selectedCategories={selectedCategories} selectedPriceRanges={selectedPriceRanges} sortBy={sortBy} searchQuery={searchQuery} onCategoryToggle={handleCategoryToggle} onPriceRangeToggle={handlePriceRangeToggle} onSortChange={sort => setSortBy(sort as SortOption)} onSearchChange={setSearchQuery} onClearFilters={handleClearFilters} />
         </div>
 
         {/* Collections Grid */}
