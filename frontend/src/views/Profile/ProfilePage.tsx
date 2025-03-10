@@ -1,4 +1,6 @@
 import {useState} from 'react'
+import useAlerts from '../../hooks/useAlert'
+import {useUltraWallet} from '../../utils/ultraWalletHelper'
 
 interface ProfileData {
   email: string
@@ -12,6 +14,8 @@ function ProfilePage() {
   })
   const [isEditing, setIsEditing] = useState(false)
   const [newEmail, setNewEmail] = useState(profile.email)
+  const {blockchainId} = useUltraWallet()
+  const {success} = useAlerts()
 
   const handleSave = () => {
     setProfile(prev => ({
@@ -19,6 +23,15 @@ function ProfilePage() {
       email: newEmail,
     }))
     setIsEditing(false)
+  }
+
+  const handleCopyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.walletAddress)
+      success('Wallet address copied to clipboard!')
+    } catch (err) {
+      console.error('Failed to copy address:', err)
+    }
   }
 
   return (
@@ -45,8 +58,10 @@ function ProfilePage() {
             <div className='mb-6'>
               <label className='block text-sm font-medium text-gray-400 mb-2'>Wallet Address</label>
               <div className='flex items-center space-x-2'>
-                <input type='text' value={profile.walletAddress} disabled className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-gray-300 focus:outline-none' />
-                <button className='px-3 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>Copy</button>
+                <div className='flex-1 px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-gray-300'>{blockchainId}</div>
+                <button onClick={handleCopyAddress} className='px-3 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
+                  Copy
+                </button>
               </div>
             </div>
 

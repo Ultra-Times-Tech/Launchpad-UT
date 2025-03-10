@@ -1,13 +1,17 @@
 import {Link} from 'react-router-dom'
 import {useState, useEffect, useRef} from 'react'
 import {getAssetUrl} from '../utils/imageHelper'
-import WalletConnectButton from './Button/WalletConnectButton'
+import {useUltraWallet} from '../utils/ultraWalletHelper'
+import useAlerts from '../hooks/useAlert'
 
 function Header() {
-  const [blockchainId, setBlockchainId] = useState<string | null>(null)
+  const {blockchainId, connect, disconnect, error} = useUltraWallet()
+  const {success, error: showError} = useAlerts()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024)
+  const [lastErrorMessage, setLastErrorMessage] = useState<string | null>(null)
+  const [userInitiated, setUserInitiated] = useState(false)
   const profileDropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -33,15 +37,35 @@ function Header() {
     }
   }, [])
 
-  const handleWalletConnect = (id: string) => {
-    setBlockchainId(id)
-    console.log('Connected to Ultra wallet with blockchain ID:', id)
+  // Show error notification when error occurs, but prevent duplicates
+  useEffect(() => {
+    if (error && error !== lastErrorMessage && userInitiated) {
+      showError(error)
+      setLastErrorMessage(error)
+    }
+  }, [error, lastErrorMessage, showError, userInitiated])
+
+  const handleConnect = async () => {
+    setUserInitiated(true)
+    const isConnected = await connect()
+
+    if (!isConnected) {
+      showError('Failed to connect wallet')
+    } else {
+      success('Wallet connected successfully!')
+    }
   }
 
-  const handleWalletDisconnect = () => {
-    setBlockchainId(null)
-    setIsProfileOpen(false)
-    console.log('Disconnected from Ultra wallet')
+  const handleDisconnect = async () => {
+    setUserInitiated(true)
+    const isDisconnected = await disconnect()
+
+    if (isDisconnected) {
+      success('Wallet disconnected successfully!')
+      setIsProfileOpen(false)
+    } else {
+      showError('Failed to disconnect wallet')
+    }
   }
 
   const toggleMenu = () => {
@@ -54,6 +78,10 @@ function Header() {
 
   const toggleProfile = () => {
     setIsProfileOpen(!isProfileOpen)
+  }
+
+  const shortenAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
   return (
@@ -120,7 +148,7 @@ function Header() {
                       <path fillRule='evenodd' d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z' clipRule='evenodd' />
                     </svg>
                   </div>
-                  <span className='hidden sm:inline'>My Profile</span>
+                  <span className='hidden sm:inline'>{shortenAddress(blockchainId)}</span>
                   <svg className={`w-4 h-4 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
                   </svg>
@@ -142,14 +170,16 @@ function Header() {
                     <Link to='/transactions' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsProfileOpen(false)}>
                       Transaction History
                     </Link>
-                    <button onClick={handleWalletDisconnect} className='w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-700 transition-colors'>
+                    <button onClick={handleDisconnect} className='w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-700 transition-colors'>
                       Disconnect Wallet
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <WalletConnectButton onConnect={handleWalletConnect} onDisconnect={handleWalletDisconnect} className='z-10' />
+              <button onClick={handleConnect} className='px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20'>
+                Connect Ultra Wallet
+              </button>
             )}
           </div>
 
@@ -201,7 +231,7 @@ function Header() {
                   <Link to='/transactions' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
                     Transaction History
                   </Link>
-                  <button onClick={handleWalletDisconnect} className='w-full text-left py-2 text-red-400 hover:text-red-500 transition-colors'>
+                  <button onClick={handleDisconnect} className='w-full text-left py-2 text-red-400 hover:text-red-500 transition-colors'>
                     Disconnect Wallet
                   </button>
                 </div>
@@ -228,7 +258,9 @@ function Header() {
 
             {!blockchainId && (
               <div className='py-2'>
-                <WalletConnectButton onConnect={handleWalletConnect} onDisconnect={handleWalletDisconnect} className='z-10 w-full' />
+                <button onClick={handleConnect} className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200'>
+                  Connect Ultra Wallet
+                </button>
               </div>
             )}
           </nav>
