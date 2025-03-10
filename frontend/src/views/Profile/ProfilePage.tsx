@@ -1,21 +1,35 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
+import {useNavigate} from 'react-router-dom'
 import useAlerts from '../../hooks/useAlert'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
 
 interface ProfileData {
   email: string
-  walletAddress: string
+  username: string | null
+  emailNotifications: boolean
+  marketingCommunications: boolean
 }
 
 function ProfilePage() {
-  const [profile, setProfile] = useState<ProfileData>({
-    email: 'user@example.com',
-    walletAddress: '0x1234...5678',
-  })
-  const [isEditing, setIsEditing] = useState(false)
-  const [newEmail, setNewEmail] = useState(profile.email)
+  const navigate = useNavigate()
   const {blockchainId} = useUltraWallet()
   const {success} = useAlerts()
+  const [isEditing, setIsEditing] = useState(false)
+  const [isEditingUsername, setIsEditingUsername] = useState(false)
+  const [profile, setProfile] = useState<ProfileData>({
+    email: 'user@example.com',
+    username: null,
+    emailNotifications: false,
+    marketingCommunications: false,
+  })
+  const [newEmail, setNewEmail] = useState(profile.email)
+  const [newUsername, setNewUsername] = useState(profile.username || '')
+
+  useEffect(() => {
+    if (!blockchainId) {
+      navigate('/')
+    }
+  }, [blockchainId, navigate])
 
   const handleSave = () => {
     setProfile(prev => ({
@@ -23,15 +37,51 @@ function ProfilePage() {
       email: newEmail,
     }))
     setIsEditing(false)
+    success('Email updated successfully!')
+  }
+
+  const handleSaveUsername = () => {
+    setProfile(prev => ({
+      ...prev,
+      username: newUsername.trim() || null,
+    }))
+    setIsEditingUsername(false)
+    success('Username updated successfully!')
   }
 
   const handleCopyAddress = async () => {
     try {
-      await navigator.clipboard.writeText(profile.walletAddress)
+      await navigator.clipboard.writeText(blockchainId || '')
       success('Wallet address copied to clipboard!')
     } catch (err) {
       console.error('Failed to copy address:', err)
     }
+  }
+
+  const handleToggleEmailNotifications = () => {
+    setProfile(prev => {
+      const newValue = !prev.emailNotifications
+      success(`Email notifications ${newValue ? 'enabled' : 'disabled'}!`)
+      return {
+        ...prev,
+        emailNotifications: newValue,
+      }
+    })
+  }
+
+  const handleToggleMarketingCommunications = () => {
+    setProfile(prev => {
+      const newValue = !prev.marketingCommunications
+      success(`Marketing communications ${newValue ? 'enabled' : 'disabled'}!`)
+      return {
+        ...prev,
+        marketingCommunications: newValue,
+      }
+    })
+  }
+
+  if (!blockchainId) {
+    return null
   }
 
   return (
@@ -54,6 +104,34 @@ function ProfilePage() {
               </div>
             </div>
 
+            {/* Username */}
+            <div className='mb-6'>
+              <label className='block text-sm font-medium text-gray-400 mb-2'>Username</label>
+              {isEditingUsername ? (
+                <div className='flex items-center space-x-2'>
+                  <input type='text' value={newUsername} onChange={e => setNewUsername(e.target.value)} className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-white focus:outline-none focus:border-primary-500' placeholder='Enter your username' />
+                  <button onClick={handleSaveUsername} className='px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors'>
+                    Save
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingUsername(false)
+                      setNewUsername(profile.username || '')
+                    }}
+                    className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className='flex items-center space-x-2'>
+                  <input type='text' value={profile.username || ''} disabled placeholder='No username set' className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-gray-300 focus:outline-none' />
+                  <button onClick={() => setIsEditingUsername(true)} className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
+                    Edit
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Wallet Address */}
             <div className='mb-6'>
               <label className='block text-sm font-medium text-gray-400 mb-2'>Wallet Address</label>
@@ -74,7 +152,12 @@ function ProfilePage() {
                   <button onClick={handleSave} className='px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors'>
                     Save
                   </button>
-                  <button onClick={() => setIsEditing(false)} className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false)
+                      setNewEmail(profile.email)
+                    }}
+                    className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
                     Cancel
                   </button>
                 </div>
@@ -97,7 +180,7 @@ function ProfilePage() {
                   <p className='text-sm text-gray-400'>Receive email updates about your activity</p>
                 </div>
                 <label className='relative inline-flex items-center cursor-pointer'>
-                  <input type='checkbox' className='sr-only peer' />
+                  <input type='checkbox' checked={profile.emailNotifications} onChange={handleToggleEmailNotifications} className='sr-only peer' />
                   <div className="w-11 h-6 bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
                 </label>
               </div>
@@ -107,7 +190,7 @@ function ProfilePage() {
                   <p className='text-sm text-gray-400'>Receive updates about new collections</p>
                 </div>
                 <label className='relative inline-flex items-center cursor-pointer'>
-                  <input type='checkbox' className='sr-only peer' />
+                  <input type='checkbox' checked={profile.marketingCommunications} onChange={handleToggleMarketingCommunications} className='sr-only peer' />
                   <div className="w-11 h-6 bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
                 </label>
               </div>
