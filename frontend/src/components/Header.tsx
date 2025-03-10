@@ -1,12 +1,14 @@
 import {Link} from 'react-router-dom'
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import {getAssetUrl} from '../utils/imageHelper'
 import WalletConnectButton from './Button/WalletConnectButton'
 
 function Header() {
   const [blockchainId, setBlockchainId] = useState<string | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024)
+  const profileDropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleResize = () => {
@@ -16,8 +18,19 @@ function Header() {
       }
     }
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false)
+      }
+    }
+
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
   }, [])
 
   const handleWalletConnect = (id: string) => {
@@ -27,6 +40,7 @@ function Header() {
 
   const handleWalletDisconnect = () => {
     setBlockchainId(null)
+    setIsProfileOpen(false)
     console.log('Disconnected from Ultra wallet')
   }
 
@@ -36,6 +50,10 @@ function Header() {
 
   const closeMenu = () => {
     setIsMenuOpen(false)
+  }
+
+  const toggleProfile = () => {
+    setIsProfileOpen(!isProfileOpen)
   }
 
   return (
@@ -94,7 +112,45 @@ function Header() {
               </a>
             </div>
 
-            <WalletConnectButton onConnect={handleWalletConnect} onDisconnect={handleWalletDisconnect} className='z-10' />
+            {blockchainId ? (
+              <div className='relative' ref={profileDropdownRef}>
+                <button onClick={toggleProfile} className='flex items-center space-x-2 bg-dark-800 hover:bg-dark-700 rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20'>
+                  <div className='w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center'>
+                    <svg className='w-4 h-4 text-white' fill='currentColor' viewBox='0 0 20 20'>
+                      <path fillRule='evenodd' d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z' clipRule='evenodd' />
+                    </svg>
+                  </div>
+                  <span className='hidden sm:inline'>My Profile</span>
+                  <svg className={`w-4 h-4 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+                  </svg>
+                </button>
+
+                {/* Profile Dropdown */}
+                {isProfileOpen && (
+                  <div className='absolute right-0 mt-2 w-64 bg-dark-800 rounded-xl shadow-lg py-2 border border-dark-700 z-50'>
+                    <div className='px-4 py-3 border-b border-dark-700'>
+                      <p className='text-sm text-gray-400'>Connected Wallet</p>
+                      <p className='text-sm font-medium text-primary-300 break-all'>{blockchainId}</p>
+                    </div>
+                    <Link to='/profile' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsProfileOpen(false)}>
+                      Profile Settings
+                    </Link>
+                    <Link to='/my-collections' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsProfileOpen(false)}>
+                      My Collections
+                    </Link>
+                    <Link to='/transactions' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsProfileOpen(false)}>
+                      Transaction History
+                    </Link>
+                    <button onClick={handleWalletDisconnect} className='w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-700 transition-colors'>
+                      Disconnect Wallet
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <WalletConnectButton onConnect={handleWalletConnect} onDisconnect={handleWalletDisconnect} className='z-10' />
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -129,6 +185,29 @@ function Header() {
               Contact
             </Link>
 
+            {blockchainId && (
+              <>
+                <div className='border-t border-dark-700 pt-4'>
+                  <div className='px-2 py-3'>
+                    <p className='text-sm text-gray-400'>Connected Wallet</p>
+                    <p className='text-sm font-medium text-primary-300 break-all'>{blockchainId}</p>
+                  </div>
+                  <Link to='/profile' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
+                    Profile Settings
+                  </Link>
+                  <Link to='/my-collections' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
+                    My Collections
+                  </Link>
+                  <Link to='/transactions' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
+                    Transaction History
+                  </Link>
+                  <button onClick={handleWalletDisconnect} className='w-full text-left py-2 text-red-400 hover:text-red-500 transition-colors'>
+                    Disconnect Wallet
+                  </button>
+                </div>
+              </>
+            )}
+
             <div className='flex items-center space-x-4 py-2'>
               <a href='https://twitter.com' target='_blank' rel='noopener noreferrer' className='text-gray-400 hover:text-primary-300 transition-colors p-2'>
                 <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' viewBox='0 0 24 24'>
@@ -147,9 +226,11 @@ function Header() {
               </a>
             </div>
 
-            <div className='py-2'>
-              <WalletConnectButton onConnect={handleWalletConnect} onDisconnect={handleWalletDisconnect} className='z-10 w-full' />
-            </div>
+            {!blockchainId && (
+              <div className='py-2'>
+                <WalletConnectButton onConnect={handleWalletConnect} onDisconnect={handleWalletDisconnect} className='z-10 w-full' />
+              </div>
+            )}
           </nav>
         </div>
       </div>

@@ -8,6 +8,9 @@ import FactoryTestPage from './views/FactoryTestPage'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import {AlertContainer} from './components/Alert/Alert'
+import ProfilePage from './views/Profile/ProfilePage'
+import MyCollectionsPage from './views/Profile/MyCollectionsPage'
+import TransactionsPage from './views/Profile/TransactionsPage'
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
           <Route path='/collection/:id' element={<CollectionDetailsPage />} />
           <Route path='/mint/:category/:id' element={<MintPage />} />
           <Route path='/factory-test' element={<FactoryTestPage />} />
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/my-collections' element={<MyCollectionsPage />} />
+          <Route path='/transactions' element={<TransactionsPage />} />
         </Routes>
       </main>
       <Footer />
