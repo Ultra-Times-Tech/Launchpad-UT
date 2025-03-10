@@ -1,6 +1,4 @@
-import {useState, useEffect} from 'react'
-import {useNavigate} from 'react-router-dom'
-import {useUltraWallet} from '../../utils/ultraWalletHelper'
+import {useState} from 'react'
 
 interface Transaction {
   id: string
@@ -13,8 +11,6 @@ interface Transaction {
 }
 
 function TransactionsPage() {
-  const navigate = useNavigate()
-  const {blockchainId} = useUltraWallet()
   const [transactions] = useState<Transaction[]>([
     {
       id: '1',
@@ -44,12 +40,6 @@ function TransactionsPage() {
       hash: '0x9876...5432',
     },
   ])
-
-  useEffect(() => {
-    if (!blockchainId) {
-      navigate('/')
-    }
-  }, [blockchainId, navigate])
 
   const getStatusColor = (status: Transaction['status']) => {
     switch (status) {
@@ -85,10 +75,6 @@ function TransactionsPage() {
           </svg>
         )
     }
-  }
-
-  if (!blockchainId) {
-    return null
   }
 
   return (

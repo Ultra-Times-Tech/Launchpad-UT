@@ -1,6 +1,5 @@
-import {useState, useEffect} from 'react'
-import {Link, useNavigate} from 'react-router-dom'
-import {useUltraWallet} from '../../utils/ultraWalletHelper'
+import {useState} from 'react'
+import {Link} from 'react-router-dom'
 
 interface Collection {
   id: number
@@ -12,8 +11,6 @@ interface Collection {
 }
 
 function MyCollectionsPage() {
-  const navigate = useNavigate()
-  const {blockchainId} = useUltraWallet()
   const [collections] = useState<Collection[]>([
     {
       id: 1,
@@ -40,16 +37,6 @@ function MyCollectionsPage() {
       lastMinted: '1 week ago',
     },
   ])
-
-  useEffect(() => {
-    if (!blockchainId) {
-      navigate('/')
-    }
-  }, [blockchainId, navigate])
-
-  if (!blockchainId) {
-    return null
-  }
 
   return (
     <div className='min-h-screen bg-dark-950 text-white py-12'>

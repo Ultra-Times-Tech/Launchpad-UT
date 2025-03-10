@@ -1,5 +1,4 @@
-import {useState, useEffect} from 'react'
-import {useNavigate} from 'react-router-dom'
+import {useState} from 'react'
 import useAlerts from '../../hooks/useAlert'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
 
@@ -11,7 +10,6 @@ interface ProfileData {
 }
 
 function ProfilePage() {
-  const navigate = useNavigate()
   const {blockchainId} = useUltraWallet()
   const {success} = useAlerts()
   const [isEditing, setIsEditing] = useState(false)
@@ -24,12 +22,6 @@ function ProfilePage() {
   })
   const [newEmail, setNewEmail] = useState(profile.email)
   const [newUsername, setNewUsername] = useState(profile.username || '')
-
-  useEffect(() => {
-    if (!blockchainId) {
-      navigate('/')
-    }
-  }, [blockchainId, navigate])
 
   const handleSave = () => {
     setProfile(prev => ({
@@ -78,10 +70,6 @@ function ProfilePage() {
         marketingCommunications: newValue,
       }
     })
-  }
-
-  if (!blockchainId) {
-    return null
   }
 
   return (
