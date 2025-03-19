@@ -5,6 +5,7 @@ import CollectionsPage from './views/CollectionsPage'
 import CollectionDetailsPage from './views/CollectionDetailsPage'
 import MintPage from './views/MintPage'
 import FactoryTestPage from './views/FactoryTestPage'
+import MintTestPage from './views/MintTestPage'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import {AlertContainer} from './components/Alert/Alert'
@@ -28,6 +29,7 @@ function App() {
           <Route path='/transactions' element={<TransactionsPage />} />
           {/* Test */}
           <Route path='/factory-test' element={<FactoryTestPage />} />
+          <Route path='/mint-test' element={<MintTestPage />} />
         </Routes>
       </main>
       <Footer />
