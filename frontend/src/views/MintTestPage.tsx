@@ -18,10 +18,12 @@ function MintTestPage() {
   const {isInstalled, isConnected, isLoading, error: walletError, blockchainId, connect} = useUltraWallet()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [txHash, setTxHash] = useState<string | null>(null)
 
   const handleMint = async () => {
     setError(null)
     setSuccess(null)
+    setTxHash(null)
 
     if (!isConnected || !blockchainId) {
       setError('Portefeuille non connecté')
@@ -51,7 +53,8 @@ function MintTestPage() {
         console.log('Transaction Hash:', response.data.transactionHash)
         
         if (response?.data?.transactionHash) {
-          setSuccess(`Transaction réussie! Hash: ${response.data.transactionHash}`)
+          setSuccess(`Transaction réussie! Hash: `)
+          setTxHash(response.data.transactionHash)
         } else {
           console.error('Réponse invalide:', response)
           setError('La transaction n\'a pas retourné de hash')
@@ -145,9 +148,9 @@ function MintTestPage() {
             
             <div className='space-y-4'>
               <p className='text-sm text-gray-400'>
-                Prix: 1.00000000 UOS<br/>
+                Prix: 0.1 UOS<br/>
                 Factory ID: 4337<br/>
-                Index: 0
+                Index: 2
               </p>
 
               <button 
@@ -168,6 +171,14 @@ function MintTestPage() {
             {success && (
               <div className='mt-4 p-4 bg-green-500/20 border border-green-500 rounded-lg text-green-300'>
                 {success}
+                <a 
+                  href={`https://explorer.testnet.ultra.io/tx/${txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-300 hover:text-primary-400 underline"
+                >
+                  {txHash}
+                </a>
               </div>
             )}
 
