@@ -298,9 +298,9 @@ export const useUltraWallet = () => {
     [isInstalled, isConnected]
   )
 
-  // Set up disconnect event listener
+  // Set up wallet event listeners and connection checker
   useEffect(() => {
-    if (isInstalled && window.ultra?.on && isConnected) {
+    if (isInstalled && window.ultra?.on) {
       const handleDisconnect = () => {
         setIsConnected(false)
         setBlockchainId(null)
@@ -308,10 +308,54 @@ export const useUltraWallet = () => {
         setChainId(null)
       }
 
+      const handleConnect = (...args: unknown[]) => {
+        const data = args[0] as UltraWalletConnectionData
+        if (data && data.blockchainid) {
+          setIsConnected(true)
+          setBlockchainId(data.blockchainid)
+          setPublicKey(data.publicKey)
+          window.ultra?.getChainId().then(response => {
+            setChainId(response.data)
+          }).catch(console.error)
+        }
+      }
+
+      // Vérifier périodiquement l'état de connexion
+      const checkConnectionStatus = async () => {
+        try {
+          const response = await window.ultra?.connect({ onlyIfTrusted: true })
+          if (response?.data?.blockchainid) {
+            setIsConnected(true)
+            setBlockchainId(response.data.blockchainid)
+            setPublicKey(response.data.publicKey)
+            try {
+              const chainResponse = await window.ultra?.getChainId()
+              if (chainResponse?.data) {
+                setChainId(chainResponse.data)
+              }
+            } catch {
+              console.error('Failed to get chain ID')
+            }
+          }
+        } catch {
+          // Si la connexion échoue, on considère que le wallet est déconnecté
+          if (isConnected) {
+            handleDisconnect()
+          }
+        }
+      }
+
+      // Vérifier immédiatement et toutes les 2 secondes
+      checkConnectionStatus()
+      const intervalId = setInterval(checkConnectionStatus, 2000)
+
       window.ultra.on('disconnect', handleDisconnect)
+      window.ultra.on('connect', handleConnect)
 
       return () => {
+        clearInterval(intervalId)
         window.ultra?.off('disconnect', handleDisconnect)
+        window.ultra?.off('connect', handleConnect)
       }
     }
   }, [isInstalled, isConnected])

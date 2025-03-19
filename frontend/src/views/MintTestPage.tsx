@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {useUltraWallet} from '../utils/ultraWalletHelper'
 import {createMintTransaction} from '../utils/transactionHelper'
 
@@ -19,6 +19,14 @@ function MintTestPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isConnected) {
+      setError(null)
+      setSuccess(null)
+      setTxHash(null)
+    }
+  }, [isConnected])
 
   const handleMint = async () => {
     setError(null)
