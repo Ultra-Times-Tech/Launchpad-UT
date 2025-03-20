@@ -3,28 +3,41 @@ import {useState, useEffect, useRef} from 'react'
 import {getAssetUrl} from '../utils/imageHelper'
 import {useUltraWallet} from '../utils/ultraWalletHelper'
 import useAlerts from '../hooks/useAlert'
+import {useTranslation} from '../hooks/useTranslation'
 
 function Header() {
   const {blockchainId, connect, disconnect, error} = useUltraWallet()
   const {success, error: showError} = useAlerts()
+  const {t, setCurrentLang, getCurrentFlag, currentLang} = useTranslation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024)
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false)
   const [lastErrorMessage, setLastErrorMessage] = useState<string | null>(null)
   const [userInitiated, setUserInitiated] = useState(false)
   const profileDropdownRef = useRef<HTMLDivElement>(null)
+  const langMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileView(window.innerWidth < 1024)
       if (window.innerWidth >= 1024) {
         setIsMenuOpen(false)
       }
     }
 
     const handleClickOutside = (event: MouseEvent) => {
+      // Vérifie si le clic est sur un bouton de langue
+      const target = event.target as HTMLElement
+      const isLanguageButton = target.closest('[role="menuitem"]')
+      
+      if (isLanguageButton) {
+        return // Ne rien faire si c'est un clic sur un bouton de langue
+      }
+
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false)
+      }
+      if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
+        setIsLangMenuOpen(false)
       }
     }
 
@@ -50,9 +63,9 @@ function Header() {
     const isConnected = await connect()
 
     if (!isConnected) {
-      showError('Failed to connect wallet')
+      showError(t('wallet_connect_error'))
     } else {
-      success('Wallet connected successfully!')
+      success(t('wallet_connect_success'))
     }
   }
 
@@ -61,10 +74,10 @@ function Header() {
     const isDisconnected = await disconnect()
 
     if (isDisconnected) {
-      success('Wallet disconnected successfully!')
+      success(t('wallet_disconnect_success'))
       setIsProfileOpen(false)
     } else {
-      showError('Failed to disconnect wallet')
+      showError(t('wallet_disconnect_error'))
     }
   }
 
@@ -78,6 +91,12 @@ function Header() {
 
   const toggleProfile = () => {
     setIsProfileOpen(!isProfileOpen)
+  }
+
+  const handleLanguageChange = (lang: 'en' | 'fr' | 'de') => {
+    console.log('Changing language to', lang)
+    setCurrentLang(lang)
+    setIsLangMenuOpen(false)
   }
 
   const shortenAddress = (address: string) => {
@@ -103,25 +122,91 @@ function Header() {
           <nav className='hidden lg:flex items-center justify-center flex-1 px-8 font-quicksand'>
             <div className='flex space-x-8'>
               <Link to='/' className='text-white hover:text-primary-300 transition-colors px-2'>
-                Home
+                {t('home')}
               </Link>
               <Link to='/collections' className='text-white hover:text-primary-300 transition-colors px-2'>
-                Collections
+                {t('collections')}
               </Link>
               <Link to='/authors' className='text-white hover:text-primary-300 transition-colors px-2'>
-                Authors
+                {t('authors')}
               </Link>
               <Link to='/shop' className='text-white hover:text-primary-300 transition-colors px-2'>
-                Shop
+                {t('shop')}
               </Link>
               <Link to='/contact' className='text-white hover:text-primary-300 transition-colors px-2'>
-                Contact
+                {t('contact')}
               </Link>
             </div>
           </nav>
 
           {/* Social & Wallet - Right */}
           <div className='hidden lg:flex items-center space-x-6'>
+            {/* Language Selector - Desktop */}
+            <div className='relative' ref={langMenuRef}>
+              <button 
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setIsLangMenuOpen(!isLangMenuOpen)
+                }}
+                className='flex items-center space-x-2 text-gray-400 hover:text-primary-300 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20 rounded-lg p-2'
+                aria-label='Select language'
+                aria-expanded={isLangMenuOpen}
+                aria-controls='language-menu'
+                type='button'
+              >
+                {getCurrentFlag()}
+              </button>
+              {isLangMenuOpen && (
+                <div 
+                  id='language-menu'
+                  className='absolute mt-2 w-12 bg-dark-800 rounded-xl shadow-lg py-2 border border-dark-700 z-50'
+                  role='menu'
+                  aria-orientation='vertical'
+                  aria-labelledby='language-menu'
+                  style={{ transform: 'translateX(50%)', right: '50%' }}
+                >
+                  <button 
+                    className={`w-full p-2 hover:bg-dark-700 transition-colors flex items-center justify-center ${currentLang === 'en' ? 'bg-dark-700' : ''}`}
+                    role='menuitem'
+                    aria-label='English'
+                    onClick={() => handleLanguageChange('en')}
+                  >
+                    <svg className='w-6 h-4' viewBox='0 0 36 24'>
+                      <rect width='36' height='24' fill='#012169'/>
+                      <path d='M0,0 L36,24 M36,0 L0,24' stroke='#fff' strokeWidth='2.4'/>
+                      <path d='M18,0 L18,24 M0,12 L36,12' stroke='#fff' strokeWidth='4'/>
+                      <path d='M18,0 L18,24 M0,12 L36,12' stroke='#C8102E' strokeWidth='2.4'/>
+                    </svg>
+                  </button>
+                  <button 
+                    className={`w-full p-2 hover:bg-dark-700 transition-colors flex items-center justify-center ${currentLang === 'fr' ? 'bg-dark-700' : ''}`}
+                    role='menuitem'
+                    aria-label='Français'
+                    onClick={() => handleLanguageChange('fr')}
+                  >
+                    <svg className='w-6 h-4' viewBox='0 0 36 24'>
+                      <rect width='36' height='24' fill='#ED2939'/>
+                      <rect width='12' height='24' fill='#002395'/>
+                      <rect x='12' width='12' height='24' fill='#fff'/>
+                    </svg>
+                  </button>
+                  <button 
+                    className={`w-full p-2 hover:bg-dark-700 transition-colors flex items-center justify-center ${currentLang === 'de' ? 'bg-dark-700' : ''}`}
+                    role='menuitem'
+                    aria-label='Deutsch'
+                    onClick={() => handleLanguageChange('de')}
+                  >
+                    <svg className='w-6 h-4' viewBox='0 0 36 24'>
+                      <rect width='36' height='8' fill='#000'/>
+                      <rect y='8' width='36' height='8' fill='#DD0000'/>
+                      <rect y='16' width='36' height='8' fill='#FFCE00'/>
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className='flex items-center space-x-2'>
               <a href='https://twitter.com' target='_blank' rel='noopener noreferrer' className='text-gray-400 hover:text-primary-300 transition-colors p-2'>
                 <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' viewBox='0 0 24 24'>
@@ -158,34 +243,102 @@ function Header() {
                 {isProfileOpen && (
                   <div className='absolute right-0 mt-2 w-64 bg-dark-800 rounded-xl shadow-lg py-2 border border-dark-700 z-50'>
                     <div className='px-4 py-3 border-b border-dark-700'>
-                      <p className='text-sm text-gray-400'>Connected Wallet</p>
+                      <p className='text-sm text-gray-400'>{t('connected_wallet')}</p>
                       <p className='text-sm font-medium text-primary-300 break-all'>{blockchainId}</p>
                     </div>
                     <Link to='/profile' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsProfileOpen(false)}>
-                      Profile Settings
+                      {t('profile_settings')}
                     </Link>
                     <Link to='/my-collections' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsProfileOpen(false)}>
-                      My Collections
+                      {t('my_collections')}
                     </Link>
                     <button onClick={handleDisconnect} className='w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-700 transition-colors'>
-                      Disconnect Wallet
+                      {t('disconnect')}
                     </button>
                   </div>
                 )}
               </div>
             ) : (
               <button onClick={handleConnect} className='px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20'>
-                Connect Ultra Wallet
+                {t('connect_wallet')}
               </button>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button onClick={toggleMenu} className='lg:hidden p-2 rounded-lg hover:bg-dark-800 transition-colors z-50' aria-label='Toggle menu'>
-            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-              {isMenuOpen ? <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' /> : <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' />}
-            </svg>
-          </button>
+          {/* Mobile Menu and Language */}
+          <div className='lg:hidden flex items-center space-x-2'>
+            {/* Language Selector - Mobile */}
+            <div className='relative' ref={langMenuRef}>
+              <button 
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setIsLangMenuOpen(!isLangMenuOpen)
+                }}
+                className='p-2 rounded-lg hover:bg-dark-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20'
+                aria-label='Select language'
+                aria-expanded={isLangMenuOpen}
+                aria-controls='language-menu-mobile'
+              >
+                {getCurrentFlag()}
+              </button>
+              {isLangMenuOpen && (
+                <div 
+                  id='language-menu-mobile'
+                  className='absolute mt-2 w-12 bg-dark-800 rounded-xl shadow-lg py-2 border border-dark-700 z-50'
+                  role='menu'
+                  aria-orientation='vertical'
+                  aria-labelledby='language-menu-mobile'
+                  style={{ transform: 'translateX(50%)', right: '50%' }}
+                >
+                  <button 
+                    className={`w-full p-2 hover:bg-dark-700 transition-colors flex items-center justify-center ${currentLang === 'en' ? 'bg-dark-700' : ''}`}
+                    role='menuitem'
+                    aria-label='English'
+                    onClick={() => handleLanguageChange('en')}
+                  >
+                    <svg className='w-6 h-4' viewBox='0 0 36 24'>
+                      <rect width='36' height='24' fill='#012169'/>
+                      <path d='M0,0 L36,24 M36,0 L0,24' stroke='#fff' strokeWidth='2.4'/>
+                      <path d='M18,0 L18,24 M0,12 L36,12' stroke='#fff' strokeWidth='4'/>
+                      <path d='M18,0 L18,24 M0,12 L36,12' stroke='#C8102E' strokeWidth='2.4'/>
+                    </svg>
+                  </button>
+                  <button 
+                    className={`w-full p-2 hover:bg-dark-700 transition-colors flex items-center justify-center ${currentLang === 'fr' ? 'bg-dark-700' : ''}`}
+                    role='menuitem'
+                    aria-label='Français'
+                    onClick={() => handleLanguageChange('fr')}
+                  >
+                    <svg className='w-6 h-4' viewBox='0 0 36 24'>
+                      <rect width='36' height='24' fill='#ED2939'/>
+                      <rect width='12' height='24' fill='#002395'/>
+                      <rect x='12' width='12' height='24' fill='#fff'/>
+                    </svg>
+                  </button>
+                  <button 
+                    className={`w-full p-2 hover:bg-dark-700 transition-colors flex items-center justify-center ${currentLang === 'de' ? 'bg-dark-700' : ''}`}
+                    role='menuitem'
+                    aria-label='Deutsch'
+                    onClick={() => handleLanguageChange('de')}
+                  >
+                    <svg className='w-6 h-4' viewBox='0 0 36 24'>
+                      <rect width='36' height='8' fill='#000'/>
+                      <rect y='8' width='36' height='8' fill='#DD0000'/>
+                      <rect y='16' width='36' height='8' fill='#FFCE00'/>
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button onClick={toggleMenu} className='p-2 rounded-lg hover:bg-dark-800 transition-colors z-50' aria-label='Toggle menu'>
+              <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
+                {isMenuOpen ? <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' /> : <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' />}
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -197,36 +350,36 @@ function Header() {
         <div className='px-4 sm:px-6 py-4'>
           <nav className='flex flex-col space-y-4'>
             <Link to='/' onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>
-              Home
+              {t('home')}
             </Link>
             <Link to='/collections' onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>
-              Collections
+              {t('collections')}
             </Link>
             <Link to='/authors' onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>
-              Authors
+              {t('authors')}
             </Link>
             <Link to='/shop' onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>
-              Shop
+              {t('shop')}
             </Link>
             <Link to='/contact' onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>
-              Contact
+              {t('contact')}
             </Link>
 
             {blockchainId && (
               <>
                 <div className='border-t border-dark-700 pt-4'>
                   <div className='px-2 py-3'>
-                    <p className='text-sm text-gray-400'>Connected Wallet</p>
+                    <p className='text-sm text-gray-400'>{t('connected_wallet')}</p>
                     <p className='text-sm font-medium text-primary-300 break-all'>{blockchainId}</p>
                   </div>
                   <Link to='/profile' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
-                    Profile Settings
+                    {t('profile_settings')}
                   </Link>
                   <Link to='/my-collections' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
-                    My Collections
+                    {t('my_collections')}
                   </Link>
                   <button onClick={handleDisconnect} className='w-full text-left py-2 text-red-400 hover:text-red-500 transition-colors'>
-                    Disconnect Wallet
+                    {t('disconnect')}
                   </button>
                 </div>
               </>
@@ -253,7 +406,7 @@ function Header() {
             {!blockchainId && (
               <div className='py-2'>
                 <button onClick={handleConnect} className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200'>
-                  Connect Ultra Wallet
+                  {t('connect_wallet')}
                 </button>
               </div>
             )}
