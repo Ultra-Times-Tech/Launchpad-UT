@@ -33,7 +33,7 @@ function HomePage() {
   }
 
   return (
-    <div className='min-h-screen bg-dark-950 text-white'>
+    <div className='bg-dark-950 text-white'>
       <Slider title="10 collections d'Uniq à ne pas rater" description='Découvrez notre sélection exclusive de collections numériques créées par des artistes de renommée mondiale' buttonText='En savoir plus' onButtonClick={() => console.log('Button clicked')} />
       <FeaturedCollections collections={featuredCollections} />
       <LatestCollections latestCollections={latestCollections} mintActivities={mintActivities} />

@@ -11,12 +11,13 @@ import Footer from './components/Footer'
 import {AlertContainer} from './components/Alert/Alert'
 import ProfilePage from './views/Profile/ProfilePage'
 import MyCollectionsPage from './views/Profile/MyCollectionsPage'
+import MainContent from './components/MainContent'
 
 function App() {
   return (
     <div className='flex flex-col min-h-screen bg-dark-950 text-white'>
       <Header />
-      <main className='flex-grow'>
+      <MainContent>
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path='/collections' element={<CollectionsPage />} />
@@ -29,7 +30,7 @@ function App() {
           <Route path='/factory-test' element={<FactoryTestPage />} />
           <Route path='/mint-test' element={<MintTestPage />} />
         </Routes>
-      </main>
+      </MainContent>
       <Footer />
       <AlertContainer position='top-right' />
     </div>
