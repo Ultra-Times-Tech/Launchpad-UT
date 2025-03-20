@@ -12,6 +12,10 @@ import {AlertContainer} from './components/Alert/Alert'
 import ProfilePage from './views/Profile/ProfilePage'
 import MyCollectionsPage from './views/Profile/MyCollectionsPage'
 import TransactionsPage from './views/Profile/TransactionsPage'
+import MentionsLegalesPage from './views/Legal/LegalPage'
+import PrivacyPolicyPage from './views/Legal/PrivacyPolicyPage'
+import TermsOfServicePage from './views/Legal/TermsOfServicePage'
+import ContactPage from './views/ContactPage'
 
 function App() {
   return (
@@ -27,6 +31,11 @@ function App() {
           <Route path='/profile' element={<ProfilePage />} />
           <Route path='/my-collections' element={<MyCollectionsPage />} />
           <Route path='/transactions' element={<TransactionsPage />} />
+          {/* Legal and contact */}
+          <Route path='/legal' element={<MentionsLegalesPage />} />
+          <Route path='/privacy' element={<PrivacyPolicyPage />} />
+          <Route path='/terms' element={<TermsOfServicePage />} />
+          <Route path='/contact' element={<ContactPage />} />
           {/* Test */}
           <Route path='/factory-test' element={<FactoryTestPage />} />
           <Route path='/mint-test' element={<MintTestPage />} />

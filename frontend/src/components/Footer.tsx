@@ -11,21 +11,8 @@ function Footer() {
               <img src={getAssetUrl('/logos/logo-ut.png')} alt='Ultra Times Logo' className='h-8 w-auto' />
               <span className='text-xl font-cabin font-semibold text-primary-300'>Ultra Times</span>
             </div>
-            <p className='text-sm mb-4 font-quicksand text-gray-300'>Some dolor amet nisi. Vestibulum incidunt lectus sed magna fringilla sagittis.</p>
+            <p className='text-sm mb-4 font-quicksand text-gray-300'>Découvrez les dernières actualités et tendances du monde de la blockchain.</p>
             <p className='text-xs text-gray-400'>© 2025 Ultra Times. All rights reserved.</p>
-            <div className='flex space-x-4 mt-2 text-xs text-gray-400 justify-center md:justify-start'>
-              <Link to='/mentions' className='hover:text-primary-300 transition-colors'>
-                Mentions légales
-              </Link>
-              <span>•</span>
-              <Link to='/terms' className='hover:text-primary-300 transition-colors'>
-                Terms of Service
-              </Link>
-              <span>•</span>
-              <Link to='/privacy' className='hover:text-primary-300 transition-colors'>
-                Privacy Policy
-              </Link>
-            </div>
           </div>
 
           <div className='text-center md:text-left'>
@@ -67,26 +54,21 @@ function Footer() {
           </div>
 
           <div className='text-center md:text-left'>
-            <h3 className='font-cabin font-semibold mb-4 text-primary-300'>About</h3>
+            <h3 className='font-cabin font-semibold mb-4 text-primary-300'>À propos</h3>
             <div className='space-y-2 font-quicksand flex flex-col items-center md:items-start'>
               <div>
-                <Link to='/shop' className='text-gray-300 hover:text-primary-300 transition-colors'>
-                  Shop
+                <Link to='/legal' className='text-gray-300 hover:text-primary-300 transition-colors'>
+                  Legal Information
                 </Link>
               </div>
               <div>
-                <Link to='/authors' className='text-gray-300 hover:text-primary-300 transition-colors'>
-                  Authors
+                <Link to='/terms' className='text-gray-300 hover:text-primary-300 transition-colors'>
+                  Terms of Sale
                 </Link>
               </div>
               <div>
-                <Link to='/sitemap' className='text-gray-300 hover:text-primary-300 transition-colors'>
-                  Sitemap
-                </Link>
-              </div>
-              <div>
-                <Link to='/about' className='text-gray-300 hover:text-primary-300 transition-colors'>
-                  About us
+                <Link to='/privacy' className='text-gray-300 hover:text-primary-300 transition-colors'>
+                  Privacy Policy
                 </Link>
               </div>
               <div>
