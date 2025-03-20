@@ -1,73 +1,5 @@
-/** @jsx React.createElement */
-import { useState, ReactElement, useEffect } from 'react'
-
-type Language = 'fr' | 'en' | 'de'
-
-type TranslationKey = 'home' | 'collections' | 'authors' | 'shop' | 'contact' | 'connect_wallet' | 'profile_settings' | 'my_collections' | 'disconnect' | 'connected_wallet' | 'wallet_connect_error' | 'wallet_connect_success' | 'wallet_disconnect_error' | 'wallet_disconnect_success'
-
-interface TranslationDictionary {
-  fr: { [key in TranslationKey]: string }
-  en: { [key in TranslationKey]: string }
-  de: { [key in TranslationKey]: string }
-}
-
-const translations: TranslationDictionary = {
-  fr: {
-    home: 'Accueil',
-    collections: 'Collections',
-    authors: 'Auteurs',
-    shop: 'Boutique',
-    contact: 'Contact',
-    connect_wallet: 'Connecter le Wallet',
-    profile_settings: 'Paramètres du Profil',
-    my_collections: 'Mes Collections',
-    disconnect: 'Déconnecter',
-    connected_wallet: 'Wallet Connecté',
-    wallet_connect_error: 'Échec de la connexion au wallet',
-    wallet_connect_success: 'Wallet connecté avec succès !',
-    wallet_disconnect_error: 'Échec de la déconnexion du wallet',
-    wallet_disconnect_success: 'Wallet déconnecté avec succès !'
-  },
-  en: {
-    home: 'Home',
-    collections: 'Collections',
-    authors: 'Authors',
-    shop: 'Shop',
-    contact: 'Contact',
-    connect_wallet: 'Connect Wallet',
-    profile_settings: 'Profile Settings',
-    my_collections: 'My Collections',
-    disconnect: 'Disconnect',
-    connected_wallet: 'Connected Wallet',
-    wallet_connect_error: 'Failed to connect wallet',
-    wallet_connect_success: 'Wallet connected successfully!',
-    wallet_disconnect_error: 'Failed to disconnect wallet',
-    wallet_disconnect_success: 'Wallet disconnected successfully!'
-  },
-  de: {
-    home: 'Startseite',
-    collections: 'Sammlungen',
-    authors: 'Autoren',
-    shop: 'Shop',
-    contact: 'Kontakt',
-    connect_wallet: 'Wallet Verbinden',
-    profile_settings: 'Profileinstellungen',
-    my_collections: 'Meine Sammlungen',
-    disconnect: 'Trennen',
-    connected_wallet: 'Wallet Verbunden',
-    wallet_connect_error: 'Wallet-Verbindung fehlgeschlagen',
-    wallet_connect_success: 'Wallet erfolgreich verbunden!',
-    wallet_disconnect_error: 'Wallet-Trennung fehlgeschlagen',
-    wallet_disconnect_success: 'Wallet erfolgreich getrennt!'
-  }
-}
-
-interface UseTranslationReturn {
-  t: (key: TranslationKey) => string
-  currentLang: Language
-  setCurrentLang: (lang: Language) => void
-  getCurrentFlag: () => ReactElement
-}
+import { ReactElement } from 'react'
+import { useTranslation as useTranslationContext } from '../contexts/TranslationContext'
 
 const FrenchFlag = () => (
   <svg className='w-6 h-4' viewBox='0 0 36 24'>
@@ -94,27 +26,8 @@ const GermanFlag = () => (
   </svg>
 )
 
-const getBrowserLanguage = (): Language => {
-  const lang = navigator.language.toLowerCase().split('-')[0]
-  if (lang === 'fr' || lang === 'en' || lang === 'de') {
-    return lang as Language
-  }
-  return 'en' // Default to English if browser language is not supported
-}
-
-export const useTranslation = (): UseTranslationReturn => {
-  const [currentLang, setCurrentLang] = useState<Language>(() => {
-    const savedLang = localStorage.getItem('language') as Language
-    return savedLang || getBrowserLanguage()
-  })
-
-  useEffect(() => {
-    localStorage.setItem('language', currentLang)
-  }, [currentLang])
-
-  const t = (key: TranslationKey): string => {
-    return translations[currentLang][key]
-  }
+export const useTranslation = () => {
+  const { currentLang, setCurrentLang, t } = useTranslationContext()
 
   const getCurrentFlag = (): ReactElement => {
     switch (currentLang) {

@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import {AlertType} from '../../context/AlertContext'
+import {AlertType} from '../../contexts/AlertContext'
 import useAlerts from '../../hooks/useAlert'
 
 // Individual Alert Component

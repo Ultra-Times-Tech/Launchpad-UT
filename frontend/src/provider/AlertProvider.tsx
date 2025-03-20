@@ -1,5 +1,5 @@
 import { useState, useCallback, ReactNode } from 'react'
-import { AlertContext, Alert } from '../context/AlertContext'
+import { AlertContext, Alert } from '../contexts/AlertContext'
 
 // Alert Provider Component
 export const AlertProvider = ({ children }: { children: ReactNode }) => {
