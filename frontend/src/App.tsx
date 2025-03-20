@@ -11,7 +11,6 @@ import Footer from './components/Footer'
 import {AlertContainer} from './components/Alert/Alert'
 import ProfilePage from './views/Profile/ProfilePage'
 import MyCollectionsPage from './views/Profile/MyCollectionsPage'
-import TransactionsPage from './views/Profile/TransactionsPage'
 
 function App() {
   return (
@@ -26,7 +25,6 @@ function App() {
           {/* Profile */}
           <Route path='/profile' element={<ProfilePage />} />
           <Route path='/my-collections' element={<MyCollectionsPage />} />
-          <Route path='/transactions' element={<TransactionsPage />} />
           {/* Test */}
           <Route path='/factory-test' element={<FactoryTestPage />} />
           <Route path='/mint-test' element={<MintTestPage />} />

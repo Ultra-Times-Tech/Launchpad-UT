@@ -167,9 +167,6 @@ function Header() {
                     <Link to='/my-collections' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsProfileOpen(false)}>
                       My Collections
                     </Link>
-                    <Link to='/transactions' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsProfileOpen(false)}>
-                      Transaction History
-                    </Link>
                     <button onClick={handleDisconnect} className='w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-700 transition-colors'>
                       Disconnect Wallet
                     </button>
@@ -227,9 +224,6 @@ function Header() {
                   </Link>
                   <Link to='/my-collections' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
                     My Collections
-                  </Link>
-                  <Link to='/transactions' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
-                    Transaction History
                   </Link>
                   <button onClick={handleDisconnect} className='w-full text-left py-2 text-red-400 hover:text-red-500 transition-colors'>
                     Disconnect Wallet
