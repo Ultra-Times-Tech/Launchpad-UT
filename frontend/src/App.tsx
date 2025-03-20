@@ -11,7 +11,7 @@ import Footer from './components/Footer'
 import {AlertContainer} from './components/Alert/Alert'
 import ProfilePage from './views/Profile/ProfilePage'
 import MyCollectionsPage from './views/Profile/MyCollectionsPage'
-import TransactionsPage from './views/Profile/TransactionsPage'
+import MainContent from './components/MainContent'
 import MentionsLegalesPage from './views/Legal/LegalPage'
 import PrivacyPolicyPage from './views/Legal/PrivacyPolicyPage'
 import TermsOfServicePage from './views/Legal/TermsOfServicePage'
@@ -21,7 +21,7 @@ function App() {
   return (
     <div className='flex flex-col min-h-screen bg-dark-950 text-white'>
       <Header />
-      <main className='flex-grow'>
+      <MainContent>
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path='/collections' element={<CollectionsPage />} />
@@ -30,7 +30,6 @@ function App() {
           {/* Profile */}
           <Route path='/profile' element={<ProfilePage />} />
           <Route path='/my-collections' element={<MyCollectionsPage />} />
-          <Route path='/transactions' element={<TransactionsPage />} />
           {/* Legal and contact */}
           <Route path='/legal' element={<MentionsLegalesPage />} />
           <Route path='/privacy' element={<PrivacyPolicyPage />} />
@@ -40,7 +39,7 @@ function App() {
           <Route path='/factory-test' element={<FactoryTestPage />} />
           <Route path='/mint-test' element={<MintTestPage />} />
         </Routes>
-      </main>
+      </MainContent>
       <Footer />
       <AlertContainer position='top-right' />
     </div>
