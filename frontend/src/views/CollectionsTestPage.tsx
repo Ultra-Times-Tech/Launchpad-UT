@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 
 interface CollectionAttributes {
   id: number;
@@ -33,57 +33,21 @@ function CollectionsTestPage() {
   const [isLoading, setIsLoading] = useState(false)
 
   const fetchCollections = async () => {
-    console.log('Début de la récupération des collections');
     setIsLoading(true)
     setError(null)
 
     try {
-      const apiUrl = import.meta.env.VITE_APP_API_URL || 'https://launchpad-ut-backend.vercel.app';
-      console.log('URL de l\'API:', apiUrl);
-      console.log('Envoi de la requête à /api/collections');
-      const response = await axios.get<CollectionsResponse>(`${apiUrl}collections`, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
-      console.log('Réponse complète:', JSON.stringify(response.data, null, 2));
-      console.log('Structure de la réponse:', {
-        hasData: !!response.data,
-        hasDataArray: !!response.data?.data,
-        dataType: typeof response.data?.data,
-        isArray: Array.isArray(response.data?.data),
-        keys: Object.keys(response.data || {}),
-        dataKeys: response.data?.data ? Object.keys(response.data.data) : []
-      });
-      
-      if (!response.data?.data || !Array.isArray(response.data.data)) {
-        console.error('Format de réponse invalide:', response.data);
-        setError('Format de réponse invalide du serveur');
-        return;
-      }
-
+      const response = await axios.get<CollectionsResponse>('/api/collections')
       setCollections(response.data.data)
     } catch (err) {
-      const axiosError = err as AxiosError;
-      console.error('Erreur détaillée lors de la récupération des collections:', {
-        message: axiosError.message,
-        status: axiosError.response?.status,
-        data: axiosError.response?.data,
-        config: {
-          url: axiosError.config?.url,
-          headers: axiosError.config?.headers
-        }
-      });
-      setError(`Erreur lors de la récupération des collections: ${axiosError.message}`)
+      console.error('Erreur lors de la récupération des collections:', err)
+      setError('Erreur lors de la récupération des collections')
     } finally {
       setIsLoading(false)
-      console.log('Fin de la récupération des collections');
     }
   }
 
   useEffect(() => {
-    console.log('CollectionsTestPage monté, lancement du fetchCollections');
     fetchCollections()
   }, [])
 
