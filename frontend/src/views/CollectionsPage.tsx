@@ -188,7 +188,7 @@ function generateMockCollections(count: number): CollectionCardProps[] {
     },
     {
       id: 2,
-      name: 'Ultra Street-Cubism Discover',
+      name: 'Ultra Street-Cubism',
       description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations.',
       image: '/banners/factory-artifact.png',
       artist: 'Ultra Times Archaeology',

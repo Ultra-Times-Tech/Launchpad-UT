@@ -14,7 +14,6 @@ interface Collection {
   releaseDate: string
   factories: FactoryCardProps[]
   features: string[]
-  story: string
 }
 
 function CollectionDetailsPage() {
@@ -109,13 +108,6 @@ function CollectionDetailsPage() {
               <h2 className='text-2xl font-bold mb-4 text-primary-300'>About {collection.name}</h2>
               <p className='text-gray-300 mb-6'>{collection.description}</p>
 
-              {activeTab === 'story' && (
-                <div className='mb-6'>
-                  <h3 className='text-xl font-bold mb-3 text-primary-300'>Story</h3>
-                  <p className='text-gray-300'>{collection.story}</p>
-                </div>
-              )}
-
               {activeTab === 'features' && (
                 <div className='mb-6'>
                   <h3 className='text-xl font-bold mb-3 text-primary-300'>Features</h3>
@@ -162,13 +154,13 @@ function CollectionDetailsPage() {
         <div className='container mx-auto px-4 py-8 mb-12'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
             <div className='bg-dark-800 p-6 rounded-xl'>
-              <h3 className='text-xl font-bold mb-4 text-primary-300'>Info marketing sur la collection</h3>
-              <p className='text-gray-300 mb-4'>Info marketing sur la collection, les utilités, les grades, table...</p>
-              <p className='text-primary-300 font-semibold'>et tous sont en VIP</p>
+              <h3 className='text-xl font-bold mb-4 text-primary-300'>Street Art Reimagined</h3>
+              <p className='text-gray-300 mb-4'>Experience the perfect fusion of street art and cubism, where each piece tells a unique story through geometric forms and vibrant colors. A groundbreaking collection that redefines the boundaries of digital art.</p>
+              <p className='text-primary-300 font-semibold'>Limited edition of 2 unique pieces</p>
             </div>
 
             <div className='flex items-center justify-center'>
-              <img src='https://picsum.photos/400/300?random=10' alt='VIP Marketing' className='rounded-xl w-full h-48 object-cover' />
+              <img src='/launchpad-ut/banners/dark-counsil.avif' alt='Dark Wisdom Counsellor' className='rounded-xl w-full h-48 object-cover' />
             </div>
           </div>
         </div>
@@ -176,13 +168,13 @@ function CollectionDetailsPage() {
         <div className='container mx-auto px-4 py-8 mb-12'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
             <div className='flex items-center justify-center'>
-              <img src='https://picsum.photos/400/300?random=11' alt='VIP Marketing' className='rounded-xl w-full h-48 object-cover' />
+              <img src='/launchpad-ut/banners/phygital.avif' alt='Phygital Voucher' className='rounded-xl w-full h-48 object-cover' />
             </div>
 
             <div className='bg-dark-800 p-6 rounded-xl'>
-              <h3 className='text-xl font-bold mb-4 text-primary-300'>Info marketing sur la collection</h3>
-              <p className='text-gray-300 mb-4'>Info marketing sur la collection, les utilités, les grades, table...</p>
-              <p className='text-primary-300 font-semibold'>et tous sont en VIP</p>
+              <h3 className='text-xl font-bold mb-4 text-primary-300'>Exclusivity & Rarity</h3>
+              <p className='text-gray-300 mb-4'>Each piece in the collection is a unique artwork signed by C-la. Take advantage of an exceptional opportunity with our special raffle system: for every 5 UniQ purchased, you have a chance to win a rare ViT UniQ from the UT Collection.</p>
+              <p className='text-primary-300 font-semibold'>Physical artwork conversion available</p>
             </div>
           </div>
         </div>
@@ -203,8 +195,6 @@ function getMockCollection(id: number): Collection {
       floorPrice: '0.5 ETH',
       creator: 'Ultra Times Studios',
       releaseDate: 'March 15, 2025',
-      story:
-        'In the year 2150, the Ultra Times Corporation revolutionized warfare with their advanced weapons technology. The Factory Arsenal collection represents the pinnacle of their achievements, featuring weapons that combine cutting-edge technology with artistic design. Each weapon in this collection has been meticulously crafted to reflect both form and function, with unique attributes that make them valuable not just as digital collectibles but as functional items within the Ultra Times ecosystem. The story of Factory Arsenal begins in the research labs of Ultra Times, where brilliant engineers and designers worked tirelessly to create weapons that would change the course of history. These weapons were not just tools of destruction, but works of art that reflected the cultural and technological advancements of their time. Now, these legendary weapons are available as NFTs, allowing collectors to own a piece of this fictional future history.',
       features: ['Each weapon has unique attributes and power levels', 'Weapons can be used in the Ultra Times gaming ecosystem', 'Rare and legendary weapons include animated visual effects', 'Owners receive exclusive access to special in-game events', 'Limited edition weapons with enhanced capabilities', 'Blockchain-verified ownership and authenticity'],
       factories: [
         {
@@ -251,57 +241,42 @@ function getMockCollection(id: number): Collection {
     },
     {
       id: 2,
-      name: 'Ultra Street-Cubism Discover',
-      description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations.',
+      name: 'Ultra Street-Cubism',
+      description: 'Discover Ultra Street-Cubism, a groundbreaking collection that merges street art with cubism. Each piece is a unique digital masterpiece that captures the essence of urban culture through geometric forms and vibrant colors.',
       image: '/banners/factory-artifact.png',
-      totalItems: 500,
-      floorPrice: '0.8 ETH',
-      creator: 'Ultra Times Archaeology',
-      releaseDate: 'April 22, 2025',
-      story:
-        'Throughout human history, ancient civilizations have created artifacts of immense power and mystery. The Factory Artifact collection brings these legendary items to life as digital collectibles. Each artifact in this collection has a unique history and set of powers, drawn from mythologies and legends from around the world. From the Amulet of Anubis to the Chalice of Immortality, these artifacts represent the pinnacle of ancient craftsmanship and mystical knowledge. The Ultra Times archaeological team has spent decades researching and documenting these artifacts, creating detailed digital recreations that capture their essence and power. Now, collectors can own these pieces of history and unlock their potential within the Ultra Times universe.',
-      features: ['Artifacts based on real-world mythologies and legends', 'Each artifact has a unique backstory and lore', 'Artifacts provide special abilities in Ultra Times games', 'Detailed 3D models with intricate designs', 'Artifact combinations unlock hidden features', 'Ownership grants access to exclusive artifact lore'],
+      totalItems: 2,
+      floorPrice: '0 ETH',
+      creator: 'C-la',
+      releaseDate: 'June 01, 2024',
+      features: [
+        'Unique fusion of street art and cubism',
+        'Each piece signed by the artist C-la',
+        'Exclusive chance to win ViT UniQ through special raffle',
+        'Physical artwork conversion option available',
+        'Limited edition of only 2 unique pieces',
+        'Blockchain-verified authenticity'
+      ],
       factories: [
         {
           id: 1,
           collectionId: 2,
-          name: 'Personnages',
-          description: 'Donec nec ante nisi. Vestibulum tincidunt lectus sed magna.',
-          image: 'https://picsum.photos/400/300?random=5',
-          mintPrice: '0.5 UOS',
-          supply: 100,
-          minted: 45,
+          name: 'Dark Wisdom Counsellor',
+          description: 'A stunning Dark Street Cubism painting inspired by an Ultra\'s Movement Elder design. This exclusive creation is personally signed by C-la. By acquiring this Art, you\'re automatically entered into a special raffle that occurs every 5 UniQ purchases (excluding Vouchers), giving you a chance to win a high-rarity ViT UniQ from the UT Collection.',
+          image: '/launchpad-ut/banners/dark-counsil.avif',
+          mintPrice: '0 UOS',
+          supply: 1,
+          minted: 0,
         },
         {
           id: 2,
           collectionId: 2,
-          name: 'Arsenal',
-          description: 'Morbi eget mattis vel felis sodales commodo tempor magna.',
-          image: 'https://picsum.photos/400/300?random=6',
-          mintPrice: '0.8 UOS',
-          supply: 150,
-          minted: 23,
-        },
-        {
-          id: 3,
-          collectionId: 2,
-          name: 'Artifacts',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-          image: 'https://picsum.photos/400/300?random=7',
-          mintPrice: '1.2 UOS',
-          supply: 75,
-          minted: 62,
-        },
-        {
-          id: 4,
-          collectionId: 2,
-          name: 'Power boosters',
-          description: 'Vivamus feugiat verius accumsan. Proin ac orci sed mattis.',
-          image: 'https://picsum.photos/400/300?random=8',
-          mintPrice: '0.3 UOS',
-          supply: 200,
-          minted: 89,
-        },
+          name: 'Phygital Voucher',
+          description: 'Transform your digital Ultra Street-Cubism collection into a physical masterpiece. This voucher entitles you to receive a printed version of your UniQ on a premium 60cm x 80cm dibond support, ensuring durability and longevity. (Shipping costs not included) For more information, contact Ultra Times teams on Discord: https://discord.gg/R2zvShJAyh',
+          image: '/launchpad-ut/banners/phygital.avif',
+          mintPrice: '0 UOS',
+          supply: 1,
+          minted: 0,
+        }
       ],
     },
     {
@@ -313,8 +288,6 @@ function getMockCollection(id: number): Collection {
       floorPrice: '1.2 ETH',
       creator: 'Ultra Times Creative',
       releaseDate: 'May 10, 2025',
-      story:
-        'The Ultra Times universe is home to countless unique characters, each with their own stories, abilities, and destinies. The Factory Characters collection brings these diverse individuals to life as digital collectibles. From brave heroes to cunning villains, mystical beings to technological wonders, this collection represents the rich tapestry of personalities that populate the Ultra Times narrative. Each character has been carefully designed with a detailed backstory, unique visual style, and special abilities that make them valuable within the Ultra Times ecosystem. Collectors can own these characters and use them in various Ultra Times games and experiences, unlocking new storylines and gameplay possibilities.',
       features: ['Characters with unique abilities and attributes', 'Detailed character backstories and lore', 'Characters can be used in Ultra Times games', 'Different character classes with special abilities', 'Character progression and customization', 'Limited edition characters with unique storylines'],
       factories: [
         {
@@ -336,26 +309,6 @@ function getMockCollection(id: number): Collection {
           mintPrice: '0.8 UOS',
           supply: 150,
           minted: 23,
-        },
-        {
-          id: 3,
-          collectionId: 3,
-          name: 'Artifacts',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-          image: 'https://picsum.photos/400/300?random=11',
-          mintPrice: '1.2 UOS',
-          supply: 75,
-          minted: 62,
-        },
-        {
-          id: 4,
-          collectionId: 3,
-          name: 'Power boosters',
-          description: 'Vivamus feugiat verius accumsan. Proin ac orci sed mattis.',
-          image: 'https://picsum.photos/400/300?random=12',
-          mintPrice: '0.3 UOS',
-          supply: 200,
-          minted: 89,
         },
       ],
     },

@@ -120,48 +120,45 @@ function MintPage() {
       try {
         setTimeout(() => {
           const factoryNames: Record<string, string> = {
-            '1': 'Personnages',
-            '2': 'Arsenal',
-            '3': 'Artifacts',
-            '4': 'Power boosters',
+            '1': 'Dark Wisdom Counsellor',
+            '2': 'Phygital Voucher',
           }
 
           const collectionNames: Record<string, string> = {
-            '1': 'Vox-in-Time',
-            '2': 'Ultra Street-Cubism Discover',
-            '3': 'Crypto Punks Edition',
+            '1': 'Ultra Street-Cubism',
+            '2': 'Ultra Street-Cubism',
           }
 
           setFactory({
             id: Number(category),
-            name: factoryNames[category || '1'] || 'Personnages',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl vel ultricies lacinia, nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl.',
-            mintPrice: '0.5 UOS',
-            supply: 100,
-            minted: 45,
-            collectionName: collectionNames[id || '1'] || 'Vox-in-Time',
+            name: factoryNames[category || '1'] || 'Dark Wisdom Counsellor',
+            description: category === '1' 
+              ? 'A stunning Dark Street Cubism painting inspired by an Ultra\'s Movement Elder design. This exclusive creation is personally signed by C-la. By acquiring this Art, you\'re automatically entered into a special raffle that occurs every 5 UniQ purchases (excluding Vouchers), giving you a chance to win a high-rarity ViT UniQ from the UT Collection.'
+              : 'Transform your digital Ultra Street-Cubism collection into a physical masterpiece. This voucher entitles you to receive a printed version of your UniQ on a premium 60cm x 80cm dibond support, ensuring durability and longevity. (Shipping costs not included) For more information, contact Ultra Times teams on Discord: https://discord.gg/R2zvShJAyh',
+            mintPrice: '0 UOS',
+            supply: 1,
+            minted: 0,
+            collectionName: collectionNames[id || '1'] || 'Ultra Street-Cubism',
           })
 
           setPhases([
-            {name: 'Phase private', active: true, date: 'Public: 11 janvier 2025'},
-            {name: 'Phase private', active: false, date: 'Public: 11 janvier 2025'},
-            {name: 'Phase publique', active: false, date: 'Public: 21 mars 2025'},
+            {name: 'Public Mint', active: true, date: 'Available now'},
           ])
 
           // Add more minted items
-          const mockMintedItems = Array.from({length: 10}, (_, index) => ({
+          const mockMintedItems = Array.from({length: 5}, (_, index) => ({
             id: index + 1,
-            name: `Personnage #${45 - index}`,
-            image: `https://picsum.photos/200/200?random=${index + 1}`,
-            price: '0.5 UOS',
+            name: category === '1' ? 'Dark Wisdom Counsellor' : 'Phygital Voucher',
+            image: category === '1' ? '/launchpad-ut/banners/dark-counsil.avif' : '/launchpad-ut/banners/phygital.avif',
+            price: '0 UOS',
             timestamp: `${index * 3 + 2} minutes ago`,
             minter: {
               address: `0x${Math.random().toString(16).slice(2)}abcdef${Math.random().toString(16).slice(2)}`,
-              username: ['CryptoWhale', 'NFTHunter', 'PixelMaster', 'ArtCollector', 'CryptoArtist', 'BlockchainGuru', 'TokenMaster', 'DigitalCollector', 'NFTEnthusiast', 'CryptoKing'][index],
+              username: ['CryptoWhale', 'NFTHunter', 'PixelMaster', 'ArtCollector', 'CryptoArtist'][index],
             },
             transactionHash: `0x${Math.random().toString(16).slice(2)}abcdef${Math.random().toString(16).slice(2)}`,
             tokenId: `#${1234 + index}`,
-            rarity: ['Legendary', 'Rare', 'Common'][Math.floor(Math.random() * 3)],
+            rarity: 'Legendary',
           }))
 
           setMintedItems(mockMintedItems)
@@ -242,7 +239,7 @@ function MintPage() {
           <div className='lg:col-span-8'>
             <div className='bg-dark-800 rounded-xl overflow-hidden shadow-lg backdrop-blur-sm border border-dark-700'>
               <div className='aspect-w-16 aspect-h-9'>
-                <img src='https://picsum.photos/800/450?random=10' alt={factory.name} className='w-full h-full object-cover' />
+                <img src={category === '1' ? '/launchpad-ut/banners/dark-counsil.avif' : '/launchpad-ut/banners/phygital.avif'} alt={factory.name} className='w-full h-full object-cover' />
               </div>
               <div className='p-6'>
                 <h2 className='text-2xl font-bold text-primary-300 mb-4'>{factory.name}</h2>
@@ -323,43 +320,47 @@ function MintPage() {
         <div className='mt-12 grid grid-cols-1 md:grid-cols-2 gap-8'>
           <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300'>
             <div className='relative h-48 mb-4 rounded-lg overflow-hidden'>
-              <img src='https://picsum.photos/500/300?random=20' alt='Marketing' className='w-full h-full object-cover' />
+              <img src={category === '1' ? '/launchpad-ut/banners/dark-counsil.avif' : '/launchpad-ut/banners/phygital.avif'} alt='Marketing' className='w-full h-full object-cover' />
               <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent'></div>
             </div>
             <h3 className='text-xl font-bold text-primary-300 mb-2'>Exclusive Benefits</h3>
-            <p className='text-gray-300'>Discover the exclusive benefits reserved for holders of this factory.</p>
+            <p className='text-gray-300'>
+              {category === '1' 
+                ? 'Get a chance to win a high-rarity ViT UniQ through our special raffle system. Every 5 UniQ purchases (excluding Vouchers) enters you into a draw for exclusive rewards.'
+                : 'Transform your digital artwork into a physical masterpiece. This voucher entitles you to receive a premium 60cm x 80cm dibond print of your UniQ, ensuring lasting quality and durability.'}
+            </p>
           </div>
 
           <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300'>
-            <h3 className='text-xl font-bold text-primary-300 mb-4'>Roadmap</h3>
+            <h3 className='text-xl font-bold text-primary-300 mb-4'>Collection Details</h3>
             <div className='relative pl-8 before:content-[""] before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-primary-600'>
               <div className='mb-6 relative'>
                 <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
                   <span className='text-white text-xs font-bold'>1</span>
                 </div>
-                <h4 className='text-white font-bold mb-1'>Collection Launch</h4>
-                <p className='text-gray-400 text-sm'>January 2025</p>
+                <h4 className='text-white font-bold mb-1'>Limited Edition</h4>
+                <p className='text-gray-400 text-sm'>Only 2 unique pieces available</p>
               </div>
               <div className='mb-6 relative'>
                 <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
                   <span className='text-white text-xs font-bold'>2</span>
                 </div>
-                <h4 className='text-white font-bold mb-1'>Game Integration</h4>
-                <p className='text-gray-400 text-sm'>March 2025</p>
+                <h4 className='text-white font-bold mb-1'>Artist Signed</h4>
+                <p className='text-gray-400 text-sm'>Each piece signed by C-la</p>
               </div>
               <div className='mb-6 relative'>
                 <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
                   <span className='text-white text-xs font-bold'>3</span>
                 </div>
-                <h4 className='text-white font-bold mb-1'>Exclusive Events</h4>
-                <p className='text-gray-400 text-sm'>June 2025</p>
+                <h4 className='text-white font-bold mb-1'>Physical Conversion</h4>
+                <p className='text-gray-400 text-sm'>Option to convert to physical artwork</p>
               </div>
               <div className='relative'>
                 <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
                   <span className='text-white text-xs font-bold'>4</span>
                 </div>
-                <h4 className='text-white font-bold mb-1'>New Features</h4>
-                <p className='text-gray-400 text-sm'>September 2025</p>
+                <h4 className='text-white font-bold mb-1'>Special Raffle</h4>
+                <p className='text-gray-400 text-sm'>Chance to win ViT UniQ rewards</p>
               </div>
             </div>
           </div>
