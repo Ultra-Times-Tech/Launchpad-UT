@@ -1,30 +1,30 @@
-import {useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 
 interface CollectionAttributes {
-  id: number
-  name: string
-  state: number
-  publish_up: string | null
-  publish_down: string | null
-  created: string
-  modified: string
+  id: number;
+  name: string;
+  state: number;
+  publish_up: string | null;
+  publish_down: string | null;
+  created: string;
+  modified: string;
 }
 
 interface Collection {
-  type: string
-  id: string
-  attributes: CollectionAttributes
+  type: string;
+  id: string;
+  attributes: CollectionAttributes;
 }
 
 interface CollectionsResponse {
   links: {
-    self: string
-  }
-  data: Collection[]
+    self: string;
+  };
+  data: Collection[];
   meta: {
-    'total-pages': number
-  }
+    'total-pages': number;
+  };
 }
 
 function CollectionsTestPage() {
@@ -37,8 +37,7 @@ function CollectionsTestPage() {
     setError(null)
 
     try {
-      const apiUrl = import.meta.env.VITE_APP_API_URL || 'https://launchpad-ut-backend.vercel.app'
-      const response = await axios.get<CollectionsResponse>(`${apiUrl}collections`)
+      const response = await axios.get<CollectionsResponse>('/api/collections')
       setCollections(response.data.data)
     } catch (err) {
       console.error('Erreur lors de la récupération des collections:', err)
@@ -59,9 +58,9 @@ function CollectionsTestPage() {
 
   const getStatusBadge = (state: number) => {
     if (state === 1) {
-      return <span className='px-2 py-1 text-xs font-semibold text-green-300 bg-green-500/20 rounded-full'>Publié</span>
+      return <span className="px-2 py-1 text-xs font-semibold text-green-300 bg-green-500/20 rounded-full">Publié</span>
     }
-    return <span className='px-2 py-1 text-xs font-semibold text-yellow-300 bg-yellow-500/20 rounded-full'>Brouillon</span>
+    return <span className="px-2 py-1 text-xs font-semibold text-yellow-300 bg-yellow-500/20 rounded-full">Brouillon</span>
   }
 
   return (
@@ -73,14 +72,18 @@ function CollectionsTestPage() {
           {/* Collections Section */}
           <div className='bg-dark-800 rounded-lg p-6 border border-dark-700'>
             <h2 className='text-xl font-bold text-primary-300 mb-4'>Collections Disponibles</h2>
-
+            
             {isLoading && (
               <div className='text-center py-4'>
                 <p className='text-primary-300'>Chargement des collections...</p>
               </div>
             )}
 
-            {error && <div className='p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-300'>{error}</div>}
+            {error && (
+              <div className='p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-300'>
+                {error}
+              </div>
+            )}
 
             {!isLoading && !error && collections.length === 0 && (
               <div className='text-center py-4'>
@@ -90,13 +93,18 @@ function CollectionsTestPage() {
 
             {!isLoading && !error && collections.length > 0 && (
               <div className='grid gap-4'>
-                {collections.map(collection => (
-                  <div key={collection.id} className='bg-dark-700 rounded-lg p-4 border border-dark-600 hover:border-primary-500 transition-colors'>
+                {collections.map((collection) => (
+                  <div 
+                    key={collection.id}
+                    className='bg-dark-700 rounded-lg p-4 border border-dark-600 hover:border-primary-500 transition-colors'
+                  >
                     <div className='flex justify-between items-start mb-2'>
-                      <h3 className='text-lg font-semibold text-primary-300'>{collection.attributes.name}</h3>
+                      <h3 className='text-lg font-semibold text-primary-300'>
+                        {collection.attributes.name}
+                      </h3>
                       {getStatusBadge(collection.attributes.state)}
                     </div>
-
+                    
                     <div className='grid grid-cols-2 gap-4 text-sm text-gray-400'>
                       <div>
                         <p className='font-medium text-gray-300'>ID</p>
@@ -124,7 +132,11 @@ function CollectionsTestPage() {
               </div>
             )}
 
-            <button onClick={fetchCollections} className='mt-4 px-6 py-2 bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors' disabled={isLoading}>
+            <button 
+              onClick={fetchCollections}
+              className='mt-4 px-6 py-2 bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors'
+              disabled={isLoading}
+            >
               {isLoading ? 'Actualisation...' : 'Actualiser les Collections'}
             </button>
           </div>
@@ -134,4 +146,4 @@ function CollectionsTestPage() {
   )
 }
 
-export default CollectionsTestPage
+export default CollectionsTestPage 
