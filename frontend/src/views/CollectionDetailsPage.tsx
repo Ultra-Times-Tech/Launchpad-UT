@@ -160,7 +160,7 @@ function CollectionDetailsPage() {
             </div>
 
             <div className='flex items-center justify-center'>
-              <img src='/launchpad-ut/banners/dark-counsil.avif' alt='Dark Wisdom Counsellor' className='rounded-xl w-full h-48 object-cover' />
+              <img src='/banners/dark-counsil.avif' alt='Dark Wisdom Counsellor' className='rounded-xl w-full h-48 object-cover' />
             </div>
           </div>
         </div>
@@ -168,7 +168,7 @@ function CollectionDetailsPage() {
         <div className='container mx-auto px-4 py-8 mb-12'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
             <div className='flex items-center justify-center'>
-              <img src='/launchpad-ut/banners/phygital.avif' alt='Phygital Voucher' className='rounded-xl w-full h-48 object-cover' />
+              <img src='/banners/phygital.avif' alt='Phygital Voucher' className='rounded-xl w-full h-48 object-cover' />
             </div>
 
             <div className='bg-dark-800 p-6 rounded-xl'>
