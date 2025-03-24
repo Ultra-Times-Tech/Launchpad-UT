@@ -40,11 +40,22 @@ function CollectionsTestPage() {
     try {
       console.log('Envoi de la requête à /api/collections');
       const response = await axios.get<CollectionsResponse>('/api/collections')
-      console.log('Réponse reçue:', {
-        status: response.status,
-        dataLength: response.data?.data?.length,
-        totalPages: response.data?.meta?.['total-pages']
+      console.log('Réponse complète:', JSON.stringify(response.data, null, 2));
+      console.log('Structure de la réponse:', {
+        hasData: !!response.data,
+        hasDataArray: !!response.data?.data,
+        dataType: typeof response.data?.data,
+        isArray: Array.isArray(response.data?.data),
+        keys: Object.keys(response.data || {}),
+        dataKeys: response.data?.data ? Object.keys(response.data.data) : []
       });
+      
+      if (!response.data?.data || !Array.isArray(response.data.data)) {
+        console.error('Format de réponse invalide:', response.data);
+        setError('Format de réponse invalide du serveur');
+        return;
+      }
+
       setCollections(response.data.data)
     } catch (err) {
       const axiosError = err as AxiosError;

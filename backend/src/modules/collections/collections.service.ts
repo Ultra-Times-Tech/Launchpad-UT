@@ -24,8 +24,24 @@ export class CollectionsService {
         },
       })
 
-      this.logger.log(`Réponse reçue avec succès. Nombre de collections: ${response.data?.data?.length || 0}`);
-      return response.data
+      this.logger.log('Structure de la réponse:', {
+        hasData: !!response.data,
+        hasDataArray: !!response.data?.data,
+        dataType: typeof response.data?.data,
+        isArray: Array.isArray(response.data?.data),
+        keys: Object.keys(response.data || {}),
+        dataKeys: response.data?.data ? Object.keys(response.data.data) : []
+      });
+
+      this.logger.debug('Réponse complète:', JSON.stringify(response.data, null, 2));
+
+      if (!response.data?.data || !Array.isArray(response.data.data)) {
+        this.logger.error('Format de réponse invalide de l\'API:', response.data);
+        throw new Error('Format de réponse invalide de l\'API');
+      }
+
+      this.logger.log(`Réponse reçue avec succès. Nombre de collections: ${response.data.data.length}`);
+      return response.data;
     } catch (error) {
       this.logger.error('Erreur lors de la récupération des collections:', {
         message: error.message,
