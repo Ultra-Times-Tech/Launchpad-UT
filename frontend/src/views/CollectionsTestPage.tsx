@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
 interface CollectionAttributes {
   id: number;
@@ -33,21 +33,39 @@ function CollectionsTestPage() {
   const [isLoading, setIsLoading] = useState(false)
 
   const fetchCollections = async () => {
+    console.log('Début de la récupération des collections');
     setIsLoading(true)
     setError(null)
 
     try {
+      console.log('Envoi de la requête à /api/collections');
       const response = await axios.get<CollectionsResponse>('/api/collections')
+      console.log('Réponse reçue:', {
+        status: response.status,
+        dataLength: response.data?.data?.length,
+        totalPages: response.data?.meta?.['total-pages']
+      });
       setCollections(response.data.data)
     } catch (err) {
-      console.error('Erreur lors de la récupération des collections:', err)
-      setError('Erreur lors de la récupération des collections')
+      const axiosError = err as AxiosError;
+      console.error('Erreur détaillée lors de la récupération des collections:', {
+        message: axiosError.message,
+        status: axiosError.response?.status,
+        data: axiosError.response?.data,
+        config: {
+          url: axiosError.config?.url,
+          headers: axiosError.config?.headers
+        }
+      });
+      setError(`Erreur lors de la récupération des collections: ${axiosError.message}`)
     } finally {
       setIsLoading(false)
+      console.log('Fin de la récupération des collections');
     }
   }
 
   useEffect(() => {
+    console.log('CollectionsTestPage monté, lancement du fetchCollections');
     fetchCollections()
   }, [])
 
