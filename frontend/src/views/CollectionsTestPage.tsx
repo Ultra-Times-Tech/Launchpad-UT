@@ -38,8 +38,15 @@ function CollectionsTestPage() {
     setError(null)
 
     try {
+      const apiUrl = import.meta.env.VITE_APP_API_URL || 'https://launchpad-ut-backend.vercel.app';
+      console.log('URL de l\'API:', apiUrl);
       console.log('Envoi de la requête à /api/collections');
-      const response = await axios.get<CollectionsResponse>('/api/collections')
+      const response = await axios.get<CollectionsResponse>(`${apiUrl}collections`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
       console.log('Réponse complète:', JSON.stringify(response.data, null, 2));
       console.log('Structure de la réponse:', {
         hasData: !!response.data,
