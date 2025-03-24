@@ -16,6 +16,7 @@ import MentionsLegalesPage from './views/Legal/LegalPage'
 import PrivacyPolicyPage from './views/Legal/PrivacyPolicyPage'
 import TermsOfServicePage from './views/Legal/TermsOfServicePage'
 import ContactPage from './views/ContactPage'
+import AdminDashboard from './views/AdminDashboard'
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
           {/* Profile */}
           <Route path='/profile' element={<ProfilePage />} />
           <Route path='/my-collections' element={<MyCollectionsPage />} />
+          {/* Admin */}
+          <Route path='/admin-ut' element={<AdminDashboard />} />
           {/* Legal and contact */}
           <Route path='/legal' element={<MentionsLegalesPage />} />
           <Route path='/privacy' element={<PrivacyPolicyPage />} />
