@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { CollectionsService } from './collections.service';
 
-@Controller('ultratimes/collections')
+@Controller('collections')
 export class CollectionsController {
   constructor(private readonly collectionsService: CollectionsService) {}
 
