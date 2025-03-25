@@ -240,7 +240,7 @@ function MintPage() {
           <div className='lg:col-span-8'>
             <div className='bg-dark-800 rounded-xl overflow-hidden shadow-lg backdrop-blur-sm border border-dark-700'>
               <div className='aspect-w-16 aspect-h-9'>
-                <img src={category === '1' ? getAssetUrl('/banners/dark-counseller.png') : getAssetUrl('/banners/phygital.png')} alt={factory.name} className='w-full h-full object-cover' />
+                <img src={category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniqphygital.png')} alt={factory.name} className='w-full h-full object-cover' />
               </div>
               <div className='p-6'>
                 <h2 className='text-2xl font-bold text-primary-300 mb-4'>{factory.name}</h2>
