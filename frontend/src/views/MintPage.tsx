@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useRef} from 'react'
 import {useParams, Link} from 'react-router-dom'
 import MintCard from '../components/Card/MintCard'
 import {getAssetUrl} from '../utils/imageHelper'
@@ -40,7 +40,24 @@ interface MintDetailsModalProps {
 }
 
 const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
+  const [isZoomed, setIsZoomed] = useState(false)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const imageRef = useRef<HTMLImageElement>(null)
+
   if (!mint) return null
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!imageRef.current) return
+    const rect = imageRef.current.getBoundingClientRect()
+    setMousePosition({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100
+    })
+  }
+
+  const handleZoomToggle = () => {
+    setIsZoomed(!isZoomed)
+  }
 
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -59,20 +76,52 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
         className='bg-dark-800 rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl border border-dark-700 animate-fadeIn'
         onClick={e => e.stopPropagation()}
       >
-        <div className='relative'>
-          <img 
-            src={mint.image} 
-            alt={mint.name} 
-            className='w-full h-auto max-h-[80vh] object-contain' 
-          />
-          <button 
-            onClick={onClose} 
-            className='absolute top-4 right-4 bg-dark-900/80 hover:bg-dark-900 text-white p-2 rounded-full transition-colors'
+        <div className='relative group'>
+          <div 
+            className={`relative overflow-hidden ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+            onMouseMove={handleMouseMove}
+            onClick={handleZoomToggle}
           >
-            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
-            </svg>
-          </button>
+            <img 
+              ref={imageRef}
+              src={mint.image} 
+              alt={mint.name} 
+              className={`w-full h-auto max-h-[80vh] transition-transform duration-300 ${
+                isZoomed ? 'scale-150' : 'scale-100'
+              }`}
+              style={{
+                transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`
+              }}
+            />
+            {isZoomed && (
+              <div className='absolute inset-0 flex items-center justify-center'>
+                <div className='bg-dark-900/80 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center space-x-2'>
+                  <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4' />
+                  </svg>
+                  <span>Click to zoom out</span>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className='absolute top-4 right-4 flex space-x-2'>
+            <button 
+              onClick={handleZoomToggle}
+              className='bg-dark-900/80 hover:bg-dark-900 text-white p-2 rounded-full transition-colors group-hover:opacity-100 opacity-0'
+            >
+              <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d={isZoomed ? 'M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4' : 'M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'} />
+              </svg>
+            </button>
+            <button 
+              onClick={onClose} 
+              className='bg-dark-900/80 hover:bg-dark-900 text-white p-2 rounded-full transition-colors group-hover:opacity-100 opacity-0'
+            >
+              <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+              </svg>
+            </button>
+          </div>
           {mint.rarity && (
             <div className='absolute bottom-4 right-4'>
               <span className={`px-3 py-1 rounded-full text-xs font-medium ${
