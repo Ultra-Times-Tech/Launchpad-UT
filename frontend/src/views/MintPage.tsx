@@ -51,54 +51,82 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
   }
 
   return (
-    <div className='fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4'>
-      <div className='bg-dark-800 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-dark-700 animate-fadeIn'>
+    <div 
+      className='fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4'
+      onClick={onClose}
+    >
+      <div 
+        className='bg-dark-800 rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl border border-dark-700 animate-fadeIn'
+        onClick={e => e.stopPropagation()}
+      >
         <div className='relative'>
-          <img src={mint.image} alt={mint.name} className='w-full h-64 object-cover' />
-          <button onClick={onClose} className='absolute top-4 right-4 bg-dark-900/80 hover:bg-dark-900 text-white p-2 rounded-full transition-colors'>
+          <img 
+            src={mint.image} 
+            alt={mint.name} 
+            className='w-full h-auto max-h-[80vh] object-contain' 
+          />
+          <button 
+            onClick={onClose} 
+            className='absolute top-4 right-4 bg-dark-900/80 hover:bg-dark-900 text-white p-2 rounded-full transition-colors'
+          >
             <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
             </svg>
           </button>
-          <div className='absolute bottom-4 right-4'>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${mint.rarity === 'Legendary' ? 'bg-yellow-500/20 text-yellow-300' : mint.rarity === 'Rare' ? 'bg-blue-500/20 text-blue-300' : 'bg-gray-500/20 text-gray-300'}`}>{mint.rarity}</span>
-          </div>
+          {mint.rarity && (
+            <div className='absolute bottom-4 right-4'>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                mint.rarity === 'Legendary' ? 'bg-yellow-500/20 text-yellow-300' : 
+                mint.rarity === 'Rare' ? 'bg-blue-500/20 text-blue-300' : 
+                'bg-gray-500/20 text-gray-300'
+              }`}>
+                {mint.rarity}
+              </span>
+            </div>
+          )}
         </div>
-        <div className='p-6 space-y-4'>
-          <div>
-            <h3 className='text-xl font-bold text-primary-300 mb-1'>{mint.name}</h3>
-            <p className='text-sm text-gray-400'>Token ID: {mint.tokenId}</p>
-          </div>
-
-          <div className='space-y-3'>
-            <div className='flex justify-between items-center text-sm'>
-              <span className='text-gray-400'>Price</span>
-              <span className='text-white font-medium'>{mint.price}</span>
+        {mint.transactionHash && (
+          <div className='p-6 space-y-4'>
+            <div>
+              <h3 className='text-xl font-bold text-primary-300 mb-1'>{mint.name}</h3>
+              <p className='text-sm text-gray-400'>Token ID: {mint.tokenId}</p>
             </div>
 
-            <div className='flex justify-between items-center text-sm'>
-              <span className='text-gray-400'>Minted by</span>
-              <div className='flex items-center space-x-2'>
-                <span className='text-primary-300'>{mint.minter.username}</span>
-                <span className='text-gray-500'>({shortenAddress(mint.minter.address)})</span>
-              </div>
-            </div>
-
-            <div className='flex justify-between items-center text-sm'>
-              <span className='text-gray-400'>Time</span>
-              <span className='text-white'>{mint.timestamp}</span>
-            </div>
-
-            <div className='pt-3 border-t border-dark-700'>
+            <div className='space-y-3'>
               <div className='flex justify-between items-center text-sm'>
-                <span className='text-gray-400'>Transaction</span>
-                <a href={`https://explorer.ultra.io/tx/${mint.transactionHash}`} target='_blank' rel='noopener noreferrer' className='text-primary-300 hover:text-primary-400 transition-colors'>
-                  {shortenHash(mint.transactionHash)} ↗
-                </a>
+                <span className='text-gray-400'>Price</span>
+                <span className='text-white font-medium'>{mint.price}</span>
+              </div>
+
+              <div className='flex justify-between items-center text-sm'>
+                <span className='text-gray-400'>Minted by</span>
+                <div className='flex items-center space-x-2'>
+                  <span className='text-primary-300'>{mint.minter.username}</span>
+                  <span className='text-gray-500'>({shortenAddress(mint.minter.address)})</span>
+                </div>
+              </div>
+
+              <div className='flex justify-between items-center text-sm'>
+                <span className='text-gray-400'>Time</span>
+                <span className='text-white'>{mint.timestamp}</span>
+              </div>
+
+              <div className='pt-3 border-t border-dark-700'>
+                <div className='flex justify-between items-center text-sm'>
+                  <span className='text-gray-400'>Transaction</span>
+                  <a 
+                    href={`https://explorer.ultra.io/tx/${mint.transactionHash}`} 
+                    target='_blank' 
+                    rel='noopener noreferrer' 
+                    className='text-primary-300 hover:text-primary-400 transition-colors'
+                  >
+                    {shortenHash(mint.transactionHash)} ↗
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
@@ -239,8 +267,23 @@ function MintPage() {
           {/* Left Column - Image */}
           <div className='lg:col-span-8'>
             <div className='bg-dark-800 rounded-xl overflow-hidden shadow-lg backdrop-blur-sm border border-dark-700'>
-              <div className='aspect-w-16 aspect-h-9'>
-                <img src={category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniqphygital.png')} alt={factory.name} className='w-full h-full object-cover' />
+              <div className='aspect-w-16 aspect-h-5'>
+                <img 
+                  src={category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniqphygital.png')} 
+                  alt={factory.name} 
+                  className='w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity'
+                  onClick={() => setSelectedMint({
+                    id: 0,
+                    name: factory.name,
+                    image: category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniqphygital.png'),
+                    price: factory.mintPrice,
+                    timestamp: '',
+                    minter: { address: '', username: '' },
+                    transactionHash: '',
+                    tokenId: '',
+                    rarity: 'Legendary'
+                  })}
+                />
               </div>
               <div className='p-6'>
                 <h2 className='text-2xl font-bold text-primary-300 mb-4'>{factory.name}</h2>
