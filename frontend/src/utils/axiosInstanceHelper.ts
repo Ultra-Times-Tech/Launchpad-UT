@@ -17,8 +17,8 @@ export const apiRequestor = axios.create({
 
 apiRequestor.interceptors.request.use(
   config => {
-    if (!isProduction) {
-      console.log(`🚀 Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`)
+    if (!isProduction && config.url) {
+      config.url = `/api${config.url}`
     }
     return config
   },
@@ -30,9 +30,6 @@ apiRequestor.interceptors.request.use(
 
 apiRequestor.interceptors.response.use(
   response => {
-    if (!isProduction) {
-      console.log(`✅ Response: ${response.status} from ${response.config.url}`)
-    }
     return response
   },
   error => {
