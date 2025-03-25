@@ -269,13 +269,13 @@ function MintPage() {
             <div className='bg-dark-800 rounded-xl overflow-hidden shadow-lg backdrop-blur-sm border border-dark-700'>
               <div className='aspect-w-16 aspect-h-5'>
                 <img 
-                  src={category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniqphygital.png')} 
+                  src={category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniq-phygital.png')} 
                   alt={factory.name} 
                   className='w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity'
                   onClick={() => setSelectedMint({
                     id: 0,
                     name: factory.name,
-                    image: category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniqphygital.png'),
+                    image: category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniq-phygital.png'),
                     price: factory.mintPrice,
                     timestamp: '',
                     minter: { address: '', username: '' },
