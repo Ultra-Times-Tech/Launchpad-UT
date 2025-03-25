@@ -1,4 +1,5 @@
 import {Link} from 'react-router-dom'
+import {getAssetUrl} from '../../utils/imageHelper'
 
 export interface FactoryCardProps {
   id: number
@@ -15,7 +16,7 @@ function FactoryCard({id, collectionId, name, description, image, mintPrice, sup
   return (
     <div className='bg-dark-800 rounded-xl overflow-hidden'>
       <div className='relative h-40'>
-        <img src={image} alt={name} className='w-full h-full object-cover' />
+        <img src={getAssetUrl(image)} alt={name} className='w-full h-full object-cover' />
       </div>
 
       <div className='p-4'>

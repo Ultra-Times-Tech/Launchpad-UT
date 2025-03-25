@@ -160,7 +160,7 @@ function CollectionDetailsPage() {
             </div>
 
             <div className='flex items-center justify-center'>
-              <img src='/banners/dark-counsil.avif' alt='Dark Wisdom Counsellor' className='rounded-xl w-full h-48 object-cover' />
+              <img src={getAssetUrl('/banners/dark-counseller.png')} alt='Dark Wisdom Counsellor' className='rounded-xl w-full h-48 object-cover' />
             </div>
           </div>
         </div>
@@ -168,7 +168,7 @@ function CollectionDetailsPage() {
         <div className='container mx-auto px-4 py-8 mb-12'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
             <div className='flex items-center justify-center'>
-              <img src='/banners/phygital.avif' alt='Phygital Voucher' className='rounded-xl w-full h-48 object-cover' />
+              <img src={getAssetUrl('/banners/phygital.png')} alt='Phygital Voucher' className='rounded-xl w-full h-48 object-cover' />
             </div>
 
             <div className='bg-dark-800 p-6 rounded-xl'>
@@ -243,26 +243,19 @@ function getMockCollection(id: number): Collection {
       id: 2,
       name: 'Ultra Street-Cubism',
       description: 'Discover Ultra Street-Cubism, a groundbreaking collection that merges street art with cubism. Each piece is a unique digital masterpiece that captures the essence of urban culture through geometric forms and vibrant colors.',
-      image: '/banners/factory-artifact.png',
+      image: '/banners/collection.png',
       totalItems: 2,
       floorPrice: '0 ETH',
       creator: 'C-la',
       releaseDate: 'June 01, 2024',
-      features: [
-        'Unique fusion of street art and cubism',
-        'Each piece signed by the artist C-la',
-        'Exclusive chance to win ViT UniQ through special raffle',
-        'Physical artwork conversion option available',
-        'Limited edition of only 2 unique pieces',
-        'Blockchain-verified authenticity'
-      ],
+      features: ['Unique fusion of street art and cubism', 'Each piece signed by the artist C-la', 'Exclusive chance to win ViT UniQ through special raffle', 'Physical artwork conversion option available', 'Limited edition of only 2 unique pieces', 'Blockchain-verified authenticity'],
       factories: [
         {
           id: 1,
           collectionId: 2,
           name: 'Dark Wisdom Counsellor',
-          description: 'A stunning Dark Street Cubism painting inspired by an Ultra\'s Movement Elder design. This exclusive creation is personally signed by C-la. By acquiring this Art, you\'re automatically entered into a special raffle that occurs every 5 UniQ purchases (excluding Vouchers), giving you a chance to win a high-rarity ViT UniQ from the UT Collection.',
-          image: '/banners/dark-counsil.avif',
+          description: "A stunning Dark Street Cubism painting inspired by an Ultra's Movement Elder design. This exclusive creation is personally signed by C-la. By acquiring this Art, you're automatically entered into a special raffle that occurs every 5 UniQ purchases (excluding Vouchers), giving you a chance to win a high-rarity ViT UniQ from the UT Collection.",
+          image: '/banners/dark-counseller.png',
           mintPrice: '0 UOS',
           supply: 1,
           minted: 0,
@@ -272,11 +265,11 @@ function getMockCollection(id: number): Collection {
           collectionId: 2,
           name: 'Phygital Voucher',
           description: 'Transform your digital Ultra Street-Cubism collection into a physical masterpiece. This voucher entitles you to receive a printed version of your UniQ on a premium 60cm x 80cm dibond support, ensuring durability and longevity. (Shipping costs not included) For more information, contact Ultra Times teams on Discord: https://discord.gg/R2zvShJAyh',
-          image: '/banners/phygital.avif',
+          image: '/banners/phygital.png',
           mintPrice: '0 UOS',
           supply: 1,
           minted: 0,
-        }
+        },
       ],
     },
     {

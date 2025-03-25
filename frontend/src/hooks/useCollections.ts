@@ -70,7 +70,7 @@ export function useCollections() {
             id: 2,
             name: 'Ultra Street-Cubism',
             description: 'Ultra Street-Cubism is a collection of unique NFTs created by an artist. Each NFT is a digital artwork that captures the essence of street art and cubism.',
-            image: '/banners/dark-counsil.avif',
+            image: '/banners/collection.png',
             artist: 'Bob Jacob',
             date: 'Feb 22, 2025',
             totalItems: 500,
