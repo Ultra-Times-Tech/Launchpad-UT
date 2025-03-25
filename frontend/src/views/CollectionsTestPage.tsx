@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+// Helpers
+import { apiRequestor } from '../utils/axiosInstanceHelper';
 
 interface CollectionAttributes {
   id: number;
@@ -37,7 +38,7 @@ function CollectionsTestPage() {
     setError(null)
 
     try {
-      const response = await axios.get<CollectionsResponse>('/api/collections')
+      const response = await apiRequestor.get<CollectionsResponse>('/api/collections')
       setCollections(response.data.data)
     } catch (err) {
       console.error('Erreur lors de la récupération des collections:', err)

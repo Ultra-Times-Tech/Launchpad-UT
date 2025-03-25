@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const isProduction = import.meta.env.PROD
 
-const apiUrl: string = isProduction ? 'https://launchpad-ut-backend.vercel.app/' : 'http://localhost:3000/'
+const apiUrl: string = isProduction ? 'https://launchpad-ut-backend.vercel.app/' : 'https://localhost:5173/'
 
 console.log('API URL:', apiUrl, 'Environment:', isProduction ? 'production' : 'development')
 
