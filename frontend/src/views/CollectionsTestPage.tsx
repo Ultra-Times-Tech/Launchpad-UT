@@ -18,16 +18,6 @@ interface Collection {
   attributes: CollectionAttributes;
 }
 
-interface CollectionsResponse {
-  links: {
-    self: string;
-  };
-  data: Collection[];
-  meta: {
-    'total-pages': number;
-  };
-}
-
 function CollectionsTestPage() {
   const [collections, setCollections] = useState<Collection[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -38,7 +28,7 @@ function CollectionsTestPage() {
     setError(null)
 
     try {
-      const response = await apiRequestor.get<CollectionsResponse>('/api/collections')
+      const response = await apiRequestor.get('/collections')
       setCollections(response.data.data)
     } catch (err) {
       console.error('Erreur lors de la récupération des collections:', err)
