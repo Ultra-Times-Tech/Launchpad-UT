@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from 'react'
+import {useState, useEffect, useCallback, useRef} from 'react'
 import {useSwipe} from './useSwipe'
 
 interface UseSliderProps {
@@ -10,6 +10,7 @@ interface UseSliderProps {
 export const useSlider = ({itemsCount, slidesPerView, autoPlayInterval = 7000}: UseSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [currentSlidesPerView, setCurrentSlidesPerView] = useState(slidesPerView)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Gestion du responsive
   useEffect(() => {
@@ -31,28 +32,47 @@ export const useSlider = ({itemsCount, slidesPerView, autoPlayInterval = 7000}: 
     return () => window.removeEventListener('resize', handleResize)
   }, [slidesPerView])
 
-  // Auto-play
-  useEffect(() => {
+  // Auto-play avec réinitialisation du timer
+  const startAutoPlay = useCallback(() => {
     if (!autoPlayInterval) return
 
-    const interval = setInterval(() => {
+    // Clear existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+    }
+
+    // Start new timer
+    timerRef.current = setInterval(() => {
       setCurrentIndex(current => (current + 1) % (itemsCount - (currentSlidesPerView - 1)))
     }, autoPlayInterval)
-
-    return () => clearInterval(interval)
   }, [itemsCount, currentSlidesPerView, autoPlayInterval])
+
+  useEffect(() => {
+    startAutoPlay()
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+      }
+    }
+  }, [startAutoPlay])
 
   const nextSlide = useCallback(() => {
     setCurrentIndex(current => (current + 1) % (itemsCount - (currentSlidesPerView - 1)))
-  }, [itemsCount, currentSlidesPerView])
+    startAutoPlay() // Réinitialise le timer
+  }, [itemsCount, currentSlidesPerView, startAutoPlay])
 
   const prevSlide = useCallback(() => {
     setCurrentIndex(current => (current - 1 + (itemsCount - (currentSlidesPerView - 1))) % (itemsCount - (currentSlidesPerView - 1)))
-  }, [itemsCount, currentSlidesPerView])
+    startAutoPlay() // Réinitialise le timer
+  }, [itemsCount, currentSlidesPerView, startAutoPlay])
 
-  const goToSlide = useCallback((index: number) => {
-    setCurrentIndex(index)
-  }, [])
+  const goToSlide = useCallback(
+    (index: number) => {
+      setCurrentIndex(index)
+      startAutoPlay() // Réinitialise le timer
+    },
+    [startAutoPlay]
+  )
 
   const {handleTouchStart, handleTouchMove, handleTouchEnd, handleMouseDown, handleMouseMove, handleMouseUp, handleMouseLeave, isDragging} = useSwipe({
     onSwipeLeft: nextSlide,
