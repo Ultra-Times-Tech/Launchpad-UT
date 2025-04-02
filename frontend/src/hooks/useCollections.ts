@@ -38,6 +38,7 @@ export interface TrendingCollection {
   artist: string
   totalItems: number
   floorPrice: string
+  category: string
 }
 
 export function useCollections() {
@@ -240,6 +241,7 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Digital Dreamers',
     totalItems: 500,
     floorPrice: '0.4 ETH',
+    category: 'Power Boosters',
   },
   {
     id: 2,
@@ -249,6 +251,7 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Cyber Labs',
     totalItems: 750,
     floorPrice: '0.6 ETH',
+    category: 'Power Boosters',
   },
   {
     id: 3,
@@ -258,6 +261,7 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Green Digital',
     totalItems: 300,
     floorPrice: '0.3 ETH',
+    category: 'Power Boosters',
   },
   {
     id: 4,
@@ -267,6 +271,7 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Meta Creators',
     totalItems: 1000,
     floorPrice: '0.5 ETH',
+    category: 'Power Boosters',
   },
   {
     id: 5,
@@ -276,6 +281,7 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Space Labs',
     totalItems: 600,
     floorPrice: '0.7 ETH',
+    category: 'Power Boosters',
   },
   {
     id: 6,
@@ -285,6 +291,7 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Pixel Art Studio',
     totalItems: 800,
     floorPrice: '0.45 ETH',
+    category: 'Power Boosters',
   },
   {
     id: 7,
@@ -294,6 +301,7 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Funk Factory',
     totalItems: 400,
     floorPrice: '0.55 ETH',
+    category: 'Power Boosters',
   },
   {
     id: 8,
@@ -303,6 +311,7 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Crystal Arts',
     totalItems: 550,
     floorPrice: '0.65 ETH',
+    category: 'Power Boosters',
   },
   {
     id: 9,
@@ -312,6 +321,7 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Digital Shamans',
     totalItems: 450,
     floorPrice: '0.48 ETH',
+    category: 'Power Boosters',
   },
   {
     id: 10,
@@ -321,5 +331,6 @@ export const trendingCollections: TrendingCollection[] = [
     artist: 'Ocean Labs',
     totalItems: 700,
     floorPrice: '0.58 ETH',
+    category: 'Power Boosters',
   },
 ]

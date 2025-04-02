@@ -1,6 +1,6 @@
 // Hooks
 import {useCollections, latestCollections, mintActivities, trendingCollections} from '../hooks/useCollections'
-import { useTranslation } from '../hooks/useTranslation'
+import {useTranslation} from '../hooks/useTranslation'
 // Components
 import Slider from '../components/Slider/Slider'
 import FeaturedCollections from '../components/Sections/FeaturedCollections'
@@ -10,7 +10,7 @@ import Newsletter from '../components/Sections/Newsletter'
 
 function HomePage() {
   const {featuredCollections, loading, error} = useCollections()
-  const { t } = useTranslation()
+  const {t} = useTranslation()
 
   if (loading) {
     return (
@@ -36,12 +36,7 @@ function HomePage() {
 
   return (
     <div className='bg-dark-950 text-white'>
-      <Slider 
-        title={t('slider_title')} 
-        description={t('slider_description')} 
-        buttonText={t('slider_button')} 
-        onButtonClick={() => console.log('Button clicked')} 
-      />
+      <Slider title={t('slider_title')} description={t('slider_description')} buttonText={t('slider_button')} onButtonClick={() => console.log('Button clicked')} />
       <FeaturedCollections collections={featuredCollections} />
       <LatestCollections latestCollections={latestCollections} mintActivities={mintActivities} />
       <TrendingCollections collections={trendingCollections} />
