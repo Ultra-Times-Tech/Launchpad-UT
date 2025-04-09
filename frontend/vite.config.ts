@@ -27,6 +27,11 @@ export default defineConfig(({mode}) => {
           }
         : {}),
     },
+    preview: {
+      host: '0.0.0.0',
+      port: 8080,
+      allowedHosts: ['launchpad-2ycml.ondigitalocean.app', 'localhost']
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
