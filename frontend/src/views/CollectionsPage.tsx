@@ -60,7 +60,13 @@ function CollectionsPage() {
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
-    window.scrollTo({top: 0, behavior: 'smooth'})
+    // Utiliser requestAnimationFrame pour s'assurer que le défilement se fait après le rendu
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
+    })
   }
 
   const handleCategoryToggle = (category: FilterCategory) => {
@@ -139,7 +145,7 @@ function CollectionsPage() {
               </button>
 
               {Array.from({length: totalPages}, (_, i) => i + 1).map(number => (
-                <button key={number} onClick={() => handlePageChange(number)} className={`w-10 h-10 rounded-lg ${currentPage === number ? 'bg-primary-500 text-white' : 'bg-dark-800 text-white hover:bg-dark-700 transition-colors'}`}>
+                <button key={number} onClick={() => handlePageChange(number)} className={`px-4 py-2 rounded-lg ${currentPage === number ? 'bg-primary-600 text-white' : 'bg-dark-800 text-white hover:bg-primary-600 transition-colors'}`}>
                   {number}
                 </button>
               ))}

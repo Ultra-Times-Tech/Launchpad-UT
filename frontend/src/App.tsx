@@ -18,12 +18,14 @@ import PrivacyPolicyPage from './views/Legal/PrivacyPolicyPage'
 import TermsOfServicePage from './views/Legal/TermsOfServicePage'
 import ContactPage from './views/ContactPage'
 import AdminDashboard from './views/AdminDashboard'
+import ScrollToTop from './components/ScrollToTop'
 
 function App() {
   return (
     <div className='flex flex-col min-h-screen bg-dark-950 text-white'>
       <Header />
       <MainContent>
+        <ScrollToTop />
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path='/collections' element={<CollectionsPage />} />
