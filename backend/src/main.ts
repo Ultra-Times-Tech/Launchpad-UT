@@ -14,7 +14,6 @@ async function bootstrap() {
       .setDescription('The API description')
       .setVersion('1.0')
       .addTag('users')
-      .addServer('https://launchpad-2ycml.ondigitalocean.app')
       .addServer('https://launchpad-2ycml.ondigitalocean.app/api')
       .addServer('http://localhost:3000')
       .build()
@@ -40,7 +39,6 @@ async function bootstrap() {
         'https://localhost:5173',
         'https://launchpad-ut-backend.vercel.app',
         'https://launchpad-2ycml.ondigitalocean.app',
-        'https://launchpad-2ycml.ondigitalocean.app/api'
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       credentials: false,
