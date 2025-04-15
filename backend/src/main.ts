@@ -14,7 +14,7 @@ async function bootstrap() {
     SwaggerModule.setup('docs', app, document, {
       swaggerOptions: {
         persistAuthorization: true,
-        basePath: '/',
+        basePath: '/api',
       },
       customSiteTitle: 'Launchpad UT API Documentation',
     })
