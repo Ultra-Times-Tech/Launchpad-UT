@@ -1,6 +1,7 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import useAlerts from '../../hooks/useAlert'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
+import axios from 'axios'
 
 interface ProfileData {
   email: string
@@ -23,6 +24,19 @@ function ProfilePage() {
   const [newEmail, setNewEmail] = useState(profile.email)
   const [newUsername, setNewUsername] = useState(profile.username || '')
 
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const response = await axios.get(`/users/${blockchainId}/username`)
+        setNewUsername(response.data.username || '')
+      } catch (error) {
+        console.error('Error fetching username:', error)
+      }
+    }
+
+    fetchUsername()
+  }, [blockchainId])
+
   const handleSave = () => {
     setProfile(prev => ({
       ...prev,
@@ -32,13 +46,17 @@ function ProfilePage() {
     success('Email updated successfully!')
   }
 
-  const handleSaveUsername = () => {
-    setProfile(prev => ({
-      ...prev,
-      username: newUsername.trim() || null,
-    }))
-    setIsEditingUsername(false)
-    success('Username updated successfully!')
+  const handleSaveUsername = async () => {
+    try {
+      await axios.put(`/users/${blockchainId}/username`, {username: newUsername})
+      setProfile(prev => ({
+        ...prev,
+        username: newUsername.trim() || null,
+      }))
+      success('Username updated successfully!')
+    } catch (error) {
+      console.error('Error updating username:', error)
+    }
   }
 
   const handleCopyAddress = async () => {

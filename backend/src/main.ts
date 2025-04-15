@@ -1,12 +1,18 @@
 import {NestFactory} from '@nestjs/core'
 import {AppModule} from './config/app.module'
 import {AppDataSource} from './ormconfig'
-import * as dotenv from 'dotenv';
+import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger'
+import * as dotenv from 'dotenv'
 
 async function bootstrap() {
-  dotenv.config();
+  dotenv.config()
   try {
     const app = await NestFactory.create(AppModule)
+
+    const config = new DocumentBuilder().setTitle('API Documentation').setDescription('The API description').setVersion('1.0').addTag('users').build()
+    const document = SwaggerModule.createDocument(app, config)
+    SwaggerModule.setup('api', app, document)
+
     try {
       await AppDataSource.initialize()
     } catch (dbError) {
