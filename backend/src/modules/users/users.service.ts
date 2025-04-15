@@ -72,16 +72,18 @@ export class UsersService {
       const response = await axios.post(`${ULTRA_API_ENDPOINT}/v1/chain/push_transaction`, {
         actions: [{
           account: ULTRA_AVATAR_CONTRACT,
-          name: 'setusername',
+          name: 'updatename',
           authorization: [{ actor: account, permission: 'active' }],
           data: {
             account: account,
             username: username,
           },
         }],
+        blocksBehind: 3,
+        expireSeconds: 30,
       }, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`, // Ajouter le token d'accès dans les en-têtes
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       });

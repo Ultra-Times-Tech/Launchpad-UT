@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react'
 import useAlerts from '../../hooks/useAlert'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
-import axios from 'axios'
+import { apiRequestor } from '../../utils/axiosInstanceHelper'
 
 interface ProfileData {
   email: string
@@ -27,7 +27,7 @@ function ProfilePage() {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const response = await axios.get(`/users/${blockchainId}/username`)
+        const response = await apiRequestor.get(`/users/${blockchainId}/username`)
         setNewUsername(response.data.username || '')
       } catch (error) {
         console.error('Error fetching username:', error)
@@ -48,7 +48,7 @@ function ProfilePage() {
 
   const handleSaveUsername = async () => {
     try {
-      await axios.put(`/users/${blockchainId}/username`, {username: newUsername})
+      await apiRequestor.put(`/users/${blockchainId}/username`, {username: newUsername})
       setProfile(prev => ({
         ...prev,
         username: newUsername.trim() || null,

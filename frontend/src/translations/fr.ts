@@ -7,7 +7,7 @@ const fr: Record<TranslationKey, string> = {
   shop: 'Boutique',
   contact: 'Contact',
   connect_wallet: 'Connecter le Wallet',
-  profile_settings: 'Paramètres du Profil',
+  profile_settings: 'Paramètres',
   my_collections: 'Mes Collections',
   disconnect: 'Déconnecter',
   connected_wallet: 'Wallet Connecté',
