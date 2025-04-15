@@ -14,14 +14,14 @@ async function bootstrap() {
       .setDescription('The API description')
       .setVersion('1.0')
       .addTag('users')
-      .addServer('https://launchpad-2ycml.ondigitalocean.app')
+      .addServer('https://launchpad-2ycml.ondigitalocean.app/api')
       .addServer('http://localhost:3000')
       .build()
     const document = SwaggerModule.createDocument(app, config)
-    SwaggerModule.setup('api', app, document, {
+    SwaggerModule.setup('docs', app, document, {
       swaggerOptions: {
         persistAuthorization: true,
-        basePath: '/'
+        basePath: '/api'
       },
       customSiteTitle: 'Launchpad UT API Documentation',
     })
