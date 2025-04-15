@@ -15,6 +15,7 @@ async function bootstrap() {
       .setVersion('1.0')
       .addTag('users')
       .addServer('https://launchpad-2ycml.ondigitalocean.app')
+      .addServer('https://launchpad-2ycml.ondigitalocean.app/api')
       .addServer('http://localhost:3000')
       .build()
     const document = SwaggerModule.createDocument(app, config)
