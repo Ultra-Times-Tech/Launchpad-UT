@@ -38,7 +38,8 @@ async function bootstrap() {
         'http://localhost:5173',
         'https://localhost:5173',
         'https://launchpad-ut-backend.vercel.app',
-        'https://launchpad-2ycml.ondigitalocean.app'
+        'https://launchpad-2ycml.ondigitalocean.app',
+        'https://launchpad-2ycml.ondigitalocean.app/api'
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       credentials: false,
