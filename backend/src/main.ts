@@ -9,9 +9,22 @@ async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule)
 
-    const config = new DocumentBuilder().setTitle('API Documentation').setDescription('The API description').setVersion('1.0').addTag('users').build()
+    const config = new DocumentBuilder()
+      .setTitle('API Documentation')
+      .setDescription('The API description')
+      .setVersion('1.0')
+      .addTag('users')
+      .addServer('https://launchpad-2ycml.ondigitalocean.app/api')
+      .addServer('http://localhost:3000')
+      .build()
     const document = SwaggerModule.createDocument(app, config)
-    SwaggerModule.setup('api', app, document)
+    SwaggerModule.setup('api', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+        basePath: '/api'
+      },
+      customSiteTitle: 'Launchpad UT API Documentation',
+    })
 
     try {
       await AppDataSource.initialize()
@@ -20,7 +33,13 @@ async function bootstrap() {
     }
 
     app.enableCors({
-      origin: ['https://launchpad-ut.vercel.app', 'http://localhost:5173', 'https://localhost:5173', 'https://launchpad-ut-backend.vercel.app'],
+      origin: [
+        'https://launchpad-ut.vercel.app',
+        'http://localhost:5173',
+        'https://localhost:5173',
+        'https://launchpad-ut-backend.vercel.app',
+        'https://launchpad-2ycml.ondigitalocean.app'
+      ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       credentials: false,
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
