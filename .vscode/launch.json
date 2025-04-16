@@ -5,7 +5,7 @@
       "type": "chrome",
       "request": "launch",
       "name": "Debug Frontend",
-      "url": "http://localhost:5173/launchpad-ut/",
+      "url": "https://localhost:5173/launchpad-ut/",
       "webRoot": "${workspaceFolder}/frontend",
       "sourceMaps": true,
       "sourceMapPathOverrides": {
@@ -17,10 +17,13 @@
       "type": "node",
       "request": "launch",
       "name": "Debug Backend",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start:debug"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--inspect-brk=9229",
+        "${workspaceFolder}/backend/dist/main.js"
+      ],
       "sourceMaps": true,
-      "cwd": "${workspaceRoot}/backend",
+      "cwd": "${workspaceFolder}/backend",
       "console": "integratedTerminal",
       "restart": true,
       "autoAttachChildProcesses": true

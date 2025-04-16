@@ -28,7 +28,12 @@ function ProfilePage() {
     const fetchUsername = async () => {
       try {
         const response = await apiRequestor.get(`/users/${blockchainId}/username`)
-        setNewUsername(response.data.username || '')
+        const fetchedUsername = response.data.username || null
+        setNewUsername(fetchedUsername || '')
+        setProfile(prev => ({
+          ...prev,
+          username: fetchedUsername,
+        }))
       } catch (error) {
         console.error('Error fetching username:', error)
       }

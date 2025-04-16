@@ -33,7 +33,7 @@ export class UsersService {
           return row as T;
         }
       }
-      return null; // No row found for this specific account
+      return null;
     } catch (error) {
       this.logger.error(`Error fetching table ${table} for account ${account}: ${error.message}`, error.stack);
       // Rethrow or handle specific errors (e.g., network issues, API errors)
