@@ -11,8 +11,8 @@ interface ProfileData {
 }
 
 function ProfilePage() {
-  const {blockchainId} = useUltraWallet()
-  const {success} = useAlerts()
+  const {blockchainId, signTransaction, isLoading: isWalletLoading, error: walletError} = useUltraWallet()
+  const {success, error: showError} = useAlerts()
   const [isEditing, setIsEditing] = useState(false)
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [profile, setProfile] = useState<ProfileData>({
@@ -52,15 +52,39 @@ function ProfilePage() {
   }
 
   const handleSaveUsername = async () => {
+    if (!blockchainId || !newUsername.trim()) {
+      showError('Blockchain ID or username is missing.')
+      return
+    }
+
+    const txObject = {
+      action: 'updatename',
+      contract: 'ultra.avatar',
+      data: {
+        account: blockchainId,
+        username: newUsername.trim(),
+      },
+    }
+
     try {
-      await apiRequestor.put(`/users/${blockchainId}/username`, {username: newUsername})
-      setProfile(prev => ({
-        ...prev,
-        username: newUsername.trim() || null,
-      }))
-      success('Username updated successfully!')
-    } catch (error) {
-      console.error('Error updating username:', error)
+      const response = await signTransaction(txObject)
+
+      if (response && response.data?.transactionHash) {
+        const finalUsername = newUsername.trim()
+        setProfile(prev => ({
+          ...prev,
+          username: finalUsername || null,
+        }))
+        setNewUsername(finalUsername)
+        setIsEditingUsername(false)
+        success(`Username updated successfully!`)
+      } else {
+        showError(walletError || 'Failed to sign or broadcast transaction.')
+        console.error('Transaction failed or was declined:', response, walletError)
+      }
+    } catch (err) {
+      console.error('Error during signTransaction process:', err)
+      showError('An unexpected error occurred while updating username.')
     }
   }
 
@@ -121,15 +145,16 @@ function ProfilePage() {
               {isEditingUsername ? (
                 <div className='flex items-center space-x-2'>
                   <input type='text' value={newUsername} onChange={e => setNewUsername(e.target.value)} className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-white focus:outline-none focus:border-primary-500' placeholder='Enter your username' />
-                  <button onClick={handleSaveUsername} className='px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors'>
-                    Save
+                  <button onClick={handleSaveUsername} disabled={isWalletLoading} className={`px-4 py-2 bg-primary-500 text-white rounded-lg transition-colors ${isWalletLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-600'}`}>
+                    {isWalletLoading ? 'Saving...' : 'Save'}
                   </button>
                   <button
                     onClick={() => {
                       setIsEditingUsername(false)
                       setNewUsername(profile.username || '')
                     }}
-                    className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
+                    disabled={isWalletLoading}
+                    className={`px-4 py-2 bg-dark-700 text-white rounded-lg transition-colors ${isWalletLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-dark-600'}`}>
                     Cancel
                   </button>
                 </div>
