@@ -23,10 +23,6 @@ interface NftContent {
   }
 }
 
-interface NftMetadata {
-  content: NftContent
-}
-
 export interface Nft {
   id: string
   serialNumber: string

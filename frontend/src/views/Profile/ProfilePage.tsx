@@ -2,7 +2,7 @@ import {useState, useEffect, useRef} from 'react'
 import useAlerts from '../../hooks/useAlert'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
 import { apiRequestor } from '../../utils/axiosInstanceHelper'
-import { getUserAvatar, fetchUserNfts, Nft } from '../../utils/nftService'
+import { Nft } from '../../utils/nftService'
 import NftSelector from '../../components/NftSelector'
 import useUserAvatar, { refreshUserAvatar, clearAvatarCache } from '../../hooks/useUserAvatar'
 

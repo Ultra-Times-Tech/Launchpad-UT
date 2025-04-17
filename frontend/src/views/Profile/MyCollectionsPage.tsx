@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import {Link} from 'react-router-dom'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
 import {fetchUserNfts, Nft, getCachedNfts, getCachedCollections, NftCollection, isNftLoadingComplete} from '../../utils/nftService'
@@ -14,10 +14,8 @@ function MyCollectionsPage() {
   const [collections, setCollections] = useState<NftCollection[]>([])
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [hasMorePages, setHasMorePages] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalNftCount, setTotalNftCount] = useState(0)
   const [selectedNft, setSelectedNft] = useState<Nft | null>(null)
   const [isNftDetailsOpen, setIsNftDetailsOpen] = useState(false)
   const nftDetailsRef = useRef<HTMLDivElement>(null)
@@ -38,7 +36,6 @@ function MyCollectionsPage() {
         // Charger les NFTs avec un limit de 25 pour avoir rapidement la première page
         const userNfts = await fetchUserNfts(blockchainId)
         setNfts(userNfts)
-        setTotalNftCount(userNfts.length)
 
         // Récupérer les collections
         const userCollections = getCachedCollections(blockchainId)
@@ -94,7 +91,6 @@ function MyCollectionsPage() {
         if (customEvent.detail.walletId === blockchainId) {
           const updatedNfts = getCachedNfts(blockchainId)
           setNfts(updatedNfts)
-          setTotalNftCount(updatedNfts.length)
 
           // Mettre à jour les collections
           const updatedCollections = getCachedCollections(blockchainId)
