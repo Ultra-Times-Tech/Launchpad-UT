@@ -112,8 +112,8 @@ export const useUltraWalletDetection = (): boolean => {
   return isInstalled
 }
 
-export const cleanWalletId = (walletId: string | null): string | null => {
-  if (!walletId) return null;
+export const cleanWalletId = (walletId: string | null): string => {
+  if (!walletId) return '';
   return walletId.split('@')[0];
 };
 
