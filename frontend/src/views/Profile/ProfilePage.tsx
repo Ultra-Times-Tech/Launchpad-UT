@@ -315,20 +315,44 @@ function ProfilePage() {
           <div className='bg-dark-800 rounded-xl p-6 shadow-lg'>
             {/* Profile Avatar */}
             <div className='flex items-center space-x-4 mb-8'>
-              <div className='w-20 h-20 rounded-full flex items-center justify-center overflow-hidden bg-primary-500 border-2 border-primary-400/30'>
-                {isLoadingAvatar ? (
-                  <div className="animate-pulse w-full h-full bg-primary-600"></div>
-                ) : profile.avatarNftId && avatarImage ? (
-                  <img 
-                    src={avatarImage} 
-                    alt="Avatar" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <svg className='w-10 h-10 text-white' fill='currentColor' viewBox='0 0 20 20'>
-                    <path fillRule='evenodd' d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z' clipRule='evenodd' />
+              <div 
+                className='relative w-20 h-20 cursor-pointer'
+                onClick={() => setIsAvatarModalOpen(true)}
+              >
+                {/* Fond circulaire */}
+                <div className='absolute inset-0 rounded-full bg-dark-900 z-0'></div>
+                
+                {/* Bordure fixe */}
+                <div className='absolute inset-0 rounded-full border-[2px] border-primary-500/50 z-10'></div>
+                
+                {/* Effet d'intensité lumineuse défilant */}
+                <div className='absolute inset-0 rounded-full overflow-hidden z-20'>
+                  <div className='absolute inset-0 animate-light-sweep'></div>
+                </div>
+                
+                {/* Contenu */}
+                <div className='absolute inset-[2px] rounded-full flex items-center justify-center overflow-hidden bg-dark-900 z-30'>
+                  {isLoadingAvatar ? (
+                    <div className="animate-pulse w-full h-full bg-primary-600/50"></div>
+                  ) : profile.avatarNftId && avatarImage ? (
+                    <img 
+                      src={avatarImage} 
+                      alt="Avatar" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <svg className='w-10 h-10 text-white' fill='currentColor' viewBox='0 0 20 20'>
+                      <path fillRule='evenodd' d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z' clipRule='evenodd' />
+                    </svg>
+                  )}
+                </div>
+                
+                {/* Indicateur d'édition */}
+                <div className='absolute bottom-1 right-1 bg-primary-500 rounded-full p-1 z-40 shadow-md'>
+                  <svg className='w-3 h-3 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' />
                   </svg>
-                )}
+                </div>
               </div>
               <div>
                 <h2 className='text-xl font-semibold'>Votre profil</h2>
@@ -518,6 +542,42 @@ function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Ajouter les styles d'animation */}
+      <style>
+        {`
+          @keyframes light-sweep {
+            0% {
+              background: conic-gradient(
+                from 0deg at 50% 50%,
+                rgba(139, 92, 246, 0.1) 0%,
+                rgba(168, 85, 247, 0.9) 20%,
+                rgba(139, 92, 246, 0.1) 40%,
+                rgba(139, 92, 246, 0.1) 60%,
+                rgba(168, 85, 247, 0.9) 80%,
+                rgba(139, 92, 246, 0.1) 100%
+              );
+              transform: rotate(0deg);
+            }
+            100% {
+              background: conic-gradient(
+                from 0deg at 50% 50%,
+                rgba(139, 92, 246, 0.1) 0%,
+                rgba(168, 85, 247, 0.9) 20%,
+                rgba(139, 92, 246, 0.1) 40%,
+                rgba(139, 92, 246, 0.1) 60%,
+                rgba(168, 85, 247, 0.9) 80%,
+                rgba(139, 92, 246, 0.1) 100%
+              );
+              transform: rotate(360deg);
+            }
+          }
+          
+          .animate-light-sweep {
+            animation: light-sweep 3s linear infinite;
+          }
+        `}
+      </style>
     </div>
   )
 }
