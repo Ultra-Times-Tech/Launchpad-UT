@@ -195,7 +195,6 @@ function ProfilePage() {
       const response = await signTransaction(txObject)
 
       if (response && response.data?.transactionHash) {
-        // Récupérer l'URL de l'image du NFT sélectionné
         const imageUrl = selectedNft.metadata.content.medias.square?.uri || 
                       selectedNft.metadata.content.medias.product?.uri || 
                       selectedNft.metadata.content.medias.gallery?.uri ||
@@ -203,14 +202,11 @@ function ProfilePage() {
         
         setAvatarImage(imageUrl || null);
         
-        // Mettre à jour le profil avec le nouvel avatar
         setProfile(prev => ({
           ...prev,
           avatarNftId: selectedNft.id,
         }))
         
-        // Notifier le backend de la mise à jour
-        await setUserAvatar(blockchainId, selectedNft.id);
         
         setIsAvatarModalOpen(false);
         success('Avatar mis à jour avec succès !');
