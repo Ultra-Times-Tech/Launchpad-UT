@@ -1,83 +1,5 @@
 import {useState, useEffect, useCallback} from 'react'
-
-// Define types for Ultra Wallet responses
-export interface UltraWalletConnectionData {
-  blockchainid: string
-  publicKey: string
-}
-
-export interface UltraWalletResponse<T> {
-  status: string
-  data: T
-}
-
-export interface UltraWalletError {
-  status: string
-  message: string
-  code?: number
-}
-
-export interface UltraWalletTransactionResponse {
-  transactionHash: string
-}
-
-export interface UltraWalletSignMessageResponse {
-  signature: string
-}
-
-export interface UltraWalletChainIdResponse {
-  chainId: string
-}
-
-export interface UltraWalletPurchaseItem {
-  productId: number
-  artifactId: number
-  blockchainTransactionId: string
-}
-
-export interface UltraWalletPurchaseResponse {
-  orderHash: string
-  items: UltraWalletPurchaseItem[]
-}
-
-export interface UltraWalletConnectOptions {
-  onlyIfTrusted?: boolean
-  referralCode?: string
-}
-
-export interface UltraWalletSignOptions {
-  signOnly?: boolean
-}
-
-export interface TransactionObject {
-  action: string
-  contract: string
-  data: Record<string, unknown>
-}
-
-// Define the Ultra Wallet interface
-interface UltraWallet {
-  connect(options?: UltraWalletConnectOptions): Promise<UltraWalletResponse<UltraWalletConnectionData>>
-  disconnect(): Promise<void>
-  getChainId(): Promise<UltraWalletResponse<string>>
-  signTransaction(txObject: TransactionObject | TransactionObject[], options?: UltraWalletSignOptions): Promise<UltraWalletResponse<UltraWalletTransactionResponse>>
-  signMessage(message: string): Promise<UltraWalletResponse<UltraWalletSignMessageResponse>>
-  purchaseItem(itemType: string, itemId: string): Promise<UltraWalletResponse<UltraWalletPurchaseResponse>>
-  on(eventName: string, callback: (...args: unknown[]) => void): void
-  off(eventName: string, callback: (...args: unknown[]) => void): void
-  once(eventName: string, callback: (...args: unknown[]) => void): void
-  prependListener(eventName: string, callback: (...args: unknown[]) => void): void
-  prependOnceListener(eventName: string, callback: (...args: unknown[]) => void): void
-  addListener(eventName: string, callback: (...args: unknown[]) => void): void
-  removeListener(eventName: string, callback: (...args: unknown[]) => void): void
-}
-
-// Extend Window interface to include Ultra Wallet
-declare global {
-  interface Window {
-    ultra?: UltraWallet
-  }
-}
+import {UltraWalletConnectionData, UltraWalletResponse, UltraWalletError, UltraWalletTransactionResponse, UltraWalletSignMessageResponse, UltraWalletPurchaseResponse, UltraWalletConnectOptions, UltraWalletSignOptions, TransactionObject} from '../types/ultraWallet'
 
 /**
  * Check if Ultra Wallet is installed
@@ -113,9 +35,9 @@ export const useUltraWalletDetection = (): boolean => {
 }
 
 export const cleanWalletId = (walletId: string | null): string => {
-  if (!walletId) return '';
-  return walletId.split('@')[0];
-};
+  if (!walletId) return ''
+  return walletId.split('@')[0]
+}
 
 /**
  * Hook to manage Ultra Wallet connection
@@ -130,7 +52,7 @@ export const useUltraWallet = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [hasAttemptedEagerConnect, setHasAttemptedEagerConnect] = useState<boolean>(false)
 
-  const blockchainId = cleanWalletId(rawBlockchainId);
+  const blockchainId = cleanWalletId(rawBlockchainId)
 
   const isInstalled = useUltraWalletDetection()
 
@@ -321,16 +243,19 @@ export const useUltraWallet = () => {
           setIsConnected(true)
           setRawBlockchainId(data.blockchainid)
           setPublicKey(data.publicKey)
-          window.ultra?.getChainId().then(response => {
-            setChainId(response.data)
-          }).catch(console.error)
+          window.ultra
+            ?.getChainId()
+            .then(response => {
+              setChainId(response.data)
+            })
+            .catch(console.error)
         }
       }
 
       // Vérifier périodiquement l'état de connexion
       const checkConnectionStatus = async () => {
         try {
-          const response = await window.ultra?.connect({ onlyIfTrusted: true })
+          const response = await window.ultra?.connect({onlyIfTrusted: true})
           if (response?.data?.blockchainid) {
             setIsConnected(true)
             setRawBlockchainId(response.data.blockchainid)
