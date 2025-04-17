@@ -5,7 +5,7 @@ import {useUltraWallet} from '../utils/ultraWalletHelper'
 import useAlerts from '../hooks/useAlert'
 import {useTranslation} from '../hooks/useTranslation'
 import {TranslationKey} from '../types/translations'
-import {useUserAvatar} from '../hooks/useUserAvatar'
+import useUserAvatar from '../hooks/useUserAvatar'
 import {useUsername} from '../hooks/useUsername'
 
 // Types

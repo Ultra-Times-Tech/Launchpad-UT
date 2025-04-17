@@ -1,9 +1,10 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import useAlerts from '../../hooks/useAlert'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
 import { apiRequestor } from '../../utils/axiosInstanceHelper'
-import { getUserAvatar, setUserAvatar, Nft, fetchUserNfts } from '../../utils/nftService'
+import { getUserAvatar, fetchUserNfts, Nft } from '../../utils/nftService'
 import NftSelector from '../../components/NftSelector'
+import useUserAvatar, { refreshUserAvatar, clearAvatarCache } from '../../hooks/useUserAvatar'
 
 interface ProfileData {
   email: string
@@ -20,9 +21,10 @@ function ProfilePage() {
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
   const [selectedNft, setSelectedNft] = useState<Nft | null>(null)
-  const [avatarImage, setAvatarImage] = useState<string | null>(null)
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false)
-  const [isLoadingAvatar, setIsLoadingAvatar] = useState(false)
+  const [isRemovingAvatar, setIsRemovingAvatar] = useState(false)
+  const { imageUrl: avatarImage, isLoading: isLoadingAvatar, avatarNftId, updateLocalAvatar, refreshAvatar } = useUserAvatar(blockchainId)
+  const avatarModalRef = useRef<HTMLDivElement>(null)
   const [profile, setProfile] = useState<ProfileData>({
     email: 'user@example.com',
     username: null,
@@ -32,6 +34,41 @@ function ProfilePage() {
   })
   const [newEmail, setNewEmail] = useState(profile.email)
   const [newUsername, setNewUsername] = useState(profile.username || '')
+  const [usernameValid, setUsernameValid] = useState(true)
+
+  // Gérer la fermeture de la popup en cliquant à l'extérieur
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isAvatarModalOpen && avatarModalRef.current && !avatarModalRef.current.contains(event.target as Node)) {
+        setIsAvatarModalOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAvatarModalOpen]);
+
+  // Forcer le rechargement de l'avatar au chargement de la page
+  useEffect(() => {
+    if (blockchainId) {
+      // Vider le cache pour forcer un rechargement frais
+      clearAvatarCache(blockchainId);
+      refreshAvatar();
+      console.log('[ProfilePage] Avatar forcé à recharger pour:', blockchainId);
+    }
+  }, [blockchainId]);
+
+  // Mettre à jour avatarNftId dans le profil quand il change dans le hook
+  useEffect(() => {
+    if (avatarNftId !== profile.avatarNftId) {
+      setProfile(prev => ({
+        ...prev,
+        avatarNftId
+      }));
+    }
+  }, [avatarNftId, profile.avatarNftId]);
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -60,73 +97,19 @@ function ProfilePage() {
       }
     };
 
-    const fetchAvatar = async () => {
-      try {
-        if (!blockchainId) {
-          console.log('Impossible de récupérer l\'avatar : blockchainId est null');
-          return;
-        }
-        
-        console.log('Récupération de l\'avatar pour :', blockchainId);
-        const avatarData = await getUserAvatar(blockchainId);
-        console.log('Données de l\'avatar récupérées :', avatarData);
-        
-        const avatarNftId = avatarData?.nft_id || null;
-        
-        setProfile(prev => ({
-          ...prev,
-          avatarNftId,
-        }));
-
-        // Si un avatar existe, récupérer les détails du NFT correspondant
-        if (avatarNftId) {
-          setIsLoadingAvatar(true);
-          try {
-            console.log('Récupération des détails du NFT pour l\'avatar avec ID :', avatarNftId);
-            const userNfts = await fetchUserNfts(blockchainId);
-            console.log('NFTs récupérés :', userNfts);
-            
-            const avatarNft = userNfts.find(nft => nft.id === avatarNftId);
-            console.log('NFT correspondant à l\'avatar :', avatarNft);
-            
-            if (avatarNft) {
-              setSelectedNft(avatarNft);
-              const imageUrl = avatarNft.metadata.content.medias.square?.uri || 
-                         avatarNft.metadata.content.medias.product?.uri || 
-                         avatarNft.metadata.content.medias.gallery?.uri ||
-                         avatarNft.metadata.content.medias.hero?.uri;
-              
-              console.log('URL de l\'image de l\'avatar :', imageUrl);
-              setAvatarImage(imageUrl || null);
-            } else {
-              console.warn('Aucun NFT correspondant trouvé pour l\'avatar avec ID :', avatarNftId);
-            }
-          } catch (error) {
-            console.error('Erreur lors de la récupération des détails du NFT avatar:', error);
-          } finally {
-            setIsLoadingAvatar(false);
-          }
-        } else {
-          console.log('Aucun avatar défini pour cet utilisateur');
-        }
-      } catch (error) {
-        console.error('Erreur lors de la récupération de l\'avatar:', error);
-        if ((error as any).response) {
-          console.error('Statut de la réponse:', (error as any).response.status);
-          console.error('Données de la réponse:', (error as any).response.data);
-        }
-      }
-    };
-
     // Attendre que le blockchainId soit défini avant de faire les appels API
     if (blockchainId) {
       console.log('BlockchainId disponible, démarrage des récupérations de données');
       fetchUsername();
-      fetchAvatar();
     } else {
       console.log('Attente du blockchainId avant de récupérer les données de profil');
     }
   }, [blockchainId]);
+
+  // Vérifier la validité du nom d'utilisateur
+  useEffect(() => {
+    setUsernameValid(newUsername.trim().length >= 3 || newUsername.trim().length === 0);
+  }, [newUsername]);
 
   const handleSave = () => {
     setProfile(prev => ({
@@ -138,8 +121,15 @@ function ProfilePage() {
   }
 
   const handleSaveUsername = async () => {
-    if (!blockchainId || !newUsername.trim()) {
-      showError('Blockchain ID ou nom d\'utilisateur manquant.')
+    if (!blockchainId) {
+      showError('Blockchain ID manquant.')
+      return
+    }
+    
+    const trimmedUsername = newUsername.trim();
+    
+    if (trimmedUsername.length < 3) {
+      showError('Le nom d\'utilisateur doit contenir au moins 3 caractères.')
       return
     }
 
@@ -148,7 +138,7 @@ function ProfilePage() {
       contract: 'ultra.avatar',
       data: {
         account: blockchainId,
-        username: newUsername.trim(),
+        username: trimmedUsername,
       },
     }
 
@@ -156,12 +146,11 @@ function ProfilePage() {
       const response = await signTransaction(txObject)
 
       if (response && response.data?.transactionHash) {
-        const finalUsername = newUsername.trim()
         setProfile(prev => ({
           ...prev,
-          username: finalUsername || null,
+          username: trimmedUsername || null,
         }))
-        setNewUsername(finalUsername)
+        setNewUsername(trimmedUsername)
         setIsEditingUsername(false)
         success('Nom d\'utilisateur mis à jour avec succès !')
       } else {
@@ -183,6 +172,16 @@ function ProfilePage() {
     setIsUpdatingAvatar(true);
 
     try {
+      // Extraire l'URL de l'image du NFT sélectionné 
+      const imageUrl = selectedNft.metadata.content.medias.square?.uri || 
+                      selectedNft.metadata.content.medias.product?.uri || 
+                      selectedNft.metadata.content.medias.gallery?.uri ||
+                      selectedNft.metadata.content.medias.hero?.uri;
+      
+      // Mettre à jour l'avatar localement AVANT la transaction blockchain
+      // pour une mise à jour visuelle immédiate
+      updateLocalAvatar(selectedNft.id, imageUrl);
+
       const txObject = {
         action: 'setavatar',
         contract: 'ultra.avatar',
@@ -195,30 +194,80 @@ function ProfilePage() {
       const response = await signTransaction(txObject)
 
       if (response && response.data?.transactionHash) {
-        const imageUrl = selectedNft.metadata.content.medias.square?.uri || 
-                      selectedNft.metadata.content.medias.product?.uri || 
-                      selectedNft.metadata.content.medias.gallery?.uri ||
-                      selectedNft.metadata.content.medias.hero?.uri;
-        
-        setAvatarImage(imageUrl || null);
-        
-        setProfile(prev => ({
-          ...prev,
-          avatarNftId: selectedNft.id,
-        }))
-        
+        // La mise à jour visuelle est déjà faite, mais on déclenche aussi 
+        // la mise à jour "officielle" depuis le serveur en arrière-plan
+        if (blockchainId) {
+          refreshUserAvatar(blockchainId);
+        }
         
         setIsAvatarModalOpen(false);
         success('Avatar mis à jour avec succès !');
       } else {
+        // En cas d'échec, on réinitialise l'avatar à sa valeur précédente
+        if (blockchainId) {
+          refreshUserAvatar(blockchainId);
+        }
         showError(walletError || 'Échec de la signature ou de la diffusion de la transaction.')
         console.error('Transaction failed or was declined:', response, walletError)
       }
     } catch (err) {
+      // En cas d'erreur, réinitialiser l'avatar depuis le serveur
+      if (blockchainId) {
+        refreshUserAvatar(blockchainId);
+      }
       console.error('Error during avatar update process:', err)
       showError('Une erreur inattendue s\'est produite lors de la mise à jour de l\'avatar.')
     } finally {
       setIsUpdatingAvatar(false);
+    }
+  }
+
+  const handleRemoveAvatar = async () => {
+    if (!blockchainId) {
+      showError('Blockchain ID manquant.')
+      return
+    }
+
+    setIsRemovingAvatar(true);
+
+    try {
+      // Mise à jour visuelle immédiate avant la transaction
+      updateLocalAvatar(null);
+
+      const txObject = {
+        action: 'clearavatar',
+        contract: 'ultra.avatar',
+        data: {
+          user: blockchainId,
+        },
+      }
+
+      const response = await signTransaction(txObject)
+
+      if (response && response.data?.transactionHash) {
+        // Mettre à jour en arrière-plan depuis le serveur
+        if (blockchainId) {
+          refreshUserAvatar(blockchainId);
+        }
+        
+        success('Avatar supprimé avec succès !');
+      } else {
+        // En cas d'échec, réinitialiser l'avatar
+        if (blockchainId) {
+          refreshUserAvatar(blockchainId);
+        }
+        showError(walletError || 'Échec de la signature ou de la diffusion de la transaction.')
+        console.error('Transaction failed or was declined:', response, walletError)
+      }
+    } catch (err) {
+      // En cas d'erreur, réinitialiser l'avatar
+      if (blockchainId) {
+        refreshUserAvatar(blockchainId);
+      }
+      console.error('Error during avatar removal process:', err)
+      showError('Une erreur inattendue s\'est produite lors de la suppression de l\'avatar.')
+    } finally {
+      setIsRemovingAvatar(false);
     }
   }
 
@@ -284,12 +333,23 @@ function ProfilePage() {
               <div>
                 <h2 className='text-xl font-semibold'>Votre profil</h2>
                 <p className='text-gray-400 text-sm'>Gérer les paramètres de votre compte</p>
-                <button 
-                  onClick={() => setIsAvatarModalOpen(true)}
-                  className='mt-2 px-3 py-1 bg-primary-600 text-sm text-white rounded-lg hover:bg-primary-700 transition-colors'
-                >
-                  Changer d'avatar
-                </button>
+                <div className="mt-2 space-x-2">
+                  <button 
+                    onClick={() => setIsAvatarModalOpen(true)}
+                    className='px-3 py-1 bg-primary-600 text-sm text-white rounded-lg hover:bg-primary-700 transition-colors'
+                  >
+                    Changer d'avatar
+                  </button>
+                  {profile.avatarNftId && (
+                    <button 
+                      onClick={handleRemoveAvatar}
+                      disabled={isRemovingAvatar}
+                      className={`px-3 py-1 bg-red-600 text-sm text-white rounded-lg transition-colors ${isRemovingAvatar ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'}`}
+                    >
+                      {isRemovingAvatar ? 'Suppression...' : 'Supprimer l\'avatar'}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -297,20 +357,43 @@ function ProfilePage() {
             <div className='mb-6'>
               <label className='block text-sm font-medium text-gray-400 mb-2'>Nom d'utilisateur</label>
               {isEditingUsername ? (
-                <div className='flex items-center space-x-2'>
-                  <input type='text' value={newUsername} onChange={e => setNewUsername(e.target.value)} className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-white focus:outline-none focus:border-primary-500' placeholder="Entrez votre nom d'utilisateur" />
-                  <button onClick={handleSaveUsername} disabled={isWalletLoading} className={`px-4 py-2 bg-primary-500 text-white rounded-lg transition-colors ${isWalletLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-600'}`}>
-                    {isWalletLoading ? 'Enregistrement...' : 'Enregistrer'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsEditingUsername(false)
-                      setNewUsername(profile.username || '')
-                    }}
-                    disabled={isWalletLoading}
-                    className={`px-4 py-2 bg-dark-700 text-white rounded-lg transition-colors ${isWalletLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-dark-600'}`}>
-                    Annuler
-                  </button>
+                <div className='space-y-2'>
+                  <div className='flex items-center space-x-2'>
+                    <div className="relative w-full">
+                      <input 
+                        type='text' 
+                        value={newUsername} 
+                        onChange={e => setNewUsername(e.target.value)} 
+                        className={`w-full px-4 py-2 bg-dark-900 border rounded-lg text-white focus:outline-none focus:border-primary-500 ${!usernameValid ? 'border-red-500' : 'border-dark-700'}`} 
+                        placeholder="Entrez votre nom d'utilisateur (min. 3 caractères)" 
+                      />
+                      {!usernameValid && newUsername.trim().length > 0 && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <button 
+                      onClick={handleSaveUsername} 
+                      disabled={isWalletLoading || !usernameValid || newUsername.trim().length < 3} 
+                      className={`px-4 py-2 bg-primary-500 text-white rounded-lg transition-colors ${(isWalletLoading || !usernameValid || newUsername.trim().length < 3) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-600'}`}
+                    >
+                      {isWalletLoading ? 'Enregistrement...' : 'Enregistrer'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsEditingUsername(false)
+                        setNewUsername(profile.username || '')
+                      }}
+                      disabled={isWalletLoading}
+                      className={`px-4 py-2 bg-dark-700 text-white rounded-lg transition-colors ${isWalletLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-dark-600'}`}
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-400">Le nom d'utilisateur doit contenir au moins 3 caractères.</p>
                 </div>
               ) : (
                 <div className='flex items-center space-x-2'>
@@ -392,7 +475,11 @@ function ProfilePage() {
       {/* Modal for NFT Selection */}
       {isAvatarModalOpen && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+          <div 
+            ref={avatarModalRef}
+            className="bg-dark-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="sticky top-0 bg-dark-800 p-4 border-b border-dark-700 flex justify-between items-center">
               <h2 className="text-xl font-semibold text-primary-300">Choisir un NFT pour votre avatar</h2>
               <button 
