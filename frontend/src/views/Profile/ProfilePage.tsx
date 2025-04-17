@@ -5,6 +5,7 @@ import { apiRequestor } from '../../utils/axiosInstanceHelper'
 import { Nft } from '../../utils/nftService'
 import NftSelector from '../../components/NftSelector'
 import useUserAvatar, { refreshUserAvatar, clearAvatarCache } from '../../hooks/useUserAvatar'
+import axios from 'axios'
 
 interface ProfileData {
   email: string
@@ -90,9 +91,9 @@ function ProfilePage() {
         }));
       } catch (error) {
         console.error('Erreur lors de la récupération du nom d\'utilisateur:', error);
-        if ((error as any).response) {
-          console.error('Statut de la réponse:', (error as any).response.status);
-          console.error('Données de la réponse:', (error as any).response.data);
+        if (axios.isAxiosError(error) && error.response) {
+          console.error('Statut de la réponse:', error.response.status);
+          console.error('Données de la réponse:', error.response.data);
         }
       }
     };
