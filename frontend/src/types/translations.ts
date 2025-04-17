@@ -19,5 +19,6 @@ export type TranslationKey =
   | 'slider_description'
   | 'collection_mint_access'
   | 'collection_coming_soon'
+  | 'loading'
 
 export type Language = 'fr' | 'en' | 'de' 

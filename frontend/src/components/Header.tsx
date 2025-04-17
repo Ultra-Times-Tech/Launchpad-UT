@@ -5,6 +5,8 @@ import {useUltraWallet} from '../utils/ultraWalletHelper'
 import useAlerts from '../hooks/useAlert'
 import {useTranslation} from '../hooks/useTranslation'
 import {TranslationKey} from '../types/translations'
+import {useUserAvatar} from '../hooks/useUserAvatar'
+import {useUsername} from '../hooks/useUsername'
 
 // Types
 interface SocialLinkProps {
@@ -137,15 +139,37 @@ const LanguageSelector = ({isOpen, setIsOpen, currentLang, handleLanguageChange,
   </div>
 )
 
-const ProfileDropdown = ({isOpen, blockchainId, t, handleDisconnect, setIsOpen, profileDropdownRef}: {isOpen: boolean; blockchainId: string; t: TranslationFunction; handleDisconnect: () => void; setIsOpen: (isOpen: boolean) => void; profileDropdownRef: React.RefObject<HTMLDivElement>}) => (
+const ProfileDropdown = ({isOpen, blockchainId, t, handleDisconnect, setIsOpen, profileDropdownRef}: {isOpen: boolean; blockchainId: string; t: TranslationFunction; handleDisconnect: () => void; setIsOpen: (isOpen: boolean) => void; profileDropdownRef: React.RefObject<HTMLDivElement>}) => {
+  const {imageUrl, isLoading} = useUserAvatar(blockchainId);
+  const {username, isLoading: usernameLoading} = useUsername(blockchainId);
+  
+  return (
   <div className='relative' ref={profileDropdownRef}>
     <button onClick={() => setIsOpen(!isOpen)} className='flex items-center space-x-2 bg-dark-800 hover:bg-dark-700 rounded-lg px-4 py-2 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20'>
-      <div className='w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center'>
-        <svg className='w-4 h-4 text-white' fill='currentColor' viewBox='0 0 20 20'>
-          <path fillRule='evenodd' d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z' clipRule='evenodd' />
-        </svg>
+      <div className='w-8 h-8 rounded-full flex items-center justify-center overflow-hidden bg-primary-500 border-2 border-primary-400/30'>
+        {isLoading ? (
+          <div className="animate-pulse w-full h-full bg-primary-600"></div>
+        ) : imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt="Avatar" 
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <svg className='w-4 h-4 text-white' fill='currentColor' viewBox='0 0 20 20'>
+            <path fillRule='evenodd' d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z' clipRule='evenodd' />
+          </svg>
+        )}
       </div>
-      <span className='hidden sm:inline'>{`${blockchainId.slice(0, 6)}...${blockchainId.slice(-4)}`}</span>
+      <span className='hidden sm:inline'>
+        {usernameLoading ? (
+          <div className="animate-pulse w-20 h-4 bg-dark-700 rounded"></div>
+        ) : username ? (
+          username
+        ) : (
+          `${blockchainId.slice(0, 6)}...${blockchainId.slice(-4)}`
+        )}
+      </span>
       <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
         <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
       </svg>
@@ -169,9 +193,13 @@ const ProfileDropdown = ({isOpen, blockchainId, t, handleDisconnect, setIsOpen, 
       </div>
     )}
   </div>
-)
+)}
 
-const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDisconnect}: {isOpen: boolean; blockchainId: string | null; t: TranslationFunction; closeMenu: () => void; handleConnect: () => void; handleDisconnect: () => void}) => (
+const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDisconnect}: {isOpen: boolean; blockchainId: string | null; t: TranslationFunction; closeMenu: () => void; handleConnect: () => void; handleDisconnect: () => void}) => {
+  const {imageUrl, isLoading} = useUserAvatar(blockchainId);
+  const {username, isLoading: usernameLoading} = useUsername(blockchainId);
+  
+  return (
   <>
     {isOpen && <div className='fixed inset-0 bg-dark-950 bg-opacity-50 z-40 lg:hidden' onClick={closeMenu} />}
 
@@ -186,9 +214,26 @@ const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDi
 
           {blockchainId && (
             <div className='border-t border-dark-700 pt-4'>
-              <div className='px-2 py-3'>
-                <p className='text-sm text-gray-400'>{t('connected_wallet' as const)}</p>
-                <p className='text-sm font-medium text-primary-300 break-all'>{blockchainId}</p>
+              <div className='px-2 py-3 flex items-center space-x-3'>
+                <div className='w-10 h-10 rounded-full flex items-center justify-center overflow-hidden bg-primary-500 border-2 border-primary-400/30'>
+                  {isLoading ? (
+                    <div className="animate-pulse w-full h-full bg-primary-600"></div>
+                  ) : imageUrl ? (
+                    <img 
+                      src={imageUrl} 
+                      alt="Avatar" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <svg className='w-5 h-5 text-white' fill='currentColor' viewBox='0 0 20 20'>
+                      <path fillRule='evenodd' d='M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z' clipRule='evenodd' />
+                    </svg>
+                  )}
+                </div>
+                <div>
+                  <p className='text-sm text-gray-400'>{usernameLoading ? t('loading') : username ? username : t('connected_wallet' as const)}</p>
+                  <p className='text-sm font-medium text-primary-300 break-all'>{blockchainId}</p>
+                </div>
               </div>
               <Link to='/profile' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
                 {t('profile_settings' as const)}
@@ -215,7 +260,7 @@ const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDi
       </div>
     </div>
   </>
-)
+)}
 
 // Composant principal
 function Header() {

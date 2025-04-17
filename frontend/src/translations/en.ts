@@ -20,7 +20,8 @@ const en: Record<TranslationKey, string> = {
   slider_button: 'Learn more',
   slider_description: 'Discover our exclusive selection of digital collections created by world-renowned artists',
   collection_mint_access: 'ACCESS MINT',
-  collection_coming_soon: 'COMING SOON'
+  collection_coming_soon: 'COMING SOON',
+  loading: 'Loading...'
 }
 
 export default en 

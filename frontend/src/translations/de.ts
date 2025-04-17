@@ -20,7 +20,8 @@ const de: Record<TranslationKey, string> = {
   slider_button: 'Mehr erfahren',
   slider_description: 'Entdecken Sie unsere exklusive Auswahl an digitalen Kollektionen von weltbekannten Künstlern',
   collection_mint_access: 'MINT ZUGRIFF',
-  collection_coming_soon: 'DEMNÄCHST VERFÜGBAR'
+  collection_coming_soon: 'DEMNÄCHST VERFÜGBAR',
+  loading: 'Wird geladen...'
 }
 
 export default de 

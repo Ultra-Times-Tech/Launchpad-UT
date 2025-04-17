@@ -6,7 +6,7 @@ const GRAPHQL_URL = 'https://staging.api.ultra.io/graphql'
 
 const getAuthToken = async () => {
   try {
-    const response = await apiRequestor.post('/auth/token')
+    const response = await apiRequestor.get('/auth/ultra-token')
     return response.data.access_token
   } catch (error) {
     console.error('Error getting auth token:', error)

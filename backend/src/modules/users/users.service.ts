@@ -1,9 +1,10 @@
-import { Injectable, Logger, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import axios from 'axios'; // Using axios directly
 import { AuthService } from '../auth/auth.service'; // Importer AuthService
 
 // Consider moving this to a configuration file/service
-const ULTRA_API_ENDPOINT = 'http://ultra.api.eosnation.io';
+const ULTRA_API_MAINNET_ENDPOINT = 'https://ultra.api.eosnation.io';
+const ULTRA_API_TESTNET_ENDPOINT = 'http://ultratest.api.eosnation.io';
 const ULTRA_AVATAR_CONTRACT = 'ultra.avatar';
 
 @Injectable()
@@ -13,8 +14,14 @@ export class UsersService {
   constructor(private readonly authService: AuthService) {} // Injecter AuthService
 
   private async getTableRow<T>(table: string, account: string): Promise<T | null> {
+    if (!account) {
+      this.logger.error(`Invalid account parameter: ${account}`);
+      throw new BadRequestException('Account ID must be provided');
+    }
+    
     try {
-      const response = await axios.post(`${ULTRA_API_ENDPOINT}/v1/chain/get_table_rows`, {
+      this.logger.debug(`Making request to ${ULTRA_API_TESTNET_ENDPOINT}/v1/chain/get_table_rows for table ${table}, account ${account}`);
+      const response = await axios.post(`${ULTRA_API_TESTNET_ENDPOINT}/v1/chain/get_table_rows`, {
         json: true,
         code: ULTRA_AVATAR_CONTRACT,
         scope: ULTRA_AVATAR_CONTRACT,
@@ -23,6 +30,8 @@ export class UsersService {
         upper_bound: account,
       });
 
+      this.logger.debug(`Response for table ${table}: ${JSON.stringify(response.data)}`);
+
       if (response.data && response.data.rows && response.data.rows.length > 0) {
         // Check if the returned row actually matches the requested account
         // (lower_bound/upper_bound might return the next key if exact match not found)
@@ -30,12 +39,19 @@ export class UsersService {
         // Assuming the first field in the struct is always the account name (key)
         const keyField = Object.keys(row)[0];
         if (row[keyField] === account) {
+          this.logger.debug(`Found matching row for account ${account} in table ${table}`);
           return row as T;
         }
+        this.logger.debug(`Row found but key ${row[keyField]} doesn't match account ${account}`);
+      } else {
+        this.logger.debug(`No rows found for account ${account} in table ${table}`);
       }
       return null;
     } catch (error) {
       this.logger.error(`Error fetching table ${table} for account ${account}: ${error.message}`, error.stack);
+      if (error.response) {
+        this.logger.error(`Response status: ${error.response.status}, data: ${JSON.stringify(error.response.data)}`);
+      }
       // Rethrow or handle specific errors (e.g., network issues, API errors)
       throw new InternalServerErrorException(`Failed to fetch data from Ultra API for table ${table}`);
     }
@@ -43,23 +59,52 @@ export class UsersService {
 
   async getUsername(account: string): Promise<{ account: string; username: string } | null> {
     this.logger.log(`Fetching username for account: ${account}`);
-    const row = await this.getTableRow<{ account: string; username: string }>('accusername', account);
-    if (!row) {
-       throw new NotFoundException(`Username not found for account ${account}`);
+    
+    if (!account) {
+      this.logger.error('Account ID is required');
+      throw new BadRequestException('Account ID must be provided');
     }
-    return row;
+    
+    try {
+      const row = await this.getTableRow<{ account: string; username: string }>('accusername', account);
+      if (!row) {
+        this.logger.log(`Username not found for account ${account}`);
+        return { account, username: '' }; // Return empty username instead of throwing 404
+      }
+      return row;
+    } catch (error) {
+      this.logger.error(`Error in getUsername for account ${account}: ${error.message}`);
+      if (error instanceof BadRequestException) {
+        throw error; // Re-throw validation errors
+      }
+      throw new InternalServerErrorException(`Failed to fetch username for account ${account}`);
+    }
   }
 
-  async getAvatar(account: string): Promise<{ account: string; nft_id: string } | null> { // Assuming nft_id is string due to uint64_t
+  async getAvatar(account: string): Promise<{ account: string; nft_id: string } | null> {
     this.logger.log(`Fetching avatar for account: ${account}`);
-    const row = await this.getTableRow<{ account: string; nft_id: string }>('accavatar', account);
-     if (!row) {
-       // It's okay if avatar is not set, return null instead of throwing error
-       this.logger.log(`Avatar not set for account ${account}`);
-       return null;
+    
+    if (!account) {
+      this.logger.error('Account ID is required');
+      throw new BadRequestException('Account ID must be provided');
     }
-     // Ultra API returns uint64_t as number sometimes, ensure it's string
-    return { ...row, nft_id: String(row.nft_id) };
+    
+    try {
+      const row = await this.getTableRow<{ account: string; nft_id: string }>('accavatar', account);
+      if (!row) {
+        // It's okay if avatar is not set, return null instead of throwing error
+        this.logger.log(`Avatar not set for account ${account}`);
+        return { account, nft_id: '' }; // Return empty nft_id instead of null
+      }
+      // Ultra API returns uint64_t as number sometimes, ensure it's string
+      return { ...row, nft_id: String(row.nft_id) };
+    } catch (error) {
+      this.logger.error(`Error in getAvatar for account ${account}: ${error.message}`);
+      if (error instanceof BadRequestException) {
+        throw error; // Re-throw validation errors
+      }
+      throw new InternalServerErrorException(`Failed to fetch avatar for account ${account}`);
+    }
   }
 
   async updateUsername(account: string, username: string): Promise<void> {
@@ -69,7 +114,7 @@ export class UsersService {
       const tokenResponse = await this.authService.getUltraToken();
       const accessToken = tokenResponse.access_token;
 
-      const response = await axios.post(`${ULTRA_API_ENDPOINT}/v1/chain/push_transaction`, {
+      const response = await axios.post(`${ULTRA_API_TESTNET_ENDPOINT}/v1/chain/push_transaction`, {
         actions: [{
           account: ULTRA_AVATAR_CONTRACT,
           name: 'updatename',

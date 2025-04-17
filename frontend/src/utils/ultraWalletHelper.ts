@@ -112,18 +112,25 @@ export const useUltraWalletDetection = (): boolean => {
   return isInstalled
 }
 
+export const cleanWalletId = (walletId: string | null): string | null => {
+  if (!walletId) return null;
+  return walletId.split('@')[0];
+};
+
 /**
  * Hook to manage Ultra Wallet connection
  * @returns Object with wallet connection state and methods
  */
 export const useUltraWallet = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false)
-  const [blockchainId, setBlockchainId] = useState<string | null>(null)
+  const [rawBlockchainId, setRawBlockchainId] = useState<string | null>(null)
   const [publicKey, setPublicKey] = useState<string | null>(null)
   const [chainId, setChainId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [hasAttemptedEagerConnect, setHasAttemptedEagerConnect] = useState<boolean>(false)
+
+  const blockchainId = cleanWalletId(rawBlockchainId);
 
   const isInstalled = useUltraWalletDetection()
 
@@ -140,7 +147,7 @@ export const useUltraWallet = () => {
 
       try {
         const response = await window.ultra.connect(options)
-        setBlockchainId(response.data.blockchainid)
+        setRawBlockchainId(response.data.blockchainid)
         setPublicKey(response.data.publicKey)
         setIsConnected(true)
 
@@ -176,7 +183,7 @@ export const useUltraWallet = () => {
       }
 
       const response = await window.ultra.connect({onlyIfTrusted: true})
-      setBlockchainId(response.data.blockchainid)
+      setRawBlockchainId(response.data.blockchainid)
       setPublicKey(response.data.publicKey)
       setIsConnected(true)
 
@@ -207,7 +214,7 @@ export const useUltraWallet = () => {
     try {
       await window.ultra.disconnect()
       setIsConnected(false)
-      setBlockchainId(null)
+      setRawBlockchainId(null)
       setPublicKey(null)
       setChainId(null)
       return true
@@ -303,7 +310,7 @@ export const useUltraWallet = () => {
     if (isInstalled && window.ultra?.on) {
       const handleDisconnect = () => {
         setIsConnected(false)
-        setBlockchainId(null)
+        setRawBlockchainId(null)
         setPublicKey(null)
         setChainId(null)
       }
@@ -312,7 +319,7 @@ export const useUltraWallet = () => {
         const data = args[0] as UltraWalletConnectionData
         if (data && data.blockchainid) {
           setIsConnected(true)
-          setBlockchainId(data.blockchainid)
+          setRawBlockchainId(data.blockchainid)
           setPublicKey(data.publicKey)
           window.ultra?.getChainId().then(response => {
             setChainId(response.data)
@@ -326,7 +333,7 @@ export const useUltraWallet = () => {
           const response = await window.ultra?.connect({ onlyIfTrusted: true })
           if (response?.data?.blockchainid) {
             setIsConnected(true)
-            setBlockchainId(response.data.blockchainid)
+            setRawBlockchainId(response.data.blockchainid)
             setPublicKey(response.data.publicKey)
             try {
               const chainResponse = await window.ultra?.getChainId()
@@ -373,6 +380,7 @@ export const useUltraWallet = () => {
     isLoading,
     error,
     blockchainId,
+    rawBlockchainId,
     publicKey,
     chainId,
     connect,
