@@ -3,26 +3,6 @@ import {cleanWalletId} from './ultraWalletHelper'
 
 const ULTRA_GRAPHQL_ENDPOINT = 'https://staging.api.ultra.io/graphql'
 
-interface NftMedia {
-  contentType: string
-  integrity?: {
-    hash: string
-    type: string
-  }
-  uri: string
-}
-
-interface NftContent {
-  name: string
-  description?: string
-  medias: {
-    square?: NftMedia
-    gallery?: NftMedia
-    hero?: NftMedia
-    product?: NftMedia
-  }
-}
-
 export interface Nft {
   id: string
   serialNumber: string
