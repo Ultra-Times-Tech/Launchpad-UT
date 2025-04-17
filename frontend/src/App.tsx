@@ -19,6 +19,7 @@ import TermsOfServicePage from './views/Legal/TermsOfServicePage'
 import ContactPage from './views/ContactPage'
 import AdminDashboard from './views/AdminDashboard'
 import ScrollToTop from './components/ScrollToTop'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   return (
@@ -31,9 +32,13 @@ function App() {
           <Route path='/collections' element={<CollectionsPage />} />
           <Route path='/collection/:id' element={<CollectionDetailsPage />} />
           <Route path='/mint/:category/:id' element={<MintPage />} />
-          {/* Profile */}
-          <Route path='/profile' element={<ProfilePage />} />
-          <Route path='/my-collections' element={<MyCollectionsPage />} />
+          
+          {/* Routes protégées nécessitant une connexion wallet */}
+          <Route element={<ProtectedRoute />}>
+            <Route path='/profile' element={<ProfilePage />} />
+            <Route path='/my-collections' element={<MyCollectionsPage />} />
+          </Route>
+          
           {/* Admin */}
           <Route path='/admin-ut' element={<AdminDashboard />} />
           {/* Legal and contact */}
