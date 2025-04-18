@@ -356,6 +356,10 @@ const UserManager = () => {
               },
             },
           }}
+          muiTableBodyRowProps={({ row }) => ({
+            onClick: () => handleRowClick(row.original.id),
+            sx: { cursor: 'pointer' }
+          })}
           localization={{
             actions: 'Actions',
             and: 'et',
