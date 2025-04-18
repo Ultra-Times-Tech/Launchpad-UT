@@ -421,25 +421,6 @@ export const isNftLoadingComplete = (walletId: string): boolean => {
   return !!nftCache[cleanedWalletId]?.isComplete;
 };
 
-export const setUserAvatar = async (blockchainId: string, nftId: string) => {
-  try {
-    const cleanedBlockchainId = cleanWalletId(blockchainId)
-    console.log('[setUserAvatar] ID wallet nettoyé:', cleanedBlockchainId)
-    console.log('[setUserAvatar] NFT ID:', nftId)
-
-    const response = await apiRequestor.put(`/users/${cleanedBlockchainId}/avatar`, {nftId})
-    console.log('[setUserAvatar] Réponse:', response.data)
-    return response.data
-  } catch (error) {
-    console.error("[setUserAvatar] Erreur de mise à jour de l'avatar:", error)
-    if ((error as any).response) {
-      console.error('[setUserAvatar] Statut:', (error as any).response.status)
-      console.error('[setUserAvatar] Données:', (error as any).response.data)
-    }
-    throw error
-  }
-}
-
 export const getUserAvatar = async (blockchainId: string) => {
   try {
     const cleanedBlockchainId = cleanWalletId(blockchainId)

@@ -1,6 +1,11 @@
-import { Injectable, Logger, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, InternalServerErrorException, BadRequestException, Inject, forwardRef } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import axios from 'axios'; // Using axios directly
 import { AuthService } from '../auth/auth.service'; // Importer AuthService
+import { UserResponse, UsersResponse } from './interfaces';
+import { UserFiltersDto } from './dto/user-filters.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 // Consider moving this to a configuration file/service
 const ULTRA_API_MAINNET_ENDPOINT = 'https://ultra.api.eosnation.io';
@@ -10,8 +15,31 @@ const ULTRA_AVATAR_CONTRACT = 'ultra.avatar';
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
+  private readonly apiUrl: string;
+  private readonly apiKey: string;
   
-  constructor(private readonly authService: AuthService) {} // Injecter AuthService
+  constructor(
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService
+  ) {
+    const apiUrl = this.configService.get<string>('UT_LAUNCHPAD_API_URL');
+    const apiKey = this.configService.get<string>('UT_LAUNCHPAD_API_KEY');
+
+    if (!apiUrl || !apiKey) {
+      throw new Error('Missing required environment variables: UT_LAUNCHPAD_API_URL or UT_LAUNCHPAD_API_KEY');
+    }
+
+    this.apiUrl = apiUrl;
+    this.apiKey = apiKey;
+  }
+
+  private getHeaders() {
+    return {
+      'X-Joomla-Token': this.apiKey,
+      'Content-Type': 'application/json',
+    };
+  }
 
   private async getTableRow<T>(table: string, account: string): Promise<T | null> {
     if (!account) {
@@ -140,26 +168,106 @@ export class UsersService {
     }
   }
 
-  async updateAvatar(account: string, nftId: string): Promise<void> {
-    this.logger.log(`Attempting to update avatar for ${account} to NFT ID ${nftId}`);
-    // TODO: Implement blockchain transaction logic
-    // Similar to updateUsername: Identify action name (e.g., 'setavatar'), params, signing.
-    // Ensure nftId is handled correctly (string vs number for uint64_t).
-    // Example placeholder:
-    // const transaction = {
-    //   actions: [{
-    //     account: ULTRA_AVATAR_CONTRACT,
-    //     name: 'ACTION_NAME_HERE', // e.g., 'setavatar'
-    //     authorization: [{ actor: account, permission: 'active' }],
-    //     data: {
-    //       account: account,
-    //       nft_id: nftId, // Ensure correct type/format for uint64_t
-    //     },
-    //   }],
-    // };
-    // Need to sign and broadcast this transaction.
-     console.warn(`[TODO] Blockchain interaction for updating avatar for ${account} not implemented.`);
-    // Simulate success for now
-    await new Promise(resolve => setTimeout(resolve, 100)); // Simulate async operation
+  // Ultra Times API
+
+  async findAll(filters?: UserFiltersDto): Promise<UsersResponse> {
+    try {
+      let url = `${this.apiUrl}/api/index.php/v1/users`;
+      const queryParams: string[] = [];
+
+      if (filters) {
+        if (filters.state !== undefined) {
+          queryParams.push(`filter[state]=${filters.state}`);
+        }
+        if (filters.search) {
+          queryParams.push(`filter[search]=${filters.search}`);
+        }
+      }
+
+      if (queryParams.length > 0) {
+        url += `?${queryParams.join('&')}`;
+      }
+
+      this.logger.log(`GET ${url}`);
+      const response = await axios.get<UsersResponse>(url, { headers: this.getHeaders() });
+      return response.data;
+    } catch (error) {
+      this.logger.error('Error fetching users:', error);
+      throw new InternalServerErrorException('Failed to fetch users from Ultratimes API');
+    }
+  }
+
+  async findOne(id: string): Promise<UserResponse> {
+    try {
+      const url = `${this.apiUrl}/api/index.php/v1/users/${id}`;
+      this.logger.log(`GET ${url}`);
+      const response = await axios.get<UserResponse>(url, { headers: this.getHeaders() });
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error fetching user ${id}:`, error);
+      if (error.response && error.response.status === 404) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      throw new InternalServerErrorException(`Failed to fetch user ${id} from Ultratimes API`);
+    }
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<UserResponse> {
+    try {
+      const url = `${this.apiUrl}/api/index.php/v1/users`;
+      this.logger.log(`POST ${url}`);
+      const response = await axios.post<UserResponse>(url, createUserDto, { headers: this.getHeaders() });
+      return response.data;
+    } catch (error) {
+      this.logger.error('Error creating user:', error);
+      if (error.response && error.response.data) {
+        throw new BadRequestException(error.response.data.message || 'Failed to create user');
+      }
+      throw new InternalServerErrorException('Failed to create user in Ultratimes API');
+    }
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponse> {
+    try {
+      const url = `${this.apiUrl}/api/index.php/v1/users/${id}`;
+      this.logger.log(`PATCH ${url}`);
+      const response = await axios.patch<UserResponse>(url, updateUserDto, { headers: this.getHeaders() });
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error updating user ${id}:`, error);
+      if (error.response && error.response.status === 404) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      if (error.response && error.response.data) {
+        throw new BadRequestException(error.response.data.message || `Failed to update user ${id}`);
+      }
+      throw new InternalServerErrorException(`Failed to update user ${id} in Ultratimes API`);
+    }
+  }
+
+  async remove(id: string): Promise<void> {
+    try {
+      const url = `${this.apiUrl}/api/index.php/v1/users/${id}`;
+      this.logger.log(`DELETE ${url}`);
+      await axios.delete(url, { headers: this.getHeaders() });
+    } catch (error) {
+      this.logger.error(`Error deleting user ${id}:`, error);
+      if (error.response && error.response.status === 404) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+      throw new InternalServerErrorException(`Failed to delete user ${id} from Ultratimes API`);
+    }
+  }
+
+  async findByWalletId(walletId: string): Promise<UsersResponse> {
+    try {
+      const url = `${this.apiUrl}/api/index.php/v1/ultratimes/users?filter[search]=wid:${walletId}`;
+      this.logger.log(`GET ${url}`);
+      const response = await axios.get<UsersResponse>(url, { headers: this.getHeaders() });
+      return response.data;
+    } catch (error) {
+      this.logger.error(`Error fetching users by wallet ID ${walletId}:`, error);
+      throw new InternalServerErrorException('Failed to fetch users by wallet ID from Ultratimes API');
+    }
   }
 }
