@@ -20,5 +20,7 @@ export type TranslationKey =
   | 'collection_mint_access'
   | 'collection_coming_soon'
   | 'loading'
+  | 'new_account_created'
+  | 'account_creation_error'
 
 export type Language = 'fr' | 'en' | 'de' 

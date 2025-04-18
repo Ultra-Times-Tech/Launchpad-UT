@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import SliderManager from '../components/Admin/SliderManager';
+import UserManager from '../components/Admin/UserManager';
 import { FaImages, FaUsers, FaCog } from 'react-icons/fa';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -54,11 +55,7 @@ const AdminDashboard = () => {
         >
           <DndProvider backend={HTML5Backend}>
             {activeTab === 'slider' && <SliderManager />}
-            {activeTab === 'users' && (
-              <div className="text-gray-300 p-4 rounded-lg bg-gray-800">
-                Gestion des utilisateurs à venir
-              </div>
-            )}
+            {activeTab === 'users' && <UserManager />}
             {activeTab === 'settings' && (
               <div className="text-gray-300 p-4 rounded-lg bg-gray-800">
                 Paramètres à venir

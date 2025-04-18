@@ -21,7 +21,9 @@ const en: Record<TranslationKey, string> = {
   slider_description: 'Discover our exclusive selection of digital collections created by world-renowned artists',
   collection_mint_access: 'ACCESS MINT',
   collection_coming_soon: 'COMING SOON',
-  loading: 'Loading...'
+  loading: 'Loading...',
+  new_account_created: 'Your account was automatically created!',
+  account_creation_error: 'Error checking/creating account'
 }
 
 export default en 

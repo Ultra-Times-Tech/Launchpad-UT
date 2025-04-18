@@ -1,12 +1,13 @@
 import {Link} from 'react-router-dom'
 import {useState, useEffect, useRef} from 'react'
 import {getAssetUrl} from '../utils/imageHelper'
-import {useUltraWallet} from '../utils/ultraWalletHelper'
+import {useUltraWallet, cleanWalletId} from '../utils/ultraWalletHelper'
 import useAlerts from '../hooks/useAlert'
 import {useTranslation} from '../hooks/useTranslation'
 import {TranslationKey} from '../types/translations'
 import useUserAvatar from '../hooks/useUserAvatar'
 import {useUsername} from '../hooks/useUsername'
+import {apiRequestor} from '../utils/axiosInstanceHelper'
 
 // Types
 interface SocialLinkProps {
@@ -272,6 +273,10 @@ function Header() {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false)
   const [lastErrorMessage, setLastErrorMessage] = useState<string | null>(null)
   const [userInitiated, setUserInitiated] = useState(false)
+  const [userCheckCompleted, setUserCheckCompleted] = useState(false)
+  const [isCheckingUser, setIsCheckingUser] = useState(false)
+  const lastCheckedBlockchainId = useRef<string | null>(null)
+  const checkTimeoutRef = useRef<number | null>(null)
   const profileDropdownRef = useRef<HTMLDivElement>(null)
   const langMenuRef = useRef<HTMLDivElement>(null)
 
@@ -313,6 +318,125 @@ function Header() {
       setLastErrorMessage(error)
     }
   }, [error, lastErrorMessage, showError, userInitiated])
+
+  // Réinitialiser l'état de vérification quand l'utilisateur se déconnecte
+  useEffect(() => {
+    if (!blockchainId) {
+      setUserCheckCompleted(false);
+      lastCheckedBlockchainId.current = null;
+      if (checkTimeoutRef.current) {
+        window.clearTimeout(checkTimeoutRef.current);
+        checkTimeoutRef.current = null;
+      }
+    }
+  }, [blockchainId]);
+
+  // Vérifier si l'utilisateur existe et le créer si nécessaire
+  useEffect(() => {
+    // Si rien n'a changé ou si une vérification est déjà en cours, on ne fait rien
+    if (!blockchainId || userCheckCompleted || isCheckingUser || blockchainId === lastCheckedBlockchainId.current) {
+      return;
+    }
+
+    // Définir un délai avant de lancer la vérification pour éviter les requêtes répétées
+    if (checkTimeoutRef.current) {
+      window.clearTimeout(checkTimeoutRef.current);
+    }
+
+    checkTimeoutRef.current = window.setTimeout(async () => {
+      setIsCheckingUser(true);
+      lastCheckedBlockchainId.current = blockchainId;
+      
+      try {
+        // Vérifier si l'utilisateur existe par son wallet ID
+        const cleanedBlockchainId = cleanWalletId(blockchainId);
+        const response = await apiRequestor.get(`/users/wallets/${cleanedBlockchainId}`);
+        
+        // Si aucun utilisateur trouvé avec ce wallet, en créer un
+        if (!response.data || !response.data.data || response.data.data.length === 0) {
+          console.log('Aucun utilisateur trouvé pour ce wallet, création d\'un nouvel utilisateur');
+          
+          // Créer un mot de passe plus robuste respectant les exigences de Joomla
+          const generateStrongPassword = () => {
+            const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+            const numbers = '0123456789';
+            const specialChars = '!@#$%^&*()-_=+[]{}|;:,.<>?';
+            
+            // Prendre au moins un caractère de chaque catégorie
+            let password = '';
+            password += uppercaseChars.charAt(Math.floor(Math.random() * uppercaseChars.length));
+            password += lowercaseChars.charAt(Math.floor(Math.random() * lowercaseChars.length));
+            password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+            password += specialChars.charAt(Math.floor(Math.random() * specialChars.length));
+            
+            // Ajouter des caractères aléatoires supplémentaires pour atteindre une longueur de 12
+            const allChars = uppercaseChars + lowercaseChars + numbers + specialChars;
+            for (let i = 0; i < 8; i++) {
+              password += allChars.charAt(Math.floor(Math.random() * allChars.length));
+            }
+            
+            // Mélanger les caractères
+            return password.split('').sort(() => 0.5 - Math.random()).join('');
+          };
+          
+          const randomPassword = generateStrongPassword();
+          
+          // Formatage de la date d'enregistrement au format ISO mais avec le fuseau horaire français
+          const now = new Date();
+          // Format ISO: YYYY-MM-DDTHH:MM:SS+00:00 (timezone)
+          // Joomla s'attend généralement à ce format standard pour les APIs
+          const formattedDate = now.toISOString().replace('Z', '+01:00'); // Remplacer Z par +01:00 pour le fuseau horaire français
+          
+          const newUser = {
+            name: `User ${cleanedBlockchainId.slice(0, 6)}`,
+            username: `ut_${cleanedBlockchainId.slice(0, 8)}`,
+            email: `${cleanedBlockchainId.slice(0, 8)}@placeholder.com`,
+            state: "0", // Non bloqué
+            password: randomPassword, // Mot de passe robuste
+            password2: randomPassword, // Confirmation du mot de passe (identique)
+            groups: ["2"], // Groupe utilisateur standard
+            registerDate: formattedDate, // Date au format ISO avec fuseau horaire français
+            wallets: {
+              [cleanedBlockchainId]: {
+                field2: "Ultra Wallet"
+              }
+            }
+          };
+          
+          try {
+            await apiRequestor.post('/users', newUser);
+            console.log('Nouvel utilisateur créé avec succès');
+            success(t('new_account_created' as const) || 'Votre compte a été créé automatiquement !');
+          } catch (error: any) {
+            console.error('Erreur lors de la création de l\'utilisateur:', error);
+            if (error.response && error.response.data) {
+              console.error('Données d\'erreur:', error.response.data);
+            }
+            throw error; // Relancer l'erreur pour qu'elle soit traitée par le catch externe
+          }
+        } else {
+          console.log('Utilisateur existant trouvé', response.data);
+        }
+        setUserCheckCompleted(true);
+      } catch (error) {
+        console.error('Erreur lors de la vérification/création de l\'utilisateur:', error);
+        showError(t('account_creation_error' as const) || 'Erreur lors de la vérification/création du compte');
+        // Même en cas d'échec, on marque comme terminé pour éviter une boucle d'erreurs
+        setUserCheckCompleted(true);
+      } finally {
+        setIsCheckingUser(false);
+        checkTimeoutRef.current = null;
+      }
+    }, 800); // Délai de 800ms pour éviter les requêtes trop fréquentes
+
+    return () => {
+      if (checkTimeoutRef.current) {
+        window.clearTimeout(checkTimeoutRef.current);
+        checkTimeoutRef.current = null;
+      }
+    };
+  }, [blockchainId, t, success, showError, userCheckCompleted, isCheckingUser]);
 
   const handleConnect = async () => {
     setUserInitiated(true)

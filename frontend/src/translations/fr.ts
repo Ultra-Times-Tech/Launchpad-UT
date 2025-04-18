@@ -21,7 +21,9 @@ const fr: Record<TranslationKey, string> = {
   slider_description: 'Découvrez notre sélection exclusive de collections numériques créées par des artistes de renommée mondiale',
   collection_mint_access: 'ACCÈS AU MINT',
   collection_coming_soon: 'BIENTÔT DISPONIBLE',
-  loading: 'Chargement...'
+  loading: 'Chargement...',
+  new_account_created: 'Votre compte a été créé automatiquement !',
+  account_creation_error: 'Erreur lors de la vérification/création du compte'
 }
 
 export default fr 

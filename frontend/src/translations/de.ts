@@ -21,7 +21,9 @@ const de: Record<TranslationKey, string> = {
   slider_description: 'Entdecken Sie unsere exklusive Auswahl an digitalen Kollektionen von weltbekannten Künstlern',
   collection_mint_access: 'MINT ZUGRIFF',
   collection_coming_soon: 'DEMNÄCHST VERFÜGBAR',
-  loading: 'Wird geladen...'
+  loading: 'Wird geladen...',
+  new_account_created: 'Ihr Konto wurde automatisch erstellt!',
+  account_creation_error: 'Fehler beim Überprüfen/Erstellen des Kontos'
 }
 
 export default de 
