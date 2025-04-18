@@ -3,18 +3,39 @@ import {AppModule} from './config/app.module'
 import {AppDataSource} from './ormconfig'
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger'
 import * as dotenv from 'dotenv'
+import * as basicAuth from 'express-basic-auth'
 
 async function bootstrap() {
   dotenv.config()
   try {
     const app = await NestFactory.create(AppModule)
 
-    const config = new DocumentBuilder().setTitle('API Documentation').setDescription('The API description').setVersion('1.0').addTag('users').addServer('https://launchpad-2ycml.ondigitalocean.app/api').addServer('http://localhost:3000').build()
+    // Protection de Swagger avec une authentification basique
+    app.use(
+      '/docs',
+      basicAuth({
+        challenge: true,
+        users: {
+          [process.env.SWAGGER_USER || 'admin']: process.env.SWAGGER_PASSWORD || 'password',
+        },
+      })
+    )
+
+    const config = new DocumentBuilder()
+      .setTitle('API Documentation')
+      .setDescription('The API description')
+      .setVersion('1.0')
+      .addTag('users')
+      .addServer('https://launchpad-2ycml.ondigitalocean.app/api')
+      .addServer('http://localhost:3000')
+      .addBearerAuth()
+      .build()
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup('docs', app, document, {
       swaggerOptions: {
         persistAuthorization: true,
         basePath: '/api',
+        security: [{bearer: []}],
       },
       customSiteTitle: 'Launchpad UT API Documentation',
     })
