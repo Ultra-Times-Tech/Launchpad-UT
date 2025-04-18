@@ -200,6 +200,7 @@ const UserManager = () => {
         header: 'Statut',
         accessorFn: row => (row.attributes.block === 0 ? 'Actif' : 'Bloqué'),
         id: 'status',
+        size: 85,
         Cell: ({row}) => (
           <span onClick={() => handleRowClick(row.original.id)} className={`cursor-pointer inline-block px-2 py-1 text-xs leading-5 font-semibold rounded-full ${row.original.attributes.block === 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
             {row.original.attributes.block === 0 ? 'Actif' : 'Bloqué'}

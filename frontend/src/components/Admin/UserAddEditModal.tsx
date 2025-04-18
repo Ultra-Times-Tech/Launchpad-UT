@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiRequestor } from '../../utils/axiosInstanceHelper';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaCheck } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import useAlerts from '../../hooks/useAlert';
 
@@ -102,9 +102,18 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleGroupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-    setFormData(prev => ({ ...prev, groups: selectedOptions }));
+  const toggleGroup = (groupId: string) => {
+    setFormData(prev => {
+      if (prev.groups.includes(groupId)) {
+        // Ne pas permettre de désélectionner tous les groupes
+        if (prev.groups.length === 1) {
+          return prev;
+        }
+        return { ...prev, groups: prev.groups.filter(id => id !== groupId) };
+      } else {
+        return { ...prev, groups: [...prev.groups, groupId] };
+      }
+    });
   };
 
   const validateForm = () => {
@@ -258,7 +267,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
             </div>
 
             {!userId && (
-              <>
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
                     Mot de passe *
@@ -289,19 +298,20 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                     required={!userId}
                   />
                 </div>
-              </>
+              </div>
             )}
 
             {userId && (
-              <>
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-                    Nouveau mot de passe (laisser vide pour ne pas changer)
+                    Nouveau mot de passe
                   </label>
                   <input
                     type="password"
                     id="password"
                     name="password"
+                    placeholder="Laisser vide pour ne pas changer"
                     value={formData.password}
                     onChange={handleInputChange}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -322,29 +332,34 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
-              </>
+              </div>
             )}
 
             <div className="md:col-span-2">
-              <label htmlFor="groups" className="block text-sm font-medium text-gray-300 mb-1">
-                Groupes
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Groupes d'utilisateurs
               </label>
-              <select
-                id="groups"
-                name="groups"
-                multiple
-                value={formData.groups}
-                onChange={handleGroupChange}
-                className="w-full h-24 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
+              <div className="flex flex-wrap gap-2">
                 {availableGroups.map(group => (
-                  <option key={group.id} value={group.id}>
-                    {group.name}
-                  </option>
+                  <button
+                    key={group.id}
+                    type="button"
+                    onClick={() => toggleGroup(group.id)}
+                    className={`flex items-center px-3 py-2 rounded-full border transition-all ${
+                      formData.groups.includes(group.id) 
+                        ? 'bg-primary-600 border-primary-500 text-white' 
+                        : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    {formData.groups.includes(group.id) && (
+                      <FaCheck className="mr-2 h-3 w-3" />
+                    )}
+                    <span>{group.name}</span>
+                  </button>
                 ))}
-              </select>
-              <p className="mt-1 text-xs text-gray-400">
-                Maintenez Ctrl (ou Cmd sur Mac) pour sélectionner plusieurs groupes
+              </div>
+              <p className="mt-2 text-xs text-gray-400">
+                Cliquez sur un groupe pour le sélectionner/désélectionner
               </p>
             </div>
           </div>
