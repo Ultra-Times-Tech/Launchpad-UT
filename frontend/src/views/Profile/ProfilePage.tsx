@@ -72,25 +72,52 @@ function ProfilePage() {
   }, [avatarNftId, profile.avatarNftId]);
 
   useEffect(() => {
-    const fetchUsername = async () => {
+    const fetchUserData = async () => {
       try {
         if (!blockchainId) {
-          console.log('Impossible de récupérer le nom d\'utilisateur : blockchainId est null');
+          console.log('Impossible de récupérer les données utilisateur : blockchainId est null');
           return;
         }
         
-        console.log('Récupération du nom d\'utilisateur pour :', blockchainId);
-        const response = await apiRequestor.get(`/users/${blockchainId}/username`);
-        console.log('Réponse du nom d\'utilisateur :', response.data);
+        console.log('Récupération des données utilisateur pour :', blockchainId);
         
-        const fetchedUsername = response.data.username || null;
+        // Récupérer l'utilisateur complet depuis l'API
+        const userResponse = await apiRequestor.get(`/users/wallets/${blockchainId}`);
+        console.log('Réponse utilisateur complète:', userResponse.data);
+        
+        if (userResponse.data && userResponse.data.data && userResponse.data.data.length > 0) {
+          const userData = userResponse.data.data[0].attributes;
+          
+          // Récupérer l'email et les préférences de notification
+          setProfile(prev => ({
+            ...prev,
+            email: userData.email || 'user@example.com',
+            emailNotifications: userData.sendNotif === '1',
+            marketingCommunications: userData.sendComm === '1',
+          }));
+          
+          // Mettre à jour l'email pour l'édition
+          setNewEmail(userData.email || 'user@example.com');
+          
+          console.log('Données utilisateur récupérées avec succès:', {
+            email: userData.email,
+            sendNotif: userData.sendNotif,
+            sendComm: userData.sendComm
+          });
+        }
+        
+        // Récupérer séparément le nom d'utilisateur
+        const usernameResponse = await apiRequestor.get(`/users/${blockchainId}/username`);
+        console.log('Réponse du nom d\'utilisateur :', usernameResponse.data);
+        
+        const fetchedUsername = usernameResponse.data.username || null;
         setNewUsername(fetchedUsername || '');
         setProfile(prev => ({
           ...prev,
           username: fetchedUsername,
         }));
       } catch (error) {
-        console.error('Erreur lors de la récupération du nom d\'utilisateur:', error);
+        console.error('Erreur lors de la récupération des données utilisateur:', error);
         if (axios.isAxiosError(error) && error.response) {
           console.error('Statut de la réponse:', error.response.status);
           console.error('Données de la réponse:', error.response.data);
@@ -101,7 +128,7 @@ function ProfilePage() {
     // Attendre que le blockchainId soit défini avant de faire les appels API
     if (blockchainId) {
       console.log('BlockchainId disponible, démarrage des récupérations de données');
-      fetchUsername();
+      fetchUserData();
     } else {
       console.log('Attente du blockchainId avant de récupérer les données de profil');
     }
@@ -112,13 +139,44 @@ function ProfilePage() {
     setUsernameValid(newUsername.trim().length >= 3 || newUsername.trim().length === 0);
   }, [newUsername]);
 
-  const handleSave = () => {
-    setProfile(prev => ({
-      ...prev,
-      email: newEmail,
-    }))
-    setIsEditing(false)
-    success('Email mis à jour avec succès !')
+  const handleSave = async () => {
+    try {
+      if (!blockchainId) {
+        showError('Connexion au portefeuille requise');
+        return;
+      }
+      
+      // Récupérer d'abord l'ID utilisateur à partir du wallet
+      const userResponse = await apiRequestor.get(`/users/wallets/${blockchainId}`);
+      if (!userResponse.data || !userResponse.data.data || userResponse.data.data.length === 0) {
+        throw new Error('Utilisateur non trouvé');
+      }
+      
+      const userId = userResponse.data.data[0].id;
+      const userData = userResponse.data.data[0].attributes;
+      
+      // Mettre à jour l'email en base de données avec toutes les informations nécessaires
+      await apiRequestor.patch(`/users/${userId}`, {
+        email: newEmail,
+        sendNotif: userData.sendNotif || profile.emailNotifications ? '1' : '0',
+        sendComm: userData.sendComm || profile.marketingCommunications ? '1' : '0',
+        name: userData.name,
+        username: userData.username,
+        block: userData.block || '0'
+      });
+      
+      // Mettre à jour l'état local après confirmation du serveur
+      setProfile(prev => ({
+        ...prev,
+        email: newEmail,
+      }));
+      
+      setIsEditing(false);
+      success('Email mis à jour avec succès !');
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'email:', error);
+      showError('Impossible de mettre à jour l\'email');
+    }
   }
 
   const handleSaveUsername = async () => {
@@ -281,26 +339,86 @@ function ProfilePage() {
     }
   }
 
-  const handleToggleEmailNotifications = () => {
-    setProfile(prev => {
-      const newValue = !prev.emailNotifications
-      success(`Notifications par e-mail ${newValue ? 'activées' : 'désactivées'} !`)
-      return {
+  const handleToggleEmailNotifications = async () => {
+    try {
+      if (!blockchainId) {
+        showError('Connexion au portefeuille requise');
+        return;
+      }
+      
+      const newValue = !profile.emailNotifications;
+      
+      // Récupérer d'abord l'ID utilisateur à partir du wallet
+      const userResponse = await apiRequestor.get(`/users/wallets/${blockchainId}`);
+      if (!userResponse.data || !userResponse.data.data || userResponse.data.data.length === 0) {
+        throw new Error('Utilisateur non trouvé');
+      }
+      
+      const userId = userResponse.data.data[0].id;
+      const userData = userResponse.data.data[0].attributes;
+      
+      // Mettre à jour la préférence en base de données avec toutes les informations nécessaires
+      await apiRequestor.patch(`/users/${userId}`, {
+        sendNotif: newValue ? '1' : '0',
+        email: userData.email,
+        sendComm: userData.sendComm || profile.marketingCommunications ? '1' : '0',
+        name: userData.name,
+        username: userData.username,
+        block: userData.block || '0'
+      });
+      
+      // Mettre à jour l'état local après confirmation du serveur
+      setProfile(prev => ({
         ...prev,
         emailNotifications: newValue,
-      }
-    })
+      }));
+      
+      success(`Notifications par e-mail ${newValue ? 'activées' : 'désactivées'} !`);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour des notifications:', error);
+      showError('Impossible de mettre à jour les préférences de notification');
+    }
   }
 
-  const handleToggleMarketingCommunications = () => {
-    setProfile(prev => {
-      const newValue = !prev.marketingCommunications
-      success(`Communications marketing ${newValue ? 'activées' : 'désactivées'} !`)
-      return {
+  const handleToggleMarketingCommunications = async () => {
+    try {
+      if (!blockchainId) {
+        showError('Connexion au portefeuille requise');
+        return;
+      }
+      
+      const newValue = !profile.marketingCommunications;
+      
+      // Récupérer d'abord l'ID utilisateur à partir du wallet
+      const userResponse = await apiRequestor.get(`/users/wallets/${blockchainId}`);
+      if (!userResponse.data || !userResponse.data.data || userResponse.data.data.length === 0) {
+        throw new Error('Utilisateur non trouvé');
+      }
+      
+      const userId = userResponse.data.data[0].id;
+      const userData = userResponse.data.data[0].attributes;
+      
+      // Mettre à jour la préférence en base de données avec toutes les informations nécessaires
+      await apiRequestor.patch(`/users/${userId}`, {
+        sendComm: newValue ? '1' : '0',
+        email: userData.email,
+        sendNotif: userData.sendNotif || profile.emailNotifications ? '1' : '0',
+        name: userData.name,
+        username: userData.username,
+        block: userData.block || '0'
+      });
+      
+      // Mettre à jour l'état local après confirmation du serveur
+      setProfile(prev => ({
         ...prev,
         marketingCommunications: newValue,
-      }
-    })
+      }));
+      
+      success(`Communications marketing ${newValue ? 'activées' : 'désactivées'} !`);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour des communications marketing:', error);
+      showError('Impossible de mettre à jour les préférences de communication');
+    }
   }
 
   const handleSelectNft = (nft: Nft) => {

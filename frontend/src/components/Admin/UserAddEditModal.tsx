@@ -3,6 +3,7 @@ import { apiRequestor } from '../../utils/axiosInstanceHelper';
 import { FaTimes, FaCheck } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import useAlerts from '../../hooks/useAlert';
+import { AxiosError } from 'axios';
 
 interface UserWallet {
   field2: string;
@@ -17,7 +18,13 @@ interface UserData {
   password2?: string;
   groups: string[];
   'wallet-id'?: string;
-  wallets?: { [key: string]: UserWallet };
+  wallets?: { [key: string]: UserWallet } | string;
+  registerDate?: string; // Format ISO pour datetime
+  requireReset?: string;
+  resetCount?: string;
+  sendEmail?: string;
+  sendNotif: string;
+  sendComm: string;
 }
 
 interface UserAddEditModalProps {
@@ -25,6 +32,29 @@ interface UserAddEditModalProps {
   onClose: () => void;
   userId?: string;
   onSuccess: () => void;
+}
+
+// Définir une interface pour le payload de l'API
+interface WalletData {
+  [key: string]: {
+    field2: string;
+  };
+}
+
+interface ApiUserPayload {
+  name: string;
+  username: string;
+  email: string;
+  block: string;
+  groups: string[];
+  requireReset: string;
+  resetCount: string;
+  sendEmail: string;
+  sendNotif: string;
+  sendComm: string;
+  wallets: WalletData | string; // Peut être un objet ou une chaîne JSON
+  password?: string;
+  password2?: string;
 }
 
 const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditModalProps) => {
@@ -36,14 +66,21 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
     password: '',
     password2: '',
     groups: ['2'], // Groupe utilisateur par défaut
+    registerDate: '',
+    requireReset: '0',
+    resetCount: '0',
+    sendEmail: '0',
+    sendNotif: '0',
+    sendComm: '0',
+    wallets: {},
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [availableGroups, setAvailableGroups] = useState<{id: string, name: string}[]>([
+  const availableGroups = [
     { id: '2', name: 'Utilisateurs enregistrés' },
     { id: '6', name: 'Managers' },
     { id: '8', name: 'Super Users' }
-  ]);
+  ];
   const { success, error: showError } = useAlerts();
 
   // Gérer l'ouverture/fermeture de la modal
@@ -61,6 +98,13 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
           password: '',
           password2: '',
           groups: ['2'],
+          registerDate: '',
+          requireReset: '0',
+          resetCount: '0',
+          sendEmail: '0',
+          sendNotif: '0',
+          sendComm: '0',
+          wallets: {},
         });
         setIsLoading(false);
       } else {
@@ -80,9 +124,26 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
 
   const fetchUserData = async (id: string) => {
     try {
+      console.log('Récupération des données utilisateur via API pour ID:', id);
       const response = await apiRequestor.get(`/users/${id}`);
+      
+      // Afficher la réponse complète pour débogage
+      console.log('Réponse API complète:', JSON.stringify(response.data, null, 2));
+      
       if (response.data && response.data.data) {
         const userData = response.data.data.attributes;
+        
+        console.log('Données utilisateur brutes:', userData);
+        console.log('Wallets bruts:', userData.wallets);
+        
+        // Récupérer directement tous les champs pour vérifier s'ils existent
+        console.log('Tous les champs disponibles:', Object.keys(userData));
+        
+        // Vérifier explicitement les champs de notification
+        console.log('Champ sendNotif existant:', Object.prototype.hasOwnProperty.call(userData, 'sendNotif'));
+        console.log('Valeur sendNotif:', userData.sendNotif);
+        console.log('Champ sendComm existant:', Object.prototype.hasOwnProperty.call(userData, 'sendComm'));
+        console.log('Valeur sendComm:', userData.sendComm);
         
         // Convertir les groupes en array de strings si nécessaire
         let groups = ['2']; // Valeur par défaut
@@ -90,20 +151,100 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
           groups = Object.keys(userData.groups).map(id => id.toString());
         }
         
-        setFormData({
+        // Normaliser les wallets pour notre format à un seul wallet
+        let wallets = {};
+        if (userData.wallets) {
+          try {
+            // Si les wallets sont une chaîne, essayer de la parser
+            const parsedWallets = typeof userData.wallets === 'string' 
+              ? JSON.parse(userData.wallets) 
+              : userData.wallets;
+            
+            console.log('Wallets après parsing:', parsedWallets);
+            
+            // Si des wallets existent, prendre le premier ou créer un format standardisé
+            if (parsedWallets && Object.keys(parsedWallets).length > 0) {
+              wallets = parsedWallets; // Conserver tous les wallets
+              
+              console.log('Wallets formatés pour affichage:', wallets);
+            }
+          } catch (err) {
+            console.error('Erreur lors du parsing des wallets:', err);
+            // En cas d'erreur, laisser wallets vide
+          }
+        }
+        
+        // Extraire les préférences de notification soit des attributs directs, soit d'autres champs
+        let sendNotif = '0';
+        let sendComm = '0';
+        
+        // Tentative d'extraction directe
+        if (userData.sendNotif !== undefined) {
+          sendNotif = userData.sendNotif;
+          console.log('sendNotif trouvé directement:', sendNotif);
+        }
+        
+        if (userData.sendComm !== undefined) {
+          sendComm = userData.sendComm;
+          console.log('sendComm trouvé directement:', sendComm);
+        }
+        
+        // Si les champs ne sont pas trouvés directement, chercher dans des champs alternatifs
+        // Note: adapter ceci en fonction de la structure réelle de votre API
+        if (userData.params) {
+          console.log('Champ params trouvé:', userData.params);
+          try {
+            const params = typeof userData.params === 'string' 
+              ? JSON.parse(userData.params) 
+              : userData.params;
+            
+            if (params.sendNotif !== undefined) {
+              sendNotif = params.sendNotif;
+              console.log('sendNotif trouvé dans params:', sendNotif);
+            }
+            
+            if (params.sendComm !== undefined) {
+              sendComm = params.sendComm;
+              console.log('sendComm trouvé dans params:', sendComm);
+            }
+          } catch (err) {
+            console.error('Erreur lors du parsing des params:', err);
+          }
+        }
+        
+        // Afficher les valeurs finales pour débogage
+        console.log('Préférences de notification extraites:');
+        console.log('- sendNotif (final):', sendNotif);
+        console.log('- sendComm (final):', sendComm);
+        
+        const formattedData = {
           name: userData.name || '',
           username: userData.username || '',
           email: userData.email || '',
-          state: userData.block.toString() || '0',
+          state: userData.block !== undefined ? userData.block.toString() : '0',
           groups: groups,
           'wallet-id': userData['wallet-id'] || '',
-          wallets: userData.wallets || {},
+          wallets: wallets,
+          registerDate: userData.registerDate || '',
+          requireReset: userData.requireReset || '0',
+          resetCount: userData.resetCount || '0',
+          sendEmail: userData.sendEmail || '0',
+          sendNotif: sendNotif,
+          sendComm: sendComm,
           password: '',
           password2: '',
-        });
+        };
+        
+        console.log('Données formatées pour le formulaire:', formattedData);
+        
+        setFormData(formattedData);
       }
     } catch (error) {
       console.error('Erreur lors du chargement des données utilisateur:', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as AxiosError;
+        console.error('Détails de l\'erreur de réponse:', axiosError.response?.status, axiosError.response?.data);
+      }
       showError('Impossible de charger les données de l\'utilisateur.');
     } finally {
       setIsLoading(false);
@@ -113,6 +254,45 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleWalletChange = (rowKey: string, value: string) => {
+    setFormData(prev => {
+      const currentWallets = typeof prev.wallets === 'object' ? {...prev.wallets} : {};
+      return { 
+        ...prev, 
+        wallets: { 
+          ...currentWallets,
+          [rowKey]: { field2: value }
+        }
+      };
+    });
+  };
+
+  const addWalletRow = () => {
+    // Cette fonction n'est plus nécessaire car nous limitons à un seul wallet
+    // Mais on peut l'utiliser pour ajouter un wallet vide s'il n'y en a pas
+    setFormData(prev => {
+      if (prev.wallets && Object.keys(prev.wallets).length > 0) {
+        return prev; // Ne rien faire si un wallet existe déjà
+      }
+      return { 
+        ...prev, 
+        wallets: { 
+          row0: { field2: '' } 
+        } 
+      };
+    });
+  };
+
+  const removeWalletRow = () => {
+    // Supprime le wallet unique
+    setFormData(prev => {
+      return { 
+        ...prev, 
+        wallets: {} 
+      };
+    });
   };
 
   const toggleGroup = (groupId: string) => {
@@ -129,14 +309,24 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
     });
   };
 
+  const toggleNotification = (type: 'sendNotif' | 'sendComm') => {
+    setFormData(prev => ({
+      ...prev,
+      [type]: prev[type] === '1' ? '0' : '1'
+    }));
+  };
+
   const validateForm = () => {
     if (!formData.name || !formData.username || !formData.email) {
       showError('Veuillez remplir tous les champs obligatoires.');
       return false;
     }
 
-    if (!userId && (!formData.password || formData.password.length < 8)) {
-      showError('Le mot de passe doit contenir au moins 8 caractères.');
+    // Vérification du mot de passe avec les nouvelles règles
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{12,}$/;
+
+    if (!userId && (!formData.password || !passwordRegex.test(formData.password))) {
+      showError('Le mot de passe doit contenir au moins 12 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.');
       return false;
     }
 
@@ -145,8 +335,8 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
       return false;
     }
 
-    if (userId && formData.password && formData.password.length > 0 && formData.password.length < 8) {
-      showError('Le nouveau mot de passe doit contenir au moins 8 caractères.');
+    if (userId && formData.password && formData.password.length > 0 && !passwordRegex.test(formData.password)) {
+      showError('Le nouveau mot de passe doit contenir au moins 12 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.');
       return false;
     }
 
@@ -165,13 +355,54 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
     
     setIsLoading(true);
     try {
-      const payload = { ...formData };
+      // Création d'un payload selon le format attendu par l'API
+      const payload: ApiUserPayload = {
+        name: formData.name,
+        username: formData.username,
+        email: formData.email,
+        block: formData.state,
+        groups: formData.groups,
+        requireReset: formData.requireReset || '0',
+        resetCount: formData.resetCount || '0',
+        sendEmail: formData.sendEmail || '0',
+        sendNotif: formData.sendNotif,
+        sendComm: formData.sendComm,
+        wallets: formData.wallets || { row0: { field2: '' } } // Valeur par défaut si undefined
+      };
       
-      // Si c'est une mise à jour sans changement de mot de passe
-      if (userId && (!payload.password || payload.password === '')) {
-        delete payload.password;
-        delete payload.password2;
+      // Ajouter les mots de passe si nécessaire
+      if (!userId || (formData.password && formData.password.length > 0)) {
+        payload.password = formData.password;
+        payload.password2 = formData.password;
       }
+      
+      // S'assurer que wallets est au bon format
+      if (typeof payload.wallets === 'object' && Object.keys(payload.wallets).length > 0) {
+        // Si c'est déjà un objet, ne pas le stringifier à nouveau
+        console.log('Wallets avant envoi (objet):', payload.wallets);
+      } else if (typeof payload.wallets === 'string') {
+        try {
+          // Si c'est une chaîne, vérifier que c'est un JSON valide
+          JSON.parse(payload.wallets);
+          console.log('Wallets avant envoi (chaîne JSON):', payload.wallets);
+        } catch {
+          // Si ce n'est pas un JSON valide, créer un wallet vide
+          payload.wallets = {
+            row0: {
+              field2: ''
+            }
+          };
+        }
+      } else {
+        // Si c'est vide ou invalide, créer un wallet vide
+        payload.wallets = {
+          row0: {
+            field2: ''
+          }
+        };
+      }
+      
+      console.log('Données complètes envoyées à l\'API:', payload);
       
       if (userId) {
         // Mode édition
@@ -220,9 +451,9 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
         animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
         exit={{ opacity: 0, y: 20 }}
         transition={{ duration: 0.2 }}
-        className="w-full max-w-2xl bg-gray-800 rounded-lg shadow-xl overflow-hidden"
+        className="w-full max-w-2xl bg-gray-800 rounded-lg shadow-xl overflow-hidden max-h-[85vh] flex flex-col"
       >
-        <div className="flex justify-between items-center p-4 bg-gray-700">
+        <div className="flex justify-between items-center p-4 bg-gray-700 sticky top-0 z-10">
           <h2 className="text-xl font-semibold text-white">
             {userId ? 'Modifier l\'utilisateur' : 'Ajouter un utilisateur'}
           </h2>
@@ -241,7 +472,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
             <p className="text-gray-400">Chargement des données...</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-6">
+          <form onSubmit={handleSubmit} className="p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 flex-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
@@ -325,8 +556,18 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       required={!userId}
-                      minLength={8}
+                      minLength={12}
                     />
+                    <div className="mt-2 text-xs text-gray-400 space-y-1">
+                      <p>Le mot de passe doit contenir :</p>
+                      <ul className="list-disc list-inside pl-2 space-y-1">
+                        <li className={formData.password && formData.password.length >= 12 ? "text-green-500" : ""}>12 caractères minimum</li>
+                        <li className={formData.password && /[A-Z]/.test(formData.password) ? "text-green-500" : ""}>1 lettre majuscule</li>
+                        <li className={formData.password && /[a-z]/.test(formData.password) ? "text-green-500" : ""}>1 lettre minuscule</li>
+                        <li className={formData.password && /\d/.test(formData.password) ? "text-green-500" : ""}>1 chiffre</li>
+                        <li className={formData.password && /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(formData.password) ? "text-green-500" : ""}>1 caractère spécial</li>
+                      </ul>
+                    </div>
                   </div>
 
                   <div>
@@ -341,7 +582,11 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       required={!userId}
+                      minLength={12}
                     />
+                    <p className={`mt-2 text-xs ${formData.password && formData.password2 && formData.password === formData.password2 ? "text-green-500" : "text-gray-400"}`}>
+                      Les mots de passe doivent correspondre
+                    </p>
                   </div>
                 </div>
               )}
@@ -360,8 +605,20 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                       value={formData.password}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      minLength={8}
+                      minLength={12}
                     />
+                    {formData.password && formData.password.length > 0 && (
+                      <div className="mt-2 text-xs text-gray-400 space-y-1">
+                        <p>Le mot de passe doit contenir :</p>
+                        <ul className="list-disc list-inside pl-2 space-y-1">
+                          <li className={formData.password && formData.password.length >= 12 ? "text-green-500" : ""}>12 caractères minimum</li>
+                          <li className={formData.password && /[A-Z]/.test(formData.password) ? "text-green-500" : ""}>1 lettre majuscule</li>
+                          <li className={formData.password && /[a-z]/.test(formData.password) ? "text-green-500" : ""}>1 lettre minuscule</li>
+                          <li className={formData.password && /\d/.test(formData.password) ? "text-green-500" : ""}>1 chiffre</li>
+                          <li className={formData.password && /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(formData.password) ? "text-green-500" : ""}>1 caractère spécial</li>
+                        </ul>
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -375,10 +632,92 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                       value={formData.password2}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      minLength={12}
                     />
+                    {formData.password && formData.password.length > 0 && (
+                      <p className={`mt-2 text-xs ${formData.password && formData.password2 && formData.password === formData.password2 ? "text-green-500" : "text-gray-400"}`}>
+                        Les mots de passe doivent correspondre
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Wallet
+                </label>
+                <div className="space-y-3">
+                  {formData.wallets && typeof formData.wallets === 'object' && Object.keys(formData.wallets).length > 0 ? (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={(formData.wallets as {[key: string]: UserWallet}).row0?.field2 || ''}
+                        onChange={(e) => handleWalletChange('row0', e.target.value)}
+                        placeholder="Identifiant du wallet"
+                        className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeWalletRow}
+                        className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
+                        title="Supprimer le wallet"
+                      >
+                        <FaTimes size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={addWalletRow}
+                      className="px-4 py-2 bg-gray-700 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
+                    >
+                      + Ajouter un wallet
+                    </button>
+                  )}
+                </div>
+                {userId && (
+                  <p className="mt-2 text-xs text-gray-400">
+                    L'identifiant du wallet devrait être au format alphanumérique
+                  </p>
+                )}
+              </div>
+
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-semibold text-primary-300 mb-4">Préférences</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between py-3 border-b border-dark-700">
+                    <div>
+                      <h4 className="font-medium">Notifications par e-mail</h4>
+                      <p className="text-sm text-gray-400">Recevoir des mises à jour par e-mail concernant l'activité</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.sendNotif === '1'} 
+                        onChange={() => toggleNotification('sendNotif')} 
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                    </label>
+                  </div>
+                  <div className="flex items-center justify-between py-3 border-b border-dark-700">
+                    <div>
+                      <h4 className="font-medium">Communications marketing</h4>
+                      <p className="text-sm text-gray-400">Recevoir des mises à jour concernant les nouvelles collections</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.sendComm === '1'} 
+                        onChange={() => toggleNotification('sendComm')} 
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-300 mb-2">

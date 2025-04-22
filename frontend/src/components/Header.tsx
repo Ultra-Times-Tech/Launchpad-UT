@@ -6,8 +6,9 @@ import useAlerts from '../hooks/useAlert'
 import {useTranslation} from '../hooks/useTranslation'
 import {TranslationKey} from '../types/translations'
 import useUserAvatar from '../hooks/useUserAvatar'
-import {useUsername} from '../hooks/useUsername'
+import {useUsername, getUsername} from '../hooks/useUsername'
 import {apiRequestor} from '../utils/axiosInstanceHelper'
+import axios from 'axios'
 
 // Types
 interface SocialLinkProps {
@@ -328,8 +329,12 @@ function Header() {
         window.clearTimeout(checkTimeoutRef.current);
         checkTimeoutRef.current = null;
       }
+    } else if (blockchainId && !userCheckCompleted && !isCheckingUser) {
+      // Si l'utilisateur est connecté mais que la vérification n'a pas été faite
+      // et qu'aucune vérification n'est en cours, mettre la vérification à faire
+      console.log('Nouvelle connexion détectée, vérification à faire.');
     }
-  }, [blockchainId]);
+  }, [blockchainId, userCheckCompleted, isCheckingUser]);
 
   // Vérifier si l'utilisateur existe et le créer si nécessaire
   useEffect(() => {
@@ -344,17 +349,98 @@ function Header() {
     }
 
     checkTimeoutRef.current = window.setTimeout(async () => {
-      setIsCheckingUser(true);
-      lastCheckedBlockchainId.current = blockchainId;
-      
       try {
-        // Vérifier si l'utilisateur existe par son wallet ID
-        const cleanedBlockchainId = cleanWalletId(blockchainId);
-        const response = await apiRequestor.get(`/users/wallets/${cleanedBlockchainId}`);
+        setIsCheckingUser(true);
         
-        // Si aucun utilisateur trouvé avec ce wallet, en créer un
-        if (!response.data || !response.data.data || response.data.data.length === 0) {
+        // Nettoyer et stocker l'ID pour référence future
+        const cleanedBlockchainId = cleanWalletId(blockchainId);
+        
+        console.log('Vérification de l\'existence de l\'utilisateur avec le wallet ID:', cleanedBlockchainId);
+        
+        // Vérifier d'abord si nous avons déjà un utilisateur pour éviter les requêtes répétées
+        // Vérifier si l'utilisateur existe par son wallet ID en utilisant l'endpoint spécifique
+        console.log('Recherche d\'utilisateur par wallet ID:', cleanedBlockchainId);
+        const response = await apiRequestor.get(`/users/wallets/${cleanedBlockchainId}`);
+        console.log('Réponse de la vérification par wallet:', response.data);
+        console.log('Structure de la réponse:', JSON.stringify(response.data, null, 2));
+        
+        // Vérifier si un utilisateur a été trouvé
+        const userExists = response.data && 
+                          response.data.data && 
+                          Array.isArray(response.data.data) && 
+                          response.data.data.length > 0;
+        
+        if (userExists) {
+          console.log('Utilisateur existant trouvé avec le wallet ID', cleanedBlockchainId);
+          // Le reste du code pour la gestion d'un utilisateur existant
+          try {
+            const userData = response.data.data[0].attributes;
+            console.log('Données utilisateur existantes:', userData);
+            
+            // Vérifier si les wallets sont déjà dans le bon format
+            let existingWallets;
+            try {
+              existingWallets = typeof userData.wallets === 'string' 
+                ? JSON.parse(userData.wallets) 
+                : userData.wallets;
+            } catch (e) {
+              existingWallets = {};
+              console.error('Erreur lors du parsing des wallets existants:', e);
+            }
+            
+            console.log('Wallets existants:', existingWallets);
+            
+            // Si pas de wallets ou si le wallet actuel n'est pas déjà enregistré
+            if (!existingWallets || 
+                !Object.values(existingWallets).some((wallet: any) => 
+                  wallet.field2 === cleanedBlockchainId)) {
+              console.log('Mise à jour du wallet pour l\'utilisateur existant');
+              
+              // Ajouter le wallet actuel
+              const updatedWallets = {
+                row0: {
+                  field2: cleanedBlockchainId
+                }
+              };
+              
+              // Mettre à jour l'utilisateur
+              const userId = response.data.data[0].id;
+              await apiRequestor.patch(`/users/${userId}`, {
+                wallets: JSON.stringify(updatedWallets)
+              });
+              console.log('Wallet mis à jour avec succès');
+            }
+          } catch (updateError) {
+            console.error('Erreur lors de la mise à jour du wallet:', updateError);
+            // Continuer malgré l'erreur de mise à jour du wallet
+          }
+        } else {
           console.log('Aucun utilisateur trouvé pour ce wallet, création d\'un nouvel utilisateur');
+          
+          // Définir le nom d'utilisateur et le nom d'affichage
+          let username = '';
+          let displayName = '';
+          
+          // Tenter de récupérer le nom d'utilisateur associé à ce wallet de la blockchain
+          try {
+            // Importation dynamique du hook pour l'utiliser dans useEffect
+            const { getUsername } = await import('../hooks/useUsername');
+            const ultraUsername = await getUsername(cleanedBlockchainId);
+            if (ultraUsername) {
+              username = ultraUsername.replace(/[^a-zA-Z0-9_]/g, '_');  // Normaliser pour éviter les caractères spéciaux
+              displayName = ultraUsername;
+              console.log('Nom d\'utilisateur Ultra récupéré:', ultraUsername);
+            } else {
+              // Si aucun nom d'utilisateur n'a été trouvé, utiliser une valeur par défaut
+              username = `ut_${cleanedBlockchainId.slice(0, 8)}`;
+              displayName = `User ${cleanedBlockchainId.slice(0, 6)}`;
+            }
+          } catch (usernameError) {
+            console.error('Erreur lors de la récupération du nom d\'utilisateur Ultra:', usernameError);
+            // En cas d'erreur, utiliser une valeur par défaut
+            username = `ut_${cleanedBlockchainId.slice(0, 8)}`;
+            displayName = `User ${cleanedBlockchainId.slice(0, 6)}`;
+          }
           
           // Créer un mot de passe plus robuste respectant les exigences de Joomla
           const generateStrongPassword = () => {
@@ -382,48 +468,84 @@ function Header() {
           
           const randomPassword = generateStrongPassword();
           
-          // Formatage de la date d'enregistrement au format ISO mais avec le fuseau horaire français
+          // Format YYYY-MM-DD HH:MM:SS comme attendu par l'API
           const now = new Date();
-          // Format ISO: YYYY-MM-DDTHH:MM:SS+00:00 (timezone)
-          // Joomla s'attend généralement à ce format standard pour les APIs
-          const formattedDate = now.toISOString().replace('Z', '+01:00'); // Remplacer Z par +01:00 pour le fuseau horaire français
+          const formattedDate = now.toISOString().slice(0, 10) + ' ' + 
+                               now.toTimeString().slice(0, 8);
+          
+          // Créer le wallet au format attendu par l'API (chaîne JSON)
+          const wallets = JSON.stringify({
+            row0: {
+              field2: cleanedBlockchainId
+            }
+          });
           
           const newUser = {
-            name: `User ${cleanedBlockchainId.slice(0, 6)}`,
-            username: `ut_${cleanedBlockchainId.slice(0, 8)}`,
-            email: `${cleanedBlockchainId.slice(0, 8)}@placeholder.com`,
+            name: displayName,
+            username: username,
+            email: `${cleanedBlockchainId}@ultra.io`,
             state: "0", // Non bloqué
             password: randomPassword, // Mot de passe robuste
             password2: randomPassword, // Confirmation du mot de passe (identique)
             groups: ["2"], // Groupe utilisateur standard
-            registerDate: formattedDate, // Date au format ISO avec fuseau horaire français
-            wallets: {
-              [cleanedBlockchainId]: {
-                field2: "Ultra Wallet"
-              }
-            }
+            registerDate: formattedDate,
+            requireReset: "0",
+            resetCount: "0",
+            sendEmail: "0",
+            sendNotif: "0",
+            sendComm: "0",
+            wallets: wallets
           };
           
+          console.log('Données utilisateur à créer:', newUser);
+          
           try {
-            await apiRequestor.post('/users', newUser);
-            console.log('Nouvel utilisateur créé avec succès');
+            const createResponse = await apiRequestor.post('/users', newUser);
+            console.log('Nouvel utilisateur créé avec succès:', createResponse.data);
             success(t('new_account_created' as const) || 'Votre compte a été créé automatiquement !');
           } catch (error: any) {
             console.error('Erreur lors de la création de l\'utilisateur:', error);
             if (error.response && error.response.data) {
-              console.error('Données d\'erreur:', error.response.data);
+              console.error('Détails de l\'erreur:', error.response.data);
+              
+              // Si l'erreur est due à un nom d'utilisateur ou email déjà utilisé
+              if (error.response.status === 409 || 
+                 (error.response.data.errors && 
+                  (error.response.data.errors.some((err: any) => err.title.includes('username')) ||
+                   error.response.data.errors.some((err: any) => err.title.includes('email'))))) {
+                console.log('Conflit de nom d\'utilisateur ou d\'email, génération de nouveaux identifiants');
+                
+                // Régénérer avec des valeurs uniques
+                const timestamp = Date.now().toString().slice(-6);
+                newUser.username = `ut_${timestamp}_${cleanedBlockchainId.slice(0, 4)}`;
+                newUser.email = `${timestamp}_${cleanedBlockchainId.slice(0, 4)}@ultra.io`;
+                
+                console.log('Nouvelle tentative avec:', newUser.username, newUser.email);
+                
+                try {
+                  const retryResponse = await apiRequestor.post('/users', newUser);
+                  console.log('Nouvel utilisateur créé avec succès après nouvelle tentative:', retryResponse.data);
+                  success(t('new_account_created' as const) || 'Votre compte a été créé automatiquement !');
+                } catch (retryError) {
+                  console.error('Échec de la seconde tentative:', retryError);
+                  throw retryError;
+                }
+              } else {
+                throw error;
+              }
+            } else {
+              throw error; // Relancer l'erreur pour qu'elle soit traitée par le catch externe
             }
-            throw error; // Relancer l'erreur pour qu'elle soit traitée par le catch externe
           }
-        } else {
-          console.log('Utilisateur existant trouvé', response.data);
         }
         setUserCheckCompleted(true);
+        lastCheckedBlockchainId.current = blockchainId; // Only store the ID after successful check
       } catch (error) {
         console.error('Erreur lors de la vérification/création de l\'utilisateur:', error);
         showError(t('account_creation_error' as const) || 'Erreur lors de la vérification/création du compte');
         // Même en cas d'échec, on marque comme terminé pour éviter une boucle d'erreurs
         setUserCheckCompleted(true);
+        // Ne pas stocker le blockchainId en cas d'erreur pour permettre une nouvelle tentative
       } finally {
         setIsCheckingUser(false);
         checkTimeoutRef.current = null;
@@ -446,6 +568,7 @@ function Header() {
       showError(t('wallet_connect_error' as const))
     } else {
       success(t('wallet_connect_success' as const))
+      // La vérification et création d'utilisateur est déjà gérée par le useEffect
     }
   }
 
