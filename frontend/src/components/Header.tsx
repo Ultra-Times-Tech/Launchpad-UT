@@ -6,9 +6,8 @@ import useAlerts from '../hooks/useAlert'
 import {useTranslation} from '../hooks/useTranslation'
 import {TranslationKey} from '../types/translations'
 import useUserAvatar from '../hooks/useUserAvatar'
-import {useUsername, getUsername} from '../hooks/useUsername'
+import {useUsername} from '../hooks/useUsername'
 import {apiRequestor} from '../utils/axiosInstanceHelper'
-import axios from 'axios'
 
 // Types
 interface SocialLinkProps {
@@ -392,14 +391,16 @@ function Header() {
             
             // Si pas de wallets ou si le wallet actuel n'est pas déjà enregistré
             if (!existingWallets || 
-                !Object.values(existingWallets).some((wallet: any) => 
-                  wallet.field2 === cleanedBlockchainId)) {
+                !Object.values(existingWallets).some((wallet) => {
+                  const w = wallet as Record<string, unknown>;
+                  return (w.field1 && w.field1 === cleanedBlockchainId);
+                })) {
               console.log('Mise à jour du wallet pour l\'utilisateur existant');
               
-              // Ajouter le wallet actuel
+              // Ajouter le wallet actuel au format field1
               const updatedWallets = {
                 row0: {
-                  field2: cleanedBlockchainId
+                  field1: cleanedBlockchainId
                 }
               };
               
@@ -476,7 +477,7 @@ function Header() {
           // Créer le wallet au format attendu par l'API (chaîne JSON)
           const wallets = JSON.stringify({
             row0: {
-              field2: cleanedBlockchainId
+              field1: cleanedBlockchainId
             }
           });
           
@@ -503,16 +504,21 @@ function Header() {
             const createResponse = await apiRequestor.post('/users', newUser);
             console.log('Nouvel utilisateur créé avec succès:', createResponse.data);
             success(t('new_account_created' as const) || 'Votre compte a été créé automatiquement !');
-          } catch (error: any) {
+          } catch (error: unknown) {
             console.error('Erreur lors de la création de l\'utilisateur:', error);
-            if (error.response && error.response.data) {
-              console.error('Détails de l\'erreur:', error.response.data);
+            
+            // Vérifier si l'erreur est une erreur de réponse avec un format spécifique
+            const err = error as { response?: { status?: number, data?: { errors?: Array<{ title?: string }> } } };
+            
+            if (err.response?.data) {
+              console.error('Détails de l\'erreur:', err.response.data);
               
               // Si l'erreur est due à un nom d'utilisateur ou email déjà utilisé
-              if (error.response.status === 409 || 
-                 (error.response.data.errors && 
-                  (error.response.data.errors.some((err: any) => err.title.includes('username')) ||
-                   error.response.data.errors.some((err: any) => err.title.includes('email'))))) {
+              const errors = err.response.data.errors || [];
+              const hasUsernameError = errors.some(e => e.title && typeof e.title === 'string' && e.title.includes('username'));
+              const hasEmailError = errors.some(e => e.title && typeof e.title === 'string' && e.title.includes('email'));
+              
+              if (err.response.status === 409 || hasUsernameError || hasEmailError) {
                 console.log('Conflit de nom d\'utilisateur ou d\'email, génération de nouveaux identifiants');
                 
                 // Régénérer avec des valeurs uniques
