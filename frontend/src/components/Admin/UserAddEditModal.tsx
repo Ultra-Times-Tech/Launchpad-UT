@@ -23,8 +23,8 @@ interface UserData {
   requireReset?: string;
   resetCount?: string;
   sendEmail?: string;
-  sendNotif: string;
-  sendComm: string;
+  sendnotif: string[];
+  sendcomm: string[];
 }
 
 interface UserAddEditModalProps {
@@ -70,8 +70,8 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
     requireReset: '0',
     resetCount: '0',
     sendEmail: '0',
-    sendNotif: '0',
-    sendComm: '0',
+    sendnotif: ['0'],
+    sendcomm: ['0'],
     wallets: {},
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -102,8 +102,8 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
           requireReset: '0',
           resetCount: '0',
           sendEmail: '0',
-          sendNotif: '0',
-          sendComm: '0',
+          sendnotif: ['0'],
+          sendcomm: ['0'],
           wallets: {},
         });
         setIsLoading(false);
@@ -191,47 +191,47 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
         }
         
         // Extraire les préférences de notification
-        let sendNotif = '0';
-        let sendComm = '0';
+        let sendnotif = ['0'];
+        let sendcomm = ['0'];
         
         // GET: Traitement de sendnotif (format objet {1: "Yes"} ou {0: "No"})
         if (typeof userData.sendnotif === 'object' && userData.sendnotif !== null) {
           // Vérifier si la clé "1" existe et a une valeur
           if (userData.sendnotif["1"]) {
-            sendNotif = '1';
+            sendnotif = ['1'];
           }
-          console.log('sendnotif (format objet):', userData.sendnotif, '→ normalisé à:', sendNotif);
+          console.log('sendnotif (format objet):', userData.sendnotif, '→ normalisé à:', sendnotif);
         } else if (Array.isArray(userData.sendnotif)) {
           // Format array ['1']
-          sendNotif = userData.sendnotif.includes('1') ? '1' : '0';
-          console.log('sendnotif (format array):', userData.sendnotif, '→ normalisé à:', sendNotif);
+          sendnotif = userData.sendnotif.includes('1') ? ['1'] : ['0'];
+          console.log('sendnotif (format array):', userData.sendnotif, '→ normalisé à:', sendnotif);
         } else if (typeof userData.sendNotif === 'string') {
           // Format chaîne directe
-          sendNotif = userData.sendNotif === '1' ? '1' : '0';
-          console.log('sendNotif (format chaîne):', userData.sendNotif, '→ normalisé à:', sendNotif);
+          sendnotif = userData.sendNotif === '1' ? ['1'] : ['0'];
+          console.log('sendNotif (format chaîne):', userData.sendNotif, '→ normalisé à:', sendnotif);
         }
         
         // GET: Traitement de sendcomm (format objet {1: "Yes"} ou {0: "No"})
         if (typeof userData.sendcomm === 'object' && userData.sendcomm !== null) {
           // Vérifier si la clé "1" existe et a une valeur
           if (userData.sendcomm["1"]) {
-            sendComm = '1';
+            sendcomm = ['1'];
           }
-          console.log('sendcomm (format objet):', userData.sendcomm, '→ normalisé à:', sendComm);
+          console.log('sendcomm (format objet):', userData.sendcomm, '→ normalisé à:', sendcomm);
         } else if (Array.isArray(userData.sendcomm)) {
           // Format array ['1']
-          sendComm = userData.sendcomm.includes('1') ? '1' : '0';
-          console.log('sendcomm (format array):', userData.sendcomm, '→ normalisé à:', sendComm);
+          sendcomm = userData.sendcomm.includes('1') ? ['1'] : ['0'];
+          console.log('sendcomm (format array):', userData.sendcomm, '→ normalisé à:', sendcomm);
         } else if (typeof userData.sendComm === 'string') {
           // Format chaîne directe
-          sendComm = userData.sendComm === '1' ? '1' : '0';
-          console.log('sendComm (format chaîne):', userData.sendComm, '→ normalisé à:', sendComm);
+          sendcomm = userData.sendComm === '1' ? ['1'] : ['0'];
+          console.log('sendComm (format chaîne):', userData.sendComm, '→ normalisé à:', sendcomm);
         }
         
         // Afficher les valeurs finales pour débogage
         console.log('Préférences de notification extraites:');
-        console.log('- sendNotif (final):', sendNotif);
-        console.log('- sendComm (final):', sendComm);
+        console.log('- sendnotif (final):', sendnotif);
+        console.log('- sendcomm (final):', sendcomm);
         
         const formattedData = {
           name: userData.name || '',
@@ -245,8 +245,8 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
           requireReset: userData.requireReset || '0',
           resetCount: userData.resetCount || '0',
           sendEmail: userData.sendEmail || '0',
-          sendNotif: sendNotif,
-          sendComm: sendComm,
+          sendnotif: sendnotif,
+          sendcomm: sendcomm,
           password: '',
           password2: '',
         };
@@ -327,10 +327,10 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
     });
   };
 
-  const toggleNotification = (type: 'sendNotif' | 'sendComm') => {
+  const toggleNotification = (type: 'sendnotif' | 'sendcomm') => {
     setFormData(prev => {
       // S'assurer que la valeur actuelle est une chaîne '0' ou '1'
-      const currentValue = prev[type] === '1' ? '1' : '0';
+      const currentValue = prev[type][0] === '1' ? '1' : '0';
       // Basculer entre '0' et '1'
       const newValue = currentValue === '1' ? '0' : '1';
       
@@ -338,7 +338,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
       
       return {
         ...prev,
-        [type]: newValue
+        [type]: newValue === '1' ? ['1'] : ['0']
       };
     });
   };
@@ -384,12 +384,12 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
     try {
       // POST/PATCH: Toujours envoyer au format array ["1"] ou ["0"]
       // Normaliser les valeurs de notification pour s'assurer qu'elles sont toujours '0' ou '1'
-      const normalizedSendNotif = formData.sendNotif === '1' ? '1' : '0';
-      const normalizedSendComm = formData.sendComm === '1' ? '1' : '0';
+      const normalizedSendnotif = formData.sendnotif[0] === '1' ? '1' : '0';
+      const normalizedSendcomm = formData.sendcomm[0] === '1' ? '1' : '0';
       
       // Convertir les valeurs en arrays au format ["0"] ou ["1"] pour l'API
-      const sendnotifArray = [normalizedSendNotif === '1' ? "1" : "0"];
-      const sendcommArray = [normalizedSendComm === '1' ? "1" : "0"];
+      const sendnotifArray = [normalizedSendnotif === '1' ? "1" : "0"];
+      const sendcommArray = [normalizedSendcomm === '1' ? "1" : "0"];
       
       // Préparer les données pour l'API
       const userData: ApiUserPayload = {
@@ -733,8 +733,8 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input 
                         type="checkbox" 
-                        checked={formData.sendNotif === '1'} 
-                        onChange={() => toggleNotification('sendNotif')} 
+                        checked={formData.sendnotif[0] === '1'} 
+                        onChange={() => toggleNotification('sendnotif')} 
                         className="sr-only peer" 
                       />
                       <div className="w-11 h-6 bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
@@ -748,8 +748,8 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input 
                         type="checkbox" 
-                        checked={formData.sendComm === '1'} 
-                        onChange={() => toggleNotification('sendComm')} 
+                        checked={formData.sendcomm[0] === '1'} 
+                        onChange={() => toggleNotification('sendcomm')} 
                         className="sr-only peer" 
                       />
                       <div className="w-11 h-6 bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>

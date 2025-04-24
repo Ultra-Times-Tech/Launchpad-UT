@@ -165,12 +165,16 @@ function ProfilePage() {
 
       // Mettre à jour l'email en base de données avec toutes les informations nécessaires
       await apiRequestor.patch(`/users/${userId}`, {
+        name: userData.name || '',
+        username: userData.username || '',
         email: newEmail,
-        sendNotif: userData.sendNotif || profile.emailNotifications ? '1' : '0',
-        sendComm: userData.sendComm || profile.marketingCommunications ? '1' : '0',
-        name: userData.name,
-        username: userData.username,
         block: userData.block || '0',
+        groups: userData.groups || ['2'],
+        // Préserver les wallets existants
+        wallets: userData.wallets || {},
+        // Envoyer les notifications au format tableau ["0"] ou ["1"]
+        sendnotif: [profile.emailNotifications ? "1" : "0"],
+        sendcomm: [profile.marketingCommunications ? "1" : "0"]
       })
 
       // Mettre à jour l'état local après confirmation du serveur
@@ -352,6 +356,12 @@ function ProfilePage() {
       }
 
       const newValue = !profile.emailNotifications
+      
+      // Mettre à jour l'interface immédiatement pour une meilleure réactivité
+      setProfile(prev => ({
+        ...prev,
+        emailNotifications: newValue,
+      }))
 
       // Récupérer d'abord l'ID utilisateur à partir du wallet
       const userResponse = await apiRequestor.get(`/users/wallets/${blockchainId}`)
@@ -362,36 +372,36 @@ function ProfilePage() {
       const userId = userResponse.data.data[0].id
       const userData = userResponse.data.data[0].attributes
 
-      // POST/PATCH: Toujours envoyer au format array ["1"] ou ["0"]
-      const sendnotifValue = [newValue ? '1' : '0']
-
-      // Pour sendcomm, conserver le format d'array mais avec la valeur actuelle
-      const sendcommValue = [profile.marketingCommunications ? '1' : '0']
-
-      console.log('handleToggleEmailNotifications - valeurs à envoyer:')
-      console.log('- sendnotif:', sendnotifValue)
-      console.log('- sendcomm:', sendcommValue)
-
-      // Mettre à jour la préférence en base de données
-      await apiRequestor.patch(`/users/${userId}`, {
-        sendnotif: sendnotifValue,
-        email: userData.email,
-        sendcomm: sendcommValue,
+      // Créer l'objet avec le format exact requis par l'API
+      const updateData = {
         name: userData.name || '',
         username: userData.username || '',
+        email: userData.email || '',
         block: userData.block || '0',
-      })
+        groups: userData.groups || ['2'],
+        // Préserver les wallets existants
+        wallets: userData.wallets || {},
+        // Envoyer sendnotif et sendcomm au format tableau
+        sendnotif: [newValue ? "1" : "0"],
+        sendcomm: [profile.marketingCommunications ? "1" : "0"]
+      }
 
-      // Mettre à jour l'état local après confirmation du serveur
-      setProfile(prev => ({
-        ...prev,
-        emailNotifications: newValue,
-      }))
+      console.log('handleToggleEmailNotifications - données envoyées:', updateData)
 
+      // Mettre à jour la préférence en base de données
+      await apiRequestor.patch(`/users/${userId}`, updateData)
+
+      // Afficher la confirmation après succès
       success(`Notifications par e-mail ${newValue ? 'activées' : 'désactivées'} !`)
     } catch (error) {
       console.error('Erreur lors de la mise à jour des notifications:', error)
       showError('Impossible de mettre à jour les préférences de notification')
+      
+      // Restaurer l'état précédent en cas d'erreur
+      setProfile(prev => ({
+        ...prev,
+        emailNotifications: !prev.emailNotifications,
+      }))
     }
   }
 
@@ -403,6 +413,12 @@ function ProfilePage() {
       }
 
       const newValue = !profile.marketingCommunications
+      
+      // Mettre à jour l'interface immédiatement pour une meilleure réactivité
+      setProfile(prev => ({
+        ...prev,
+        marketingCommunications: newValue,
+      }))
 
       // Récupérer d'abord l'ID utilisateur à partir du wallet
       const userResponse = await apiRequestor.get(`/users/wallets/${blockchainId}`)
@@ -413,36 +429,36 @@ function ProfilePage() {
       const userId = userResponse.data.data[0].id
       const userData = userResponse.data.data[0].attributes
 
-      // POST/PATCH: Toujours envoyer au format array ["1"] ou ["0"]
-      const sendcommValue = [newValue ? '1' : '0']
-
-      // Pour sendnotif, conserver le format d'array mais avec la valeur actuelle
-      const sendnotifValue = [profile.emailNotifications ? '1' : '0']
-
-      console.log('handleToggleMarketingCommunications - valeurs à envoyer:')
-      console.log('- sendnotif:', sendnotifValue)
-      console.log('- sendcomm:', sendcommValue)
-
-      // Mettre à jour la préférence en base de données
-      await apiRequestor.patch(`/users/${userId}`, {
-        sendcomm: sendcommValue,
-        email: userData.email,
-        sendnotif: sendnotifValue,
+      // Créer l'objet avec le format exact requis par l'API
+      const updateData = {
         name: userData.name || '',
         username: userData.username || '',
+        email: userData.email || '',
         block: userData.block || '0',
-      })
+        groups: userData.groups || ['2'],
+        // Préserver les wallets existants
+        wallets: userData.wallets || {},
+        // Envoyer sendnotif et sendcomm au format tableau
+        sendnotif: [profile.emailNotifications ? "1" : "0"],
+        sendcomm: [newValue ? "1" : "0"]
+      }
 
-      // Mettre à jour l'état local après confirmation du serveur
-      setProfile(prev => ({
-        ...prev,
-        marketingCommunications: newValue,
-      }))
+      console.log('handleToggleMarketingCommunications - données envoyées:', updateData)
 
+      // Mettre à jour la préférence en base de données
+      await apiRequestor.patch(`/users/${userId}`, updateData)
+
+      // Afficher la confirmation après succès
       success(`Communications marketing ${newValue ? 'activées' : 'désactivées'} !`)
     } catch (error) {
       console.error('Erreur lors de la mise à jour des communications marketing:', error)
       showError('Impossible de mettre à jour les préférences de communication')
+      
+      // Restaurer l'état précédent en cas d'erreur
+      setProfile(prev => ({
+        ...prev,
+        marketingCommunications: !prev.marketingCommunications,
+      }))
     }
   }
 

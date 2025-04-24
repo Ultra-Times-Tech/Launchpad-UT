@@ -493,8 +493,8 @@ function Header() {
             requireReset: "0",
             resetCount: "0",
             sendEmail: "0",
-            sendNotif: "0",
-            sendComm: "0",
+            sendnotif: ["0"],
+            sendcomm: ["0"],
             wallets: wallets
           };
           

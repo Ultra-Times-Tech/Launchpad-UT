@@ -30,7 +30,7 @@ class UserParams {
 
 class WalletRow {
   @IsString()
-  field2: string
+  field1: string
 }
 
 export class UpdateUserDto {
@@ -84,6 +84,18 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   sendEmail?: string
+
+  @ApiPropertyOptional({description: 'Notification preferences'})
+  @IsOptional()
+  @IsArray()
+  @IsString({each: true})
+  sendnotif?: string[]
+
+  @ApiPropertyOptional({description: 'Marketing communication preferences'})
+  @IsOptional()
+  @IsArray()
+  @IsString({each: true})
+  sendcomm?: string[]
 
   @ApiPropertyOptional({description: 'Additional user parameters'})
   @IsOptional()

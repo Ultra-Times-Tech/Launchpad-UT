@@ -9,7 +9,7 @@ interface WalletConnectProps {
 }
 
 const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconnect, className = ''}) => {
-  const {isInstalled, isConnected, isLoading, error, blockchainId, connect, disconnect} = useUltraWallet()
+  const {isInstalled, isConnected, isLoading, error, blockchainId, connect, disconnect, eagerConnect} = useUltraWallet()
   const {success, error: showError} = useAlerts()
   const [lastErrorMessage, setLastErrorMessage] = useState<string | null>(null)
   const [lastConnectedId, setLastConnectedId] = useState<string | null>(null)
@@ -20,6 +20,9 @@ const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconn
     if (isConnected && blockchainId && onConnect && blockchainId !== lastConnectedId) {
       onConnect(blockchainId)
       setLastConnectedId(blockchainId)
+
+      // Stocker l'état de connexion dans localStorage pour faciliter les reconnexions
+      localStorage.setItem('eagerlyConnection', 'true')
 
       // Only show success notification if the connection was user-initiated
       if (userInitiated) {
@@ -35,6 +38,22 @@ const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconn
       setLastErrorMessage(error)
     }
   }, [error, lastErrorMessage, showError, userInitiated])
+
+  // Vérifier s'il y a une connexion précédente et tenter une reconnexion automatique
+  useEffect(() => {
+    const attemptEagerConnection = async () => {
+      const hasEagerlyConnection = localStorage.getItem('eagerlyConnection') === 'true'
+      if (hasEagerlyConnection && isInstalled && !isConnected) {
+        try {
+          await eagerConnect()
+        } catch (err) {
+          console.error('Failed eager connection:', err)
+        }
+      }
+    }
+
+    attemptEagerConnection()
+  }, [isInstalled, isConnected, eagerConnect])
 
   const handleConnect = async () => {
     setUserInitiated(true)
@@ -52,6 +71,8 @@ const WalletConnectButton: React.FC<WalletConnectProps> = ({onConnect, onDisconn
     const isDisconnected = await disconnect()
 
     if (isDisconnected) {
+      // Supprimer l'état de connexion dans localStorage lors de la déconnexion
+      localStorage.removeItem('eagerlyConnection')
       success('Wallet disconnected successfully!')
       setLastConnectedId(null)
       if (onDisconnect) {
