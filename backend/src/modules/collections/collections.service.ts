@@ -2,6 +2,7 @@ import {Injectable, Logger} from '@nestjs/common'
 import {ConfigService} from '@nestjs/config'
 import axios from 'axios'
 import {CollectionsResponse} from './interfaces/collection-response.interface'
+import {Collection} from './interfaces/collection.interface'
 import {CreateCollectionDto} from './dto/create-collection.dto'
 import {UpdateCollectionDto} from './dto/update-collection.dto'
 import {CollectionFiltersDto} from './dto/collection-filters.dto'
@@ -31,6 +32,47 @@ export class CollectionsService {
     }
   }
 
+  private transformCollectionResponse(data: any): Collection[] | Collection {
+    if (Array.isArray(data)) {
+      return data.map(item => this.transformCollectionItem(item))
+    } else {
+      return this.transformCollectionItem(data)
+    }
+  }
+
+  private transformCollectionItem(item: any): Collection {
+    console.log('Original item from API:', item);
+    
+    // Conversion explicite des valeurs booléennes
+    const isTrending = item.is_trending === null ? null : 
+                      item.is_trending === true || item.is_trending === 1 || item.is_trending === '1' || 
+                      item.is_trending === 'true' || item.is_trending === 'yes';
+                      
+    const isFeatured = item.is_featured === null ? null : 
+                      item.is_featured === true || item.is_featured === 1 || item.is_featured === '1' || 
+                      item.is_featured === 'true' || item.is_featured === 'yes';
+    
+    const transformed = {
+      type: 'collections',
+      id: String(item.id),
+      attributes: {
+        id: item.id,
+        name: item.name || `Collection #${item.id}`,
+        state: item.state !== undefined ? Number(item.state) : 0,
+        publish_up: item.publish_up || null,
+        publish_down: item.publish_down || null,
+        modified: item.modified || new Date().toISOString(),
+        image: item.image || null,
+        is_trending: isTrending,
+        is_featured: isFeatured,
+        ordering: item.ordering === null ? null : Number(item.ordering)
+      }
+    };
+    
+    console.log('Transformed item:', transformed);
+    return transformed;
+  }
+
   async findAll(filters?: CollectionFiltersDto): Promise<CollectionsResponse> {
     try {
       let url = `${this.apiUrl}/api/index.php/v1/ultratimes/collections`
@@ -55,8 +97,15 @@ export class CollectionsService {
         url += `?${queryParams.join('&')}`
       }
 
-      const response = await axios.get<CollectionsResponse>(url, {headers: this.getHeaders()})
-      return response.data
+      const response = await axios.get(url, {headers: this.getHeaders()})
+      
+      const transformedData = this.transformCollectionResponse(response.data.data)
+      
+      return {
+        links: response.data.links,
+        data: transformedData,
+        meta: response.data.meta
+      }
     } catch (error) {
       this.logger.error('Error fetching collections:', error)
       throw error
@@ -65,11 +114,17 @@ export class CollectionsService {
 
   async findOne(id: string): Promise<CollectionsResponse> {
     try {
-      const response = await axios.get<CollectionsResponse>(
+      const response = await axios.get(
         `${this.apiUrl}/api/index.php/v1/ultratimes/collections/${id}`,
         {headers: this.getHeaders()}
       )
-      return response.data
+      
+      const transformedData = this.transformCollectionItem(response.data.data)
+      
+      return {
+        links: response.data.links,
+        data: transformedData
+      }
     } catch (error) {
       this.logger.error(`Error fetching collection ${id}:`, error)
       throw error
@@ -78,9 +133,19 @@ export class CollectionsService {
 
   async create(createCollectionDto: CreateCollectionDto): Promise<void> {
     try {
+      const payload = {
+        name: createCollectionDto.name,
+        alias: createCollectionDto.alias,
+        state: createCollectionDto.state,
+        image: createCollectionDto.image,
+        is_trending: createCollectionDto.is_trending,
+        is_featured: createCollectionDto.is_featured,
+        ordering: createCollectionDto.ordering
+      }
+      
       await axios.post(
         `${this.apiUrl}/api/index.php/v1/ultratimes/collections`,
-        createCollectionDto,
+        payload,
         {headers: this.getHeaders()}
       )
     } catch (error) {
@@ -91,9 +156,19 @@ export class CollectionsService {
 
   async update(id: string, updateCollectionDto: UpdateCollectionDto): Promise<void> {
     try {
+      const payload = {
+        ...(updateCollectionDto.name && { name: updateCollectionDto.name }),
+        ...(updateCollectionDto.alias && { alias: updateCollectionDto.alias }),
+        ...(updateCollectionDto.state && { state: updateCollectionDto.state }),
+        ...(updateCollectionDto.image !== undefined && { image: updateCollectionDto.image }),
+        ...(updateCollectionDto.is_trending !== undefined && { is_trending: updateCollectionDto.is_trending }),
+        ...(updateCollectionDto.is_featured !== undefined && { is_featured: updateCollectionDto.is_featured }),
+        ...(updateCollectionDto.ordering !== undefined && { ordering: updateCollectionDto.ordering })
+      }
+      
       await axios.patch(
         `${this.apiUrl}/api/index.php/v1/ultratimes/collections/${id}`,
-        updateCollectionDto,
+        payload,
         {headers: this.getHeaders()}
       )
     } catch (error) {

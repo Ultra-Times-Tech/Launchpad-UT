@@ -353,15 +353,7 @@ function Header() {
         
         // Nettoyer et stocker l'ID pour référence future
         const cleanedBlockchainId = cleanWalletId(blockchainId);
-        
-        console.log('Vérification de l\'existence de l\'utilisateur avec le wallet ID:', cleanedBlockchainId);
-        
-        // Vérifier d'abord si nous avons déjà un utilisateur pour éviter les requêtes répétées
-        // Vérifier si l'utilisateur existe par son wallet ID en utilisant l'endpoint spécifique
-        console.log('Recherche d\'utilisateur par wallet ID:', cleanedBlockchainId);
         const response = await apiRequestor.get(`/users/wallets/${cleanedBlockchainId}`);
-        console.log('Réponse de la vérification par wallet:', response.data);
-        console.log('Structure de la réponse:', JSON.stringify(response.data, null, 2));
         
         // Vérifier si un utilisateur a été trouvé
         const userExists = response.data && 
