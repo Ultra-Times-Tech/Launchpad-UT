@@ -1,5 +1,5 @@
 // Hooks
-import {useCollections, latestCollections, mintActivities, trendingCollections} from '../hooks/useCollections'
+import {useCollections} from '../hooks/useCollections'
 import {useTranslation} from '../hooks/useTranslation'
 // Components
 import Slider from '../components/Slider/Slider'
@@ -7,9 +7,13 @@ import FeaturedCollections from '../components/Sections/FeaturedCollections'
 import LatestCollections from '../components/Sections/LatestCollections'
 import TrendingCollections from '../components/Sections/TrendingCollections'
 import Newsletter from '../components/Sections/Newsletter'
+// Data
+import {mintActivities} from '../data/collections.data'
+// Types
+import {Collection} from '../types/collection.types'
 
 function HomePage() {
-  const {featuredCollections, loading, error} = useCollections()
+  const {featuredCollections, trendingCollections, allCollections, loading, error} = useCollections()
   const {t} = useTranslation()
 
   if (loading) {
@@ -33,6 +37,14 @@ function HomePage() {
       </div>
     )
   }
+
+  const latestCollections = allCollections.slice(0, 5).map((collection: Collection) => ({
+    id: collection.attributes.id,
+    name: collection.attributes.name,
+    description: 'Collection from Ultra Times ecosystem',
+    image: collection.attributes.image || 'https://picsum.photos/800/500?random=1',
+    artist: 'Ultra Times'
+  }))
 
   return (
     <div className='bg-dark-950 text-white'>

@@ -1,6 +1,9 @@
 import {useState, useEffect} from 'react'
-import CollectionCard, {CollectionCardProps} from '../components/Card/CollectionCard'
+import CollectionCard from '../components/Card/CollectionCard'
 import FilterBar, {FilterCategory, SortOption, PriceRange} from '../components/FilterBar/FilterBar'
+import {CollectionCardProps} from '../types/collection.types'
+import {collectionsService} from '../services/collections.service'
+import {generateMockCollections, isPriceInRange} from '../data/collections.data'
 
 function CollectionsPage() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -10,6 +13,7 @@ function CollectionsPage() {
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<Set<PriceRange>>(new Set())
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [searchQuery, setSearchQuery] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   const collectionsPerPage = 9
 
@@ -44,13 +48,29 @@ function CollectionsPage() {
     const fetchCollections = async () => {
       setLoading(true)
       try {
-        setTimeout(() => {
-          const mockCollections = generateMockCollections(24)
-          setCollections(mockCollections)
-          setLoading(false)
-        }, 800)
+        // Get all collections from the API
+        const apiCollections = await collectionsService.getAllCollections()
+        
+        // Map them to the CollectionCardProps type
+        const mappedCollections = apiCollections.map(collection => ({
+          id: collection.attributes.id,
+          name: collection.attributes.name,
+          description: 'Collection from Ultra Times ecosystem',
+          image: collection.attributes.image || 'https://picsum.photos/400/300?random=11',
+          artist: 'Ultra Times',
+          totalItems: 1000,
+          floorPrice: '0.5',
+          category: collection.attributes.is_trending ? 'game-assets' : 
+                   collection.attributes.is_featured ? 'art' : 'collectibles',
+        }))
+        
+        setCollections(mappedCollections)
+        setError(null)
       } catch (error) {
         console.error('Error fetching collections:', error)
+        setError('Failed to load collections. Please try again later.')
+        setCollections(generateMockCollections(4))
+      } finally {
         setLoading(false)
       }
     }
@@ -60,7 +80,6 @@ function CollectionsPage() {
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
-    // Utiliser requestAnimationFrame pour s'assurer que le défilement se fait après le rendu
     requestAnimationFrame(() => {
       window.scrollTo({
         top: 0,
@@ -106,6 +125,17 @@ function CollectionsPage() {
         <div className='flex flex-col items-center'>
           <div className='w-16 h-16 border-t-4 border-primary-500 border-solid rounded-full animate-spin'></div>
           <p className='mt-4 text-xl'>Loading collections...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error && collections.length === 0) {
+    return (
+      <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
+        <div className='text-center'>
+          <h2 className='text-2xl font-bold text-red-500 mb-4'>Error</h2>
+          <p className='text-gray-300'>{error}</p>
         </div>
       </div>
     )
@@ -159,85 +189,6 @@ function CollectionsPage() {
       </div>
     </div>
   )
-}
-
-// Helper function to check if price is in range
-function isPriceInRange(price: string, range: PriceRange): boolean {
-  const priceValue = parseFloat(price)
-  switch (range) {
-    case 'under-1':
-      return priceValue < 1
-    case '1-5':
-      return priceValue >= 1 && priceValue <= 5
-    case '5-10':
-      return priceValue > 5 && priceValue <= 10
-    case 'above-10':
-      return priceValue > 10
-    default:
-      return true
-  }
-}
-
-// Helper function to generate mock collections
-function generateMockCollections(count: number): CollectionCardProps[] {
-  const categories: FilterCategory[] = ['art', 'collectibles', 'game-assets', 'music', 'photography', 'sports']
-  const baseCollections = [
-    {
-      id: 1,
-      name: 'Vox-in-Time',
-      description: 'A collection of rare weapons and equipment from the future, featuring unique designs and powerful capabilities.',
-      image: '/banners/vit-banner.png',
-      artist: 'Ultra Times Studios',
-      totalItems: 1000,
-      floorPrice: '0.5',
-      category: 'game-assets' as FilterCategory,
-    },
-    {
-      id: 2,
-      name: 'Ultra Street-Cubism',
-      description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations.',
-      image: '/banners/collection.png',
-      artist: 'Ultra Times Archaeology',
-      totalItems: 500,
-      floorPrice: '0.8',
-      category: 'art' as FilterCategory,
-    },
-    {
-      id: 3,
-      name: 'Crypto Punks Edition',
-      description: 'A collection featuring unique characters with different abilities, backgrounds, and stories from the Ultra Times universe.',
-      image: '/banners/factory-characters.png',
-      artist: 'Ultra Times Creative',
-      totalItems: 750,
-      floorPrice: '1.2',
-      category: 'collectibles' as FilterCategory,
-    },
-    {
-      id: 4,
-      name: 'Factory Power Booster',
-      description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem.',
-      image: '/banners/factory-powerbooster.png',
-      artist: 'Ultra Times Labs',
-      totalItems: 600,
-      floorPrice: '0.75',
-      category: 'game-assets' as FilterCategory,
-    },
-  ]
-
-  const collections: CollectionCardProps[] = []
-
-  for (let i = 0; i < count; i++) {
-    const baseCollection = baseCollections[i % baseCollections.length]
-    collections.push({
-      ...baseCollection,
-      id: i + 1,
-      name: i < baseCollections.length ? baseCollection.name : `${baseCollection.name} #${Math.floor(i / baseCollections.length) + 1}`,
-      category: categories[Math.floor(Math.random() * categories.length)],
-      floorPrice: (Math.random() * 15).toFixed(2),
-    })
-  }
-
-  return collections
 }
 
 export default CollectionsPage

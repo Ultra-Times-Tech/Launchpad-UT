@@ -1,40 +1,41 @@
 import {useEffect, useState} from 'react'
 import {useParams, Link} from 'react-router-dom'
 import {getAssetUrl} from '../utils/imageHelper'
-import FactoryCard, {FactoryCardProps} from '../components/Card/FactoryCard'
-
-interface Collection {
-  id: number
-  name: string
-  description: string
-  image: string
-  totalItems: number
-  floorPrice: string
-  creator: string
-  releaseDate: string
-  factories: FactoryCardProps[]
-  features: string[]
-}
+import FactoryCard from '../components/Card/FactoryCard'
+import {CollectionDetailsProps} from '../types/collection.types'
+import {collectionsService} from '../services/collections.service'
+import {getMockCollection} from '../data/collections.data'
 
 function CollectionDetailsPage() {
   const {id} = useParams<{id: string}>()
-  const [collection, setCollection] = useState<Collection | null>(null)
+  const [collection, setCollection] = useState<CollectionDetailsProps | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'story' | 'features'>('story')
 
   useEffect(() => {
-    // Simulate fetching collection data
     const fetchCollection = async () => {
       setLoading(true)
       try {
-        // In a real app, this would be an API call
-        setTimeout(() => {
-          const mockCollection = getMockCollection(Number(id))
-          setCollection(mockCollection)
-          setLoading(false)
-        }, 800)
+        if (!id) throw new Error('Collection ID is required')
+        
+        const collectionDetails = await collectionsService.getCollectionDetails(id)
+        
+        if (collectionDetails) {
+          setCollection(collectionDetails)
+          setError(null)
+        } else {
+          throw new Error('Collection not found')
+        }
       } catch (error) {
         console.error('Error fetching collection:', error)
+        setError('Failed to load collection. Please try again later.')
+        
+        if (id) {
+          const mockCollection = getMockCollection(Number(id))
+          setCollection(mockCollection)
+        }
+      } finally {
         setLoading(false)
       }
     }
@@ -49,6 +50,18 @@ function CollectionDetailsPage() {
           <div className='w-16 h-16 border-t-4 border-primary-500 border-solid rounded-full animate-spin'></div>
           <p className='mt-4 text-xl'>Loading collection...</p>
         </div>
+      </div>
+    )
+  }
+
+  if (error && !collection) {
+    return (
+      <div className='min-h-screen bg-dark-950 text-white flex flex-col items-center justify-center'>
+        <h2 className='text-2xl font-bold text-red-500 mb-4'>Error</h2>
+        <p className='mb-6 text-gray-300'>{error}</p>
+        <Link to='/collections' className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200'>
+          Back to Collections
+        </Link>
       </div>
     )
   }
@@ -181,133 +194,6 @@ function CollectionDetailsPage() {
       </div>
     </div>
   )
-}
-
-// Mock data function
-function getMockCollection(id: number): Collection {
-  const collections = [
-    {
-      id: 1,
-      name: 'Vox-in-Time',
-      description: 'A collection of rare weapons and equipment from the future, featuring unique designs and powerful capabilities.',
-      image: '/banners/vit-banner.png',
-      totalItems: 1000,
-      floorPrice: '0.5 ETH',
-      creator: 'Ultra Times Studios',
-      releaseDate: 'March 15, 2025',
-      features: ['Each weapon has unique attributes and power levels', 'Weapons can be used in the Ultra Times gaming ecosystem', 'Rare and legendary weapons include animated visual effects', 'Owners receive exclusive access to special in-game events', 'Limited edition weapons with enhanced capabilities', 'Blockchain-verified ownership and authenticity'],
-      factories: [
-        {
-          id: 1,
-          collectionId: 1,
-          name: 'Personnages',
-          description: 'Donec nec ante nisi. Vestibulum tincidunt lectus sed magna.',
-          image: 'https://picsum.photos/400/300?random=1',
-          mintPrice: '0.5 UOS',
-          supply: 100,
-          minted: 45,
-        },
-        {
-          id: 2,
-          collectionId: 1,
-          name: 'Arsenal',
-          description: 'Morbi eget mattis vel felis sodales commodo tempor magna.',
-          image: 'https://picsum.photos/400/300?random=2',
-          mintPrice: '0.8 UOS',
-          supply: 150,
-          minted: 23,
-        },
-        {
-          id: 3,
-          collectionId: 1,
-          name: 'Artifacts',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-          image: 'https://picsum.photos/400/300?random=3',
-          mintPrice: '1.2 UOS',
-          supply: 75,
-          minted: 62,
-        },
-        {
-          id: 4,
-          collectionId: 1,
-          name: 'Power boosters',
-          description: 'Vivamus feugiat verius accumsan. Proin ac orci sed mattis.',
-          image: 'https://picsum.photos/400/300?random=4',
-          mintPrice: '0.3 UOS',
-          supply: 200,
-          minted: 89,
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Ultra Street-Cubism',
-      description: 'Discover Ultra Street-Cubism, a groundbreaking collection that merges street art with cubism. Each piece is a unique digital masterpiece that captures the essence of urban culture through geometric forms and vibrant colors.',
-      image: '/banners/collection.png',
-      totalItems: 2,
-      floorPrice: '0 ETH',
-      creator: 'C-la',
-      releaseDate: 'June 01, 2024',
-      features: ['Unique fusion of street art and cubism', 'Each piece signed by the artist C-la', 'Exclusive chance to win ViT UniQ through special raffle', 'Physical artwork conversion option available', 'Limited edition of only 2 unique pieces', 'Blockchain-verified authenticity'],
-      factories: [
-        {
-          id: 1,
-          collectionId: 2,
-          name: 'Dark Wisdom Counsellor',
-          description: "A stunning Dark Street Cubism painting inspired by an Ultra's Movement Elder design. This exclusive creation is personally signed by C-la. By acquiring this Art, you're automatically entered into a special raffle that occurs every 5 UniQ purchases (excluding Vouchers), giving you a chance to win a high-rarity ViT UniQ from the UT Collection.",
-          image: '/banners/dark-counseller.png',
-          mintPrice: '0 UOS',
-          supply: 1,
-          minted: 0,
-        },
-        {
-          id: 2,
-          collectionId: 2,
-          name: 'Phygital Voucher',
-          description: 'Transform your digital Ultra Street-Cubism collection into a physical masterpiece. This voucher entitles you to receive a printed version of your UniQ on a premium 60cm x 80cm dibond support, ensuring durability and longevity. (Shipping costs not included) For more information, contact Ultra Times teams on Discord: https://discord.gg/R2zvShJAyh',
-          image: '/banners/phygital.png',
-          mintPrice: '0 UOS',
-          supply: 1,
-          minted: 0,
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Crypto Punks Edition',
-      description: 'A collection featuring unique characters with different abilities, backgrounds, and stories from the Ultra Times universe.',
-      image: '/banners/factory-characters.png',
-      totalItems: 750,
-      floorPrice: '1.2 ETH',
-      creator: 'Ultra Times Creative',
-      releaseDate: 'May 10, 2025',
-      features: ['Characters with unique abilities and attributes', 'Detailed character backstories and lore', 'Characters can be used in Ultra Times games', 'Different character classes with special abilities', 'Character progression and customization', 'Limited edition characters with unique storylines'],
-      factories: [
-        {
-          id: 1,
-          collectionId: 3,
-          name: 'Personnages',
-          description: 'Donec nec ante nisi. Vestibulum tincidunt lectus sed magna.',
-          image: 'https://picsum.photos/400/300?random=9',
-          mintPrice: '0.5 UOS',
-          supply: 100,
-          minted: 45,
-        },
-        {
-          id: 2,
-          collectionId: 3,
-          name: 'Arsenal',
-          description: 'Morbi eget mattis vel felis sodales commodo tempor magna.',
-          image: 'https://picsum.photos/400/300?random=10',
-          mintPrice: '0.8 UOS',
-          supply: 150,
-          minted: 23,
-        },
-      ],
-    },
-  ]
-
-  return collections.find(c => c.id === id) || collections[0]
 }
 
 export default CollectionDetailsPage
