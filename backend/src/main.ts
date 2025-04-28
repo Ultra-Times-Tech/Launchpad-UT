@@ -10,7 +10,6 @@ async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule)
 
-    // Protection de Swagger avec une authentification basique
     app.use(
       '/docs',
       basicAuth({

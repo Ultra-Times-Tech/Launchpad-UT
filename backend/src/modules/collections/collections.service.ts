@@ -43,29 +43,23 @@ export class CollectionsService {
   private transformCollectionItem(item: any): Collection {
     console.log('Original item from API:', item);
     
-    // Conversion explicite des valeurs booléennes
-    const isTrending = item.is_trending === null ? null : 
-                      item.is_trending === true || item.is_trending === 1 || item.is_trending === '1' || 
-                      item.is_trending === 'true' || item.is_trending === 'yes';
-                      
-    const isFeatured = item.is_featured === null ? null : 
-                      item.is_featured === true || item.is_featured === 1 || item.is_featured === '1' || 
-                      item.is_featured === 'true' || item.is_featured === 'yes';
-    
     const transformed = {
-      type: 'collections',
-      id: String(item.id),
+      type: "collections",
+      id: String(item.attributes?.id || item.id),
       attributes: {
-        id: item.id,
-        name: item.name || `Collection #${item.id}`,
-        state: item.state !== undefined ? Number(item.state) : 0,
-        publish_up: item.publish_up || null,
-        publish_down: item.publish_down || null,
-        modified: item.modified || new Date().toISOString(),
-        image: item.image || null,
-        is_trending: isTrending,
-        is_featured: isFeatured,
-        ordering: item.ordering === null ? null : Number(item.ordering)
+        id: Number(item.attributes?.id || item.id),
+        name: item.attributes?.name || item.name || `Collection #${item.attributes?.id || item.id}`,
+        state: item.attributes?.state !== undefined ? Number(item.attributes?.state) : 
+               item.state !== undefined ? Number(item.state) : 0,
+        publish_up: item.attributes?.publish_up || item.publish_up || null,
+        publish_down: item.attributes?.publish_down || item.publish_down || null,
+        modified: item.attributes?.modified || item.modified || new Date().toISOString(),
+        image: item.attributes?.image || item.image ? 
+               `/images/collections/${item.attributes?.id || item.id}/${item.attributes?.image || item.image}` : null,
+        is_trending: Boolean(Number(item.attributes?.is_trending || item.is_trending || 0)),
+        is_featured: Boolean(Number(item.attributes?.is_featured || item.is_featured || 0)),
+        ordering: item.attributes?.ordering !== undefined ? Number(item.attributes?.ordering) :
+                 item.ordering !== undefined ? Number(item.ordering) : null,
       }
     };
     

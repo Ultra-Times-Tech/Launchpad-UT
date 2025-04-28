@@ -48,22 +48,19 @@ function CollectionsPage() {
     const fetchCollections = async () => {
       setLoading(true)
       try {
-        // Get all collections from the API
         const apiCollections = await collectionsService.getAllCollections()
-        
-        // Map them to the CollectionCardProps type
+
         const mappedCollections = apiCollections.map(collection => ({
           id: collection.attributes.id,
           name: collection.attributes.name,
           description: 'Collection from Ultra Times ecosystem',
-          image: collection.attributes.image || 'https://picsum.photos/400/300?random=11',
+          image: collection.attributes.image || '',
           artist: 'Ultra Times',
           totalItems: 1000,
           floorPrice: '0.5',
-          category: collection.attributes.is_trending ? 'game-assets' : 
-                   collection.attributes.is_featured ? 'art' : 'collectibles',
+          category: collection.attributes.is_trending ? 'game-assets' : collection.attributes.is_featured ? 'art' : 'collectibles',
         }))
-        
+
         setCollections(mappedCollections)
         setError(null)
       } catch (error) {
@@ -83,7 +80,7 @@ function CollectionsPage() {
     requestAnimationFrame(() => {
       window.scrollTo({
         top: 0,
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     })
   }

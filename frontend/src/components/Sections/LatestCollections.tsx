@@ -1,5 +1,7 @@
 import {useState, useEffect} from 'react'
 import MintCard from '../Card/MintCard'
+// Utils
+import { getAssetUrl } from '../../utils/imageHelper'
 
 interface FeaturedCollection {
   id: number
@@ -44,7 +46,7 @@ function LatestCollections({latestCollections, mintActivities}: LatestCollection
         <div className='lg:col-span-2'>
           <div className='bg-dark-800 text-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300'>
             <div className='relative h-[300px] sm:h-[400px] lg:h-[500px]'>
-              <img src={currentCollection.image} alt={currentCollection.name} className='w-full h-full object-cover' />
+              <img src={getAssetUrl(currentCollection.image)} alt={currentCollection.name} className='w-full h-full object-cover' />
               <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent flex items-end justify-center'>
                 <div className='text-center p-4 sm:p-6 w-full'>
                   <h3 className='text-xl sm:text-2xl lg:text-3xl font-cabin font-bold mb-2 text-primary-300'>{currentCollection.name}</h3>

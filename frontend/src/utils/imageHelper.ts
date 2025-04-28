@@ -1,10 +1,3 @@
-/**
- * Image Helper Utility
- *
- * This utility provides functions for working with images in the application,
- * including determining optimal dimensions and loading strategies.
- */
-
 // Define standard image dimensions for different screen sizes
 export const imageDimensions = {
   mobile: {
@@ -29,11 +22,6 @@ export const imageDimensions = {
   },
 }
 
-/**
- * Get the asset URL based on the environment
- * @param path - The path to the asset
- * @returns The full URL to the asset
- */
 export const getAssetUrl = (path: string): string => {
   const baseUrl = import.meta.env.VITE_APP_ASSETS_URL || ''
   const isProduction = import.meta.env.PROD
