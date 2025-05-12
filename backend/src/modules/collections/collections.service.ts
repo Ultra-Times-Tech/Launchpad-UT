@@ -41,30 +41,27 @@ export class CollectionsService {
   }
 
   private transformCollectionItem(item: any): Collection {
-    console.log('Original item from API:', item);
-    
     const transformed = {
-      type: "collections",
+      type: 'collections',
       id: String(item.attributes?.id || item.id),
       attributes: {
         id: Number(item.attributes?.id || item.id),
         name: item.attributes?.name || item.name || `Collection #${item.attributes?.id || item.id}`,
-        state: item.attributes?.state !== undefined ? Number(item.attributes?.state) : 
-               item.state !== undefined ? Number(item.state) : 0,
+        state: item.attributes?.state !== undefined ? Number(item.attributes?.state) : item.state !== undefined ? Number(item.state) : 0,
         publish_up: item.attributes?.publish_up || item.publish_up || null,
         publish_down: item.attributes?.publish_down || item.publish_down || null,
+        created: item.attributes?.created || item.created || null,
+        created_by: Number(item.attributes?.created_by || item.created_by || 0),
         modified: item.attributes?.modified || item.modified || new Date().toISOString(),
-        image: item.attributes?.image || item.image ? 
-               `/images/collections/${item.attributes?.id || item.id}/${item.attributes?.image || item.image}` : null,
+        image: item.attributes?.image || item.image ? `/images/collections/${item.attributes?.id || item.id}/${item.attributes?.image || item.image}` : null,
         is_trending: Boolean(Number(item.attributes?.is_trending || item.is_trending || 0)),
         is_featured: Boolean(Number(item.attributes?.is_featured || item.is_featured || 0)),
-        ordering: item.attributes?.ordering !== undefined ? Number(item.attributes?.ordering) :
-                 item.ordering !== undefined ? Number(item.ordering) : null,
-      }
-    };
-    
-    console.log('Transformed item:', transformed);
-    return transformed;
+        ordering: item.attributes?.ordering !== undefined ? Number(item.attributes?.ordering) : item.ordering !== undefined ? Number(item.ordering) : null,
+      },
+    }
+
+    console.log('Transformed item:', transformed)
+    return transformed
   }
 
   async findAll(filters?: CollectionFiltersDto): Promise<CollectionsResponse> {
@@ -92,13 +89,13 @@ export class CollectionsService {
       }
 
       const response = await axios.get(url, {headers: this.getHeaders()})
-      
+
       const transformedData = this.transformCollectionResponse(response.data.data)
-      
+
       return {
         links: response.data.links,
         data: transformedData,
-        meta: response.data.meta
+        meta: response.data.meta,
       }
     } catch (error) {
       this.logger.error('Error fetching collections:', error)
@@ -108,16 +105,13 @@ export class CollectionsService {
 
   async findOne(id: string): Promise<CollectionsResponse> {
     try {
-      const response = await axios.get(
-        `${this.apiUrl}/api/index.php/v1/ultratimes/collections/${id}`,
-        {headers: this.getHeaders()}
-      )
-      
+      const response = await axios.get(`${this.apiUrl}/api/index.php/v1/ultratimes/collections/${id}`, {headers: this.getHeaders()})
+
       const transformedData = this.transformCollectionItem(response.data.data)
-      
+
       return {
         links: response.data.links,
-        data: transformedData
+        data: transformedData,
       }
     } catch (error) {
       this.logger.error(`Error fetching collection ${id}:`, error)
@@ -134,14 +128,10 @@ export class CollectionsService {
         image: createCollectionDto.image,
         is_trending: createCollectionDto.is_trending,
         is_featured: createCollectionDto.is_featured,
-        ordering: createCollectionDto.ordering
+        ordering: createCollectionDto.ordering,
       }
-      
-      await axios.post(
-        `${this.apiUrl}/api/index.php/v1/ultratimes/collections`,
-        payload,
-        {headers: this.getHeaders()}
-      )
+
+      await axios.post(`${this.apiUrl}/api/index.php/v1/ultratimes/collections`, payload, {headers: this.getHeaders()})
     } catch (error) {
       this.logger.error('Error creating collection:', error)
       throw error
@@ -151,20 +141,16 @@ export class CollectionsService {
   async update(id: string, updateCollectionDto: UpdateCollectionDto): Promise<void> {
     try {
       const payload = {
-        ...(updateCollectionDto.name && { name: updateCollectionDto.name }),
-        ...(updateCollectionDto.alias && { alias: updateCollectionDto.alias }),
-        ...(updateCollectionDto.state && { state: updateCollectionDto.state }),
-        ...(updateCollectionDto.image !== undefined && { image: updateCollectionDto.image }),
-        ...(updateCollectionDto.is_trending !== undefined && { is_trending: updateCollectionDto.is_trending }),
-        ...(updateCollectionDto.is_featured !== undefined && { is_featured: updateCollectionDto.is_featured }),
-        ...(updateCollectionDto.ordering !== undefined && { ordering: updateCollectionDto.ordering })
+        ...(updateCollectionDto.name && {name: updateCollectionDto.name}),
+        ...(updateCollectionDto.alias && {alias: updateCollectionDto.alias}),
+        ...(updateCollectionDto.state && {state: updateCollectionDto.state}),
+        ...(updateCollectionDto.image !== undefined && {image: updateCollectionDto.image}),
+        ...(updateCollectionDto.is_trending !== undefined && {is_trending: updateCollectionDto.is_trending}),
+        ...(updateCollectionDto.is_featured !== undefined && {is_featured: updateCollectionDto.is_featured}),
+        ...(updateCollectionDto.ordering !== undefined && {ordering: updateCollectionDto.ordering}),
       }
-      
-      await axios.patch(
-        `${this.apiUrl}/api/index.php/v1/ultratimes/collections/${id}`,
-        payload,
-        {headers: this.getHeaders()}
-      )
+
+      await axios.patch(`${this.apiUrl}/api/index.php/v1/ultratimes/collections/${id}`, payload, {headers: this.getHeaders()})
     } catch (error) {
       this.logger.error(`Error updating collection ${id}:`, error)
       throw error
@@ -173,10 +159,7 @@ export class CollectionsService {
 
   async remove(id: string): Promise<void> {
     try {
-      await axios.delete(
-        `${this.apiUrl}/api/index.php/v1/ultratimes/collections/${id}`,
-        {headers: this.getHeaders()}
-      )
+      await axios.delete(`${this.apiUrl}/api/index.php/v1/ultratimes/collections/${id}`, {headers: this.getHeaders()})
     } catch (error) {
       this.logger.error(`Error deleting collection ${id}:`, error)
       throw error

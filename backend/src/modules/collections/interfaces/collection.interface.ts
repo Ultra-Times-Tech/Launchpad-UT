@@ -4,6 +4,8 @@ export interface CollectionAttributes {
   state: number
   publish_up: string | null
   publish_down: string | null
+  created: string | null
+  created_by: number
   modified: string
   image: string | null
   is_trending: boolean | null

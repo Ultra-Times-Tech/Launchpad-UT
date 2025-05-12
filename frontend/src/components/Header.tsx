@@ -185,6 +185,9 @@ const ProfileDropdown = ({isOpen, blockchainId, t, handleDisconnect, setIsOpen, 
         <Link to='/profile' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsOpen(false)}>
           {t('profile_settings' as const)}
         </Link>
+        <Link to='/my-collections' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsOpen(false)}>
+          {t('my_collections' as const)}
+        </Link>
         <Link to='/my-uniqs' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsOpen(false)}>
           {t('my_uniqs' as const)}
         </Link>
@@ -238,6 +241,9 @@ const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDi
               </div>
               <Link to='/profile' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
                 {t('profile_settings' as const)}
+              </Link>
+              <Link to='/my-collections' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
+                {t('my_collections' as const)}
               </Link>
               <Link to='/my-uniqs' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
                 {t('my_uniqs' as const)}
