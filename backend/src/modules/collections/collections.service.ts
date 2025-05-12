@@ -47,13 +47,19 @@ export class CollectionsService {
       attributes: {
         id: Number(item.attributes?.id || item.id),
         name: item.attributes?.name || item.name || `Collection #${item.attributes?.id || item.id}`,
+        description: item.attributes?.description || item.description || '',
+        note: item.attributes?.note || item.note || '',
         state: item.attributes?.state !== undefined ? Number(item.attributes?.state) : item.state !== undefined ? Number(item.state) : 0,
         publish_up: item.attributes?.publish_up || item.publish_up || null,
         publish_down: item.attributes?.publish_down || item.publish_down || null,
         created: item.attributes?.created || item.created || null,
         created_by: Number(item.attributes?.created_by || item.created_by || 0),
         modified: item.attributes?.modified || item.modified || new Date().toISOString(),
-        image: item.attributes?.image || item.image ? `/images/collections/${item.attributes?.id || item.id}/${item.attributes?.image || item.image}` : null,
+        image: item.attributes?.image || item.image ? 
+          (item.attributes?.image?.startsWith('/') || item.image?.startsWith('/') ? 
+            item.attributes?.image || item.image : 
+            `/images/collections/${item.attributes?.id || item.id}/${item.attributes?.image || item.image}`) : 
+          null,
         is_trending: Boolean(Number(item.attributes?.is_trending || item.is_trending || 0)),
         is_featured: Boolean(Number(item.attributes?.is_featured || item.is_featured || 0)),
         ordering: item.attributes?.ordering !== undefined ? Number(item.attributes?.ordering) : item.ordering !== undefined ? Number(item.ordering) : null,
@@ -88,9 +94,11 @@ export class CollectionsService {
       }
 
       const response = await axios.get(url, {headers: this.getHeaders()})
-
-      const transformedData = this.transformCollectionResponse(response.data.data)
-
+      
+      const transformedData = Array.isArray(response.data.data) 
+        ? response.data.data.map(item => this.transformCollectionItem(item))
+        : [this.transformCollectionItem(response.data.data)];
+      
       return {
         links: response.data.links,
         data: transformedData,
@@ -123,7 +131,11 @@ export class CollectionsService {
       const payload = {
         name: createCollectionDto.name,
         alias: createCollectionDto.alias,
+        description: createCollectionDto.description,
+        note: createCollectionDto.note,
         state: createCollectionDto.state,
+        publish_up: createCollectionDto.publish_up,
+        publish_down: createCollectionDto.publish_down,
         image: createCollectionDto.image,
         is_trending: createCollectionDto.is_trending,
         is_featured: createCollectionDto.is_featured,
@@ -140,10 +152,14 @@ export class CollectionsService {
   async update(id: string, updateCollectionDto: UpdateCollectionDto): Promise<void> {
     try {
       const payload = {
-        ...(updateCollectionDto.name && {name: updateCollectionDto.name}),
-        ...(updateCollectionDto.alias && {alias: updateCollectionDto.alias}),
-        ...(updateCollectionDto.state && {state: updateCollectionDto.state}),
+        ...(updateCollectionDto.name !== undefined && {name: updateCollectionDto.name}),
+        ...(updateCollectionDto.alias !== undefined && {alias: updateCollectionDto.alias}),
+        ...(updateCollectionDto.description !== undefined && {description: updateCollectionDto.description}),
+        ...(updateCollectionDto.note !== undefined && {note: updateCollectionDto.note}),
+        ...(updateCollectionDto.state !== undefined && {state: updateCollectionDto.state}),
         ...(updateCollectionDto.image !== undefined && {image: updateCollectionDto.image}),
+        ...(updateCollectionDto.publish_up !== undefined && {publish_up: updateCollectionDto.publish_up}),
+        ...(updateCollectionDto.publish_down !== undefined && {publish_down: updateCollectionDto.publish_down}),
         ...(updateCollectionDto.is_trending !== undefined && {is_trending: updateCollectionDto.is_trending}),
         ...(updateCollectionDto.is_featured !== undefined && {is_featured: updateCollectionDto.is_featured}),
         ...(updateCollectionDto.ordering !== undefined && {ordering: updateCollectionDto.ordering}),

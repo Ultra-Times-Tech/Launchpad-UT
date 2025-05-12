@@ -1,6 +1,8 @@
 export interface CollectionAttributes {
   id: number
   name: string
+  description: string
+  note?: string | null
   state: number
   publish_up: string | null
   publish_down: string | null

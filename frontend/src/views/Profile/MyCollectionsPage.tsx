@@ -13,6 +13,10 @@ interface Collection {
   description?: string
   image: string
   created_by: number
+  publish_up?: string
+  publish_down?: string
+  state?: number
+  note?: string
 }
 
 interface CollectionApiItem {
@@ -22,6 +26,7 @@ interface CollectionApiItem {
     id: number
     name: string
     description?: string
+    note?: string
     image: string
     created_by: number
     state?: number
@@ -74,8 +79,8 @@ function ConfirmDeleteModal({open, collection, onClose, onConfirm}: ConfirmDelet
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm" onClick={handleBackdropClick}>
-      <div ref={modalRef} className="bg-dark-800 rounded-lg w-full max-w-md mx-4 overflow-hidden border border-dark-600 shadow-xl">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto" onClick={handleBackdropClick}>
+      <div ref={modalRef} className="bg-dark-800 rounded-lg w-full max-w-md mx-4 my-8 overflow-hidden border border-dark-600 shadow-xl">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-white">Supprimer la collection</h2>
@@ -119,6 +124,9 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
   const [name, setName] = useState(collection?.name || '')
   const [description, setDescription] = useState(collection?.description || '')
   const [imageUrl, setImageUrl] = useState(collection?.image || '')
+  const [publishUp, setPublishUp] = useState(collection?.publish_up || '')
+  const [publishDown, setPublishDown] = useState(collection?.publish_down || '')
+  const [state, setState] = useState(collection?.state !== undefined ? collection.state : 0)
   const [uploading, setUploading] = useState(false)
   const [imageError, setImageError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -130,9 +138,12 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
   
   useEffect(() => {
     if (collection) {
-      setName(collection.name)
+      setName(collection.name || '')
       setDescription(collection.description || '')
-      setImageUrl(collection.image)
+      setImageUrl(collection.image || '')
+      setPublishUp(collection.publish_up || '')
+      setPublishDown(collection.publish_down || '')
+      setState(collection.state !== undefined ? collection.state : 0)
     }
   }, [collection])
 
@@ -151,11 +162,18 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
       return
     }
     
+    // Préserver la note existante, elle ne peut pas être modifiée par l'interface utilisateur
+    const noteToSave = collection?.note || '';
+    
     onSave({
       ...(collection || {}),
       name,
       description,
-      image: imageUrl
+      image: imageUrl,
+      publish_up: publishUp,
+      publish_down: publishDown,
+      state,
+      note: noteToSave // Utiliser la note existante, pas celle potentiellement modifiée
     })
   }
 
@@ -234,10 +252,10 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm" onClick={handleBackdropClick}>
-      <div ref={modalRef} className="bg-dark-800 rounded-lg w-full max-w-lg mx-4 overflow-hidden border border-dark-600 shadow-xl">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm overflow-y-auto" onClick={handleBackdropClick}>
+      <div ref={modalRef} className="bg-dark-800 rounded-lg w-full max-w-lg mx-4 my-8 overflow-hidden border border-dark-600 shadow-xl max-h-[90vh]">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-48px)]">
+          <div className="flex justify-between items-center mb-6 sticky top-0 bg-dark-800 z-10 py-2">
             <h2 className="text-2xl font-bold text-white">{title}</h2>
             <button 
               onClick={onCancel}
@@ -267,6 +285,38 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
                 onChange={(e) => setDescription(e.target.value)} 
                 className="w-full bg-dark-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px] border border-dark-600"
                 placeholder="Description de la collection"
+              />
+            </div>
+            
+            <div className="mb-5">
+              <label className="block text-gray-300 mb-2 font-medium">État</label>
+              <select
+                value={state}
+                onChange={(e) => setState(Number(e.target.value))}
+                className="w-full bg-dark-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 border border-dark-600"
+              >
+                <option value="0">Brouillon</option>
+                <option value="1">Publié</option>
+              </select>
+            </div>
+
+            <div className="mb-5">
+              <label className="block text-gray-300 mb-2 font-medium">Date de publication</label>
+              <input 
+                type="datetime-local" 
+                value={publishUp ? publishUp.replace(' ', 'T') : ''} 
+                onChange={(e) => setPublishUp(e.target.value.replace('T', ' '))} 
+                className="w-full bg-dark-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 border border-dark-600"
+              />
+            </div>
+
+            <div className="mb-5">
+              <label className="block text-gray-300 mb-2 font-medium">Date de fin de publication</label>
+              <input 
+                type="datetime-local" 
+                value={publishDown ? publishDown.replace(' ', 'T') : ''}
+                onChange={(e) => setPublishDown(e.target.value.replace('T', ' '))} 
+                className="w-full bg-dark-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 border border-dark-600"
               />
             </div>
             
@@ -392,7 +442,7 @@ function MyCollectionsPage() {
       // Récupérer l'ID utilisateur à partir du wallet
       const userResponse = await apiRequestor.get(`/users/wallets/${blockchainId}`)
       const userId = userResponse.data.data[0].id
-
+      
       // Récupérer les collections avec l'ID utilisateur
       const collectionsResponse = await apiRequestor.get<CollectionApiResponse>(`/collections`, {
         params: {
@@ -400,15 +450,40 @@ function MyCollectionsPage() {
         },
       })
       
-      // Extraire le tableau de collections depuis la propriété data de la réponse
-      const collectionData = collectionsResponse.data.data.map((item: CollectionApiItem) => ({
-        id: item.attributes.id,
-        name: item.attributes.name,
-        description: item.attributes.description || '',
-        image: item.attributes.image,
-        created_by: item.attributes.created_by,
-      }))
+      console.log("Raw API Response:", JSON.stringify(collectionsResponse.data, null, 2));
       
+      // Récupérer individuellement chaque collection pour avoir toutes les données
+      const completeCollections = await Promise.all(
+        collectionsResponse.data.data.map(async (item: CollectionApiItem) => {
+          try {
+            // Récupérer les détails complets de chaque collection
+            const detailResponse = await apiRequestor.get(`/collections/${item.attributes.id}`);
+            console.log(`Detail for collection ${item.attributes.id}:`, detailResponse.data);
+            return detailResponse.data.data;
+          } catch (err) {
+            console.error(`Error fetching details for collection ${item.attributes.id}:`, err);
+            return item; // Fallback to original item if detail fetch fails
+          }
+        })
+      );
+      
+      // Transformer les données complètes
+      const collectionData = completeCollections.map((item: CollectionApiItem) => {
+        // S'assurer que tous les champs sont présents avec des valeurs par défaut si nécessaire
+        return {
+          id: item.attributes.id,
+          name: item.attributes.name,
+          description: item.attributes.description || '',
+          note: item.attributes.note || '',
+          image: item.attributes.image,
+          created_by: item.attributes.created_by,
+          publish_up: item.attributes.publish_up,
+          publish_down: item.attributes.publish_down,
+          state: item.attributes.state !== undefined ? item.attributes.state : 0
+        };
+      });
+      
+      console.log("Processed collection data:", collectionData);
       setCollections(collectionData)
     } catch (err) {
       showError('Erreur lors du chargement des collections')
@@ -426,8 +501,18 @@ function MyCollectionsPage() {
 
   // Handlers pour les actions
   const handleEditClick = (collection: Collection) => {
-    setCurrentCollection(collection)
-    setEditModalOpen(true)
+    // S'assurer que tous les champs sont présents
+    const completeCollection = {
+      ...collection,
+      description: collection.description || '',
+      note: collection.note || '',
+      publish_up: collection.publish_up || '',
+      publish_down: collection.publish_down || '',
+      state: collection.state !== undefined ? collection.state : 0
+    };
+    
+    setCurrentCollection(completeCollection);
+    setEditModalOpen(true);
   }
 
   const handleDeleteClick = (collection: Collection) => {
@@ -446,13 +531,17 @@ function MyCollectionsPage() {
         return
       }
       
-      await apiRequestor.put(`/collections/${updatedCollection.id}`, {
+      await apiRequestor.patch(`/collections/${updatedCollection.id}`, {
         name: updatedCollection.name,
         description: updatedCollection.description,
-        image: updatedCollection.image
+        image: updatedCollection.image,
+        publish_up: updatedCollection.publish_up,
+        publish_down: updatedCollection.publish_down,
+        state: updatedCollection.state,
+        note: updatedCollection.note
       })
       
-      showSuccess('Collection mise à jour avec succès')
+      showSuccess('Collection mise à jour avec succès !')
       
       // Mettre à jour la collection dans l'état local
       setCollections(prev => 
@@ -476,10 +565,14 @@ function MyCollectionsPage() {
         name: newCollection.name,
         description: newCollection.description,
         image: newCollection.image,
-        created_by: userId
+        created_by: userId,
+        publish_up: newCollection.publish_up,
+        publish_down: newCollection.publish_down,
+        state: newCollection.state !== undefined ? newCollection.state : 0,
+        note: newCollection.note
       })
       
-      showSuccess('Collection créée avec succès')
+      showSuccess('Collection créée avec succès !')
       
       // Recharger les collections pour inclure la nouvelle
       await loadCollections()
@@ -497,7 +590,7 @@ function MyCollectionsPage() {
     try {
       await apiRequestor.delete(`/collections/${currentCollection.id}`)
       
-      showSuccess('Collection supprimée avec succès.')
+      showSuccess('Collection supprimée avec succès !')
       
       // Supprimer la collection de l'état local
       setCollections(prev => prev.filter(c => c.id !== currentCollection.id))
@@ -574,7 +667,7 @@ function MyCollectionsPage() {
               </div>
               <div className='p-4'>
                 <h3 className='text-xl font-semibold text-white mb-2'>{collection.name}</h3>
-                <p className='text-gray-400 line-clamp-2'>{collection.description}</p>
+                <p className='text-gray-400 line-clamp-2'>{collection.description || "Aucune description"}</p>
                 <div className="mt-4 flex justify-between items-center">
                   <span className="text-xs text-gray-500">ID: {collection.id}</span>
                   <Link to={`/collection/${collection.id}`} className="text-primary-500 hover:text-primary-400 text-sm font-medium transition-colors">
