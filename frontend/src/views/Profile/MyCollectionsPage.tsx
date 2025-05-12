@@ -10,7 +10,7 @@ import {Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Close as CloseIc
 interface Collection {
   id: number
   name: string
-  description?: string
+  content?: string
   image: string
   created_by: number
   publish_up?: string
@@ -25,7 +25,7 @@ interface CollectionApiItem {
   attributes: {
     id: number
     name: string
-    description?: string
+    content?: string
     note?: string
     image: string
     created_by: number
@@ -122,7 +122,7 @@ function ConfirmDeleteModal({open, collection, onClose, onConfirm}: ConfirmDelet
 
 function CollectionForm({collection, onSave, onCancel, title, submitLabel}: CollectionFormProps) {
   const [name, setName] = useState(collection?.name || '')
-  const [description, setDescription] = useState(collection?.description || '')
+  const [content, setContent] = useState(collection?.content || '')
   const [imageUrl, setImageUrl] = useState(collection?.image || '')
   const [publishUp, setPublishUp] = useState(collection?.publish_up || '')
   const [publishDown, setPublishDown] = useState(collection?.publish_down || '')
@@ -139,7 +139,7 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
   useEffect(() => {
     if (collection) {
       setName(collection.name || '')
-      setDescription(collection.description || '')
+      setContent(collection.content || '')
       setImageUrl(collection.image || '')
       setPublishUp(collection.publish_up || '')
       setPublishDown(collection.publish_down || '')
@@ -168,7 +168,7 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
     onSave({
       ...(collection || {}),
       name,
-      description,
+      content,
       image: imageUrl,
       publish_up: publishUp,
       publish_down: publishDown,
@@ -235,15 +235,8 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
         setUploading(false)
         return
       }
-      
-      // Dans un environnement réel, vous téléchargeriez ici l'image au serveur
-      // Pour cet exemple, nous simulons un téléchargement réussi après un délai
-      setTimeout(() => {
-        // En production, remplacer cette URL fictive par celle retournée par l'API
-        setImageUrl(`/images/collections/${Date.now()}-${file.name}`)
-        setUploading(false)
-      }, 1500)
-      
+
+      setUploading(false)
     } catch (error) {
       console.error('Erreur lors du téléchargement de l\'image', error)
       setImageError('Une erreur est survenue lors du téléchargement')
@@ -281,8 +274,8 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
             <div className="mb-5">
               <label className="block text-gray-300 mb-2 font-medium">Description</label>
               <textarea 
-                value={description} 
-                onChange={(e) => setDescription(e.target.value)} 
+                value={content} 
+                onChange={(e) => setContent(e.target.value)} 
                 className="w-full bg-dark-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px] border border-dark-600"
                 placeholder="Description de la collection"
               />
@@ -473,7 +466,7 @@ function MyCollectionsPage() {
         return {
           id: item.attributes.id,
           name: item.attributes.name,
-          description: item.attributes.description || '',
+          content: item.attributes.content || '',
           note: item.attributes.note || '',
           image: item.attributes.image,
           created_by: item.attributes.created_by,
@@ -504,7 +497,7 @@ function MyCollectionsPage() {
     // S'assurer que tous les champs sont présents
     const completeCollection = {
       ...collection,
-      description: collection.description || '',
+      content: collection.content || '',
       note: collection.note || '',
       publish_up: collection.publish_up || '',
       publish_down: collection.publish_down || '',
@@ -533,7 +526,7 @@ function MyCollectionsPage() {
       
       await apiRequestor.patch(`/collections/${updatedCollection.id}`, {
         name: updatedCollection.name,
-        description: updatedCollection.description,
+        content: updatedCollection.content,
         image: updatedCollection.image,
         publish_up: updatedCollection.publish_up,
         publish_down: updatedCollection.publish_down,
@@ -563,7 +556,7 @@ function MyCollectionsPage() {
 
       await apiRequestor.post('/collections', {
         name: newCollection.name,
-        description: newCollection.description,
+        content: newCollection.content,
         image: newCollection.image,
         created_by: userId,
         publish_up: newCollection.publish_up,
@@ -667,7 +660,7 @@ function MyCollectionsPage() {
               </div>
               <div className='p-4'>
                 <h3 className='text-xl font-semibold text-white mb-2'>{collection.name}</h3>
-                <p className='text-gray-400 line-clamp-2'>{collection.description || "Aucune description"}</p>
+                <p className='text-gray-400 line-clamp-2'>{collection.content || "Aucune description"}</p>
                 <div className="mt-4 flex justify-between items-center">
                   <span className="text-xs text-gray-500">ID: {collection.id}</span>
                   <Link to={`/collection/${collection.id}`} className="text-primary-500 hover:text-primary-400 text-sm font-medium transition-colors">

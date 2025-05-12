@@ -1,4 +1,4 @@
-import {IsString, IsNotEmpty, IsOptional, IsNumber, IsBoolean, IsDateString} from 'class-validator'
+import {IsString, IsNotEmpty, IsOptional, IsNumber, IsBoolean} from 'class-validator'
 import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger'
 
 export class CreateCollectionDto {
@@ -19,12 +19,12 @@ export class CreateCollectionDto {
   alias: string
 
   @ApiPropertyOptional({
-    description: 'Collection description',
+    description: 'Collection content',
     example: 'This is my awesome collection',
   })
   @IsString()
   @IsOptional()
-  description?: string
+  content?: string
 
   @ApiPropertyOptional({
     description: 'Collection internal note (only visible to admin)',

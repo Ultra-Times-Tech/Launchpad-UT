@@ -47,7 +47,7 @@ export class CollectionsService {
       attributes: {
         id: Number(item.attributes?.id || item.id),
         name: item.attributes?.name || item.name || `Collection #${item.attributes?.id || item.id}`,
-        description: item.attributes?.description || item.description || '',
+        content: item.attributes?.content || item.content || '',
         note: item.attributes?.note || item.note || '',
         state: item.attributes?.state !== undefined ? Number(item.attributes?.state) : item.state !== undefined ? Number(item.state) : 0,
         publish_up: item.attributes?.publish_up || item.publish_up || null,
@@ -131,7 +131,7 @@ export class CollectionsService {
       const payload = {
         name: createCollectionDto.name,
         alias: createCollectionDto.alias,
-        description: createCollectionDto.description,
+        content: createCollectionDto.content,
         note: createCollectionDto.note,
         state: createCollectionDto.state,
         publish_up: createCollectionDto.publish_up,
@@ -154,7 +154,7 @@ export class CollectionsService {
       const payload = {
         ...(updateCollectionDto.name !== undefined && {name: updateCollectionDto.name}),
         ...(updateCollectionDto.alias !== undefined && {alias: updateCollectionDto.alias}),
-        ...(updateCollectionDto.description !== undefined && {description: updateCollectionDto.description}),
+        ...(updateCollectionDto.content !== undefined && {content: updateCollectionDto.content}),
         ...(updateCollectionDto.note !== undefined && {note: updateCollectionDto.note}),
         ...(updateCollectionDto.state !== undefined && {state: updateCollectionDto.state}),
         ...(updateCollectionDto.image !== undefined && {image: updateCollectionDto.image}),
