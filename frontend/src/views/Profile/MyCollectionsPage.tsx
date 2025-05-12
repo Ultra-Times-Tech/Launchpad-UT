@@ -176,7 +176,7 @@ function MyCollectionsPage() {
       // Filtrer les NFTs de cette collection avec recherche étendue
       return collectionNfts.filter(nft => {
         // Recherche dans le nom du NFT
-        const nftName = nft.metadata.content.name || `NFT #${nft.serialNumber}`
+        const nftName = nft.metadata?.content?.name || `NFT #${nft.serialNumber}`
         if (nftName.toLowerCase().includes(searchTermLower)) return true
 
         // Recherche dans l'ID du NFT
@@ -404,18 +404,23 @@ function MyCollectionsPage() {
 
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'>
                 {displayedNfts.map(nft => {
-                  const imageUrl = nft.metadata.content.medias.square?.uri || nft.metadata.content.medias.product?.uri || nft.metadata.content.medias.gallery?.uri || nft.metadata.content.medias.hero?.uri
+                  const imageUrl = nft.metadata?.content?.medias?.square?.uri || 
+                                 nft.metadata?.content?.medias?.product?.uri || 
+                                 nft.metadata?.content?.medias?.gallery?.uri || 
+                                 nft.metadata?.content?.medias?.hero?.uri
 
                   // Récupérer le nom de la collection pour ce NFT
-                  const collectionName = nft.metadata.content.subName || collections.find(c => c.id === nft.factory?.id || c.id === nft.collection?.id)?.name || 'Collection inconnue'
+                  const collectionName = nft.metadata?.content?.subName || 
+                                      collections.find(c => c.id === nft.factory?.id || c.id === nft.collection?.id)?.name || 
+                                      'Collection inconnue'
 
                   return (
                     <div key={nft.id} className='bg-dark-800 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 cursor-pointer' onClick={() => handleNftClick(nft)}>
                       <div className='relative h-48'>
-                        {imageUrl ? <img src={imageUrl} alt={nft.metadata.content.name} className='w-full h-full object-cover' /> : <div className='w-full h-full bg-dark-800 flex items-center justify-center text-gray-500'>Aucune image</div>}
+                        {imageUrl ? <img src={imageUrl} alt={nft.metadata?.content?.name || `NFT #${nft.serialNumber}`} className='w-full h-full object-cover' /> : <div className='w-full h-full bg-dark-800 flex items-center justify-center text-gray-500'>Aucune image</div>}
                         <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent'></div>
                         <div className='absolute bottom-4 left-4'>
-                          <h3 className='text-lg font-semibold text-white'>{nft.metadata.content.name || `NFT #${nft.serialNumber}`}</h3>
+                          <h3 className='text-lg font-semibold text-white'>{nft.metadata?.content?.name || `NFT #${nft.serialNumber}`}</h3>
                         </div>
                       </div>
                       <div className='p-4'>
@@ -499,8 +504,16 @@ function MyCollectionsPage() {
                 {/* Image du NFT et attributs */}
                 <div className='md:w-1/2'>
                   <div className='relative aspect-square rounded-lg overflow-hidden bg-dark-900 mb-4'>
-                    {selectedNft.metadata.content.medias.square?.uri || selectedNft.metadata.content.medias.product?.uri || selectedNft.metadata.content.medias.gallery?.uri || selectedNft.metadata.content.medias.hero?.uri ? (
-                      <img src={selectedNft.metadata.content.medias.square?.uri || selectedNft.metadata.content.medias.product?.uri || selectedNft.metadata.content.medias.gallery?.uri || selectedNft.metadata.content.medias.hero?.uri} alt={selectedNft.metadata.content.name} className='w-full h-full object-cover' />
+                    {selectedNft.metadata?.content?.medias?.square?.uri || 
+                     selectedNft.metadata?.content?.medias?.product?.uri || 
+                     selectedNft.metadata?.content?.medias?.gallery?.uri || 
+                     selectedNft.metadata?.content?.medias?.hero?.uri ? (
+                      <img src={selectedNft.metadata?.content?.medias?.square?.uri || 
+                              selectedNft.metadata?.content?.medias?.product?.uri || 
+                              selectedNft.metadata?.content?.medias?.gallery?.uri || 
+                              selectedNft.metadata?.content?.medias?.hero?.uri} 
+                           alt={selectedNft.metadata?.content?.name || `NFT #${selectedNft.serialNumber}`} 
+                           className='w-full h-full object-cover' />
                     ) : (
                       <div className='w-full h-full flex items-center justify-center text-gray-500'>Aucune image</div>
                     )}
@@ -524,11 +537,11 @@ function MyCollectionsPage() {
 
                 {/* Informations du NFT */}
                 <div className='md:w-1/2'>
-                  <h1 className='text-2xl font-bold text-white mb-2'>{selectedNft.metadata.content.name || `NFT #${selectedNft.serialNumber}`}</h1>
+                  <h1 className='text-2xl font-bold text-white mb-2'>{selectedNft.metadata?.content?.name || `NFT #${selectedNft.serialNumber}`}</h1>
 
                   <div className='mb-4'>
                     <span className='text-sm text-gray-400'>Collection</span>
-                    <p className='text-primary-300 font-medium'>{selectedNft.metadata.content.subName || collections.find(c => c.id === selectedNft.factory?.id || c.id === selectedNft.collection?.id)?.name || 'Collection inconnue'}</p>
+                    <p className='text-primary-300 font-medium'>{selectedNft.metadata?.content?.subName || collections.find(c => c.id === selectedNft.factory?.id || c.id === selectedNft.collection?.id)?.name || 'Collection inconnue'}</p>
                   </div>
 
                   <div className='grid grid-cols-2 gap-4 mb-6'>
@@ -549,7 +562,7 @@ function MyCollectionsPage() {
                   </div>
 
                   {/* Description */}
-                  {selectedNft.metadata.content.description && (
+                  {selectedNft.metadata?.content?.description && (
                     <div className='mb-6'>
                       <h3 className='text-lg font-semibold mb-2'>Description</h3>
                       <div className='text-gray-300 text-sm'>
