@@ -1,39 +1,37 @@
 import React, {useState, useEffect} from 'react'
-import {Nft, fetchUserNfts, getCachedCollections, getCachedNfts, NftCollection, isNftLoadingComplete} from '../utils/nftService'
+import {Uniq, fetchUserUNIQs, getCachedCollections, getCachedUNIQs, UNIQsCollection, isUNIQLoadingComplete} from '../utils/uniqService'
 
-interface NftSelectorProps {
+interface UNIQSelectorProps {
   blockchainId: string
-  onSelect: (nft: Nft) => void
+  onSelect: (uniq: Uniq) => void
   currentAvatarId?: string
 }
 
 const ITEMS_PER_PAGE = 12
 
-const NftSelector: React.FC<NftSelectorProps> = ({blockchainId, onSelect, currentAvatarId}) => {
-  const [nfts, setNfts] = useState<Nft[]>([])
-  const [filteredNfts, setFilteredNfts] = useState<Nft[]>([])
-  const [displayedNfts, setDisplayedNfts] = useState<Nft[]>([])
-  const [collections, setCollections] = useState<NftCollection[]>([])
+const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, currentAvatarId}) => {
+  const [UNIQs, setUNIQs] = useState<Uniq[]>([])
+  const [filteredUNIQs, setFilteredUNIQs] = useState<Uniq[]>([])
+  const [displayedUNIQs, setDisplayedUNIQs] = useState<Uniq[]>([])
+  const [collections, setCollections] = useState<UNIQsCollection[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCollection, setSelectedCollection] = useState<string>('all')
   const [loading, setLoading] = useState(true)
   const [initialLoading, setInitialLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedNftId, setSelectedNftId] = useState<string | null>(currentAvatarId || null)
+  const [selectedUNIQId, setSelectedUNIQId] = useState<string | null>(currentAvatarId || null)
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMorePages, setHasMorePages] = useState(false)
   const [totalFilteredCount, setTotalFilteredCount] = useState(0)
 
-  // Charger les NFTs au chargement initial
   useEffect(() => {
-    const loadNfts = async () => {
+    const loadUNIQs = async () => {
       if (!blockchainId) return
 
       try {
         setInitialLoading(true)
-        // Charger les NFTs avec la pagination pour avoir rapidement la première page
-        const userNfts = await fetchUserNfts(blockchainId)
-        setNfts(userNfts)
+        const userUNIQs = await fetchUserUNIQs(blockchainId)
+        setUNIQs(userUNIQs)
 
         // Récupérer les collections
         const userCollections = getCachedCollections(blockchainId)
@@ -41,22 +39,21 @@ const NftSelector: React.FC<NftSelectorProps> = ({blockchainId, onSelect, curren
 
         setError(null)
       } catch (err) {
-        console.error('Failed to load NFTs:', err)
-        setError('Impossible de charger vos NFTs. Veuillez réessayer plus tard.')
+        console.error('Failed to load UNIQs:', err)
+        setError('Impossible de charger vos UNIQs. Veuillez réessayer plus tard.')
       } finally {
         setInitialLoading(false)
       }
     }
 
-    loadNfts()
+    loadUNIQs()
 
-    // Écouter les mises à jour des NFTs en arrière-plan
-    const handleNftUpdate = (event: Event) => {
+    const handleUNIQUpdate = (event: Event) => {
       if (blockchainId) {
         const customEvent = event as CustomEvent<{walletId: string}>
         if (customEvent.detail.walletId === blockchainId) {
-          const updatedNfts = getCachedNfts(blockchainId)
-          setNfts(updatedNfts)
+          const updatedUNIQs = getCachedUNIQs(blockchainId)
+          setUNIQs(updatedUNIQs)
 
           // Mettre à jour les collections
           const updatedCollections = getCachedCollections(blockchainId)
@@ -65,25 +62,23 @@ const NftSelector: React.FC<NftSelectorProps> = ({blockchainId, onSelect, curren
       }
     }
 
-    document.addEventListener('nftUpdate', handleNftUpdate)
+    document.addEventListener('UNIQUpdate', handleUNIQUpdate)
 
     return () => {
-      document.removeEventListener('nftUpdate', handleNftUpdate)
+      document.removeEventListener('UNIQUpdate', handleUNIQUpdate)
     }
   }, [blockchainId])
 
-  // Filtrer les NFTs quand la recherche ou la collection sélectionnée change
   useEffect(() => {
     setLoading(true)
-    let filtered = [...nfts]
+    let filtered = [...UNIQs]
 
     // Filtrer par collection si nécessaire
     if (selectedCollection !== 'all') {
-      filtered = filtered.filter(nft => {
-        // Vérifier si le NFT appartient à la collection sélectionnée
-        if (nft.factory?.id === selectedCollection) return true
-        if (nft.collection?.id === selectedCollection) return true
-        if (nft.metadata.content.subName === selectedCollection) return true
+      filtered = filtered.filter(uniq => {
+        if (uniq.factory?.id === selectedCollection) return true
+        if (uniq.collection?.id === selectedCollection) return true
+        if (uniq.metadata.content.subName === selectedCollection) return true
         return false
       })
     }
@@ -92,41 +87,35 @@ const NftSelector: React.FC<NftSelectorProps> = ({blockchainId, onSelect, curren
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase().trim()
       filtered = filtered.filter(
-        nft =>
-          // Recherche par nom
-          nft.metadata.content.name?.toLowerCase().includes(query) ||
-          // Recherche par numéro de série
-          nft.serialNumber?.toString().includes(query) ||
-          // Recherche par ID (complète ou partielle)
-          nft.id?.toLowerCase().includes(query) ||
-          // Recherche par attributs si disponibles
-          nft.attributes?.some(attr => attr.key.toLowerCase().includes(query) || (typeof attr.value === 'string' && attr.value.toLowerCase().includes(query)) || (typeof attr.value === 'number' && attr.value.toString().includes(query)))
+        uniq =>
+          uniq.metadata.content.name?.toLowerCase().includes(query) ||
+          uniq.serialNumber?.toString().includes(query) ||
+          uniq.id?.toLowerCase().includes(query) ||
+          uniq.attributes?.some((attr: {key: string; value: string | number}) => attr.key.toLowerCase().includes(query) || (typeof attr.value === 'string' && attr.value.toLowerCase().includes(query)) || (typeof attr.value === 'number' && attr.value.toString().includes(query)))
       )
     }
 
-    setFilteredNfts(filtered)
+    setFilteredUNIQs(filtered)
     setTotalFilteredCount(filtered.length)
-    // Réinitialiser à la première page lors d'un changement de filtre
     setCurrentPage(1)
     setLoading(false)
-  }, [searchQuery, selectedCollection, nfts])
+  }, [searchQuery, selectedCollection, UNIQs])
 
-  // Mettre à jour les NFTs affichés en fonction de la pagination
   useEffect(() => {
     setLoading(true)
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
     const endIndex = startIndex + ITEMS_PER_PAGE
-    setDisplayedNfts(filteredNfts.slice(startIndex, endIndex))
+    setDisplayedUNIQs(filteredUNIQs.slice(startIndex, endIndex))
 
-    const hasMore = filteredNfts.length > ITEMS_PER_PAGE * currentPage
+    const hasMore = filteredUNIQs.length > ITEMS_PER_PAGE * currentPage
     setHasMorePages(hasMore)
 
     setLoading(false)
-  }, [filteredNfts, currentPage, blockchainId])
+  }, [filteredUNIQs, currentPage, blockchainId])
 
-  const handleSelect = (nft: Nft) => {
-    setSelectedNftId(nft.id)
-    onSelect(nft)
+  const handleSelect = (uniq: Uniq) => {
+    setSelectedUNIQId(uniq.id)
+    onSelect(uniq)
   }
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,7 +141,7 @@ const NftSelector: React.FC<NftSelectorProps> = ({blockchainId, onSelect, curren
 
   // Calcul des informations de pagination
   const totalPages = Math.ceil(totalFilteredCount / ITEMS_PER_PAGE)
-  const isLastPage = currentPage >= totalPages && isNftLoadingComplete(blockchainId || '')
+  const isLastPage = currentPage >= totalPages && isUNIQLoadingComplete(blockchainId || '')
 
   if (initialLoading) {
     return (
@@ -173,17 +162,17 @@ const NftSelector: React.FC<NftSelectorProps> = ({blockchainId, onSelect, curren
     )
   }
 
-  if (nfts.length === 0) {
+  if (UNIQs.length === 0) {
     return (
       <div className='p-4 bg-dark-900 rounded-lg'>
-        <p className='text-gray-400'>Vous ne possédez aucun NFT pour le moment.</p>
+        <p className='text-gray-400'>Vous ne possédez aucun UNIQs pour le moment.</p>
       </div>
     )
   }
 
   return (
     <div>
-      <h3 className='text-lg font-semibold mb-3'>Sélectionnez un NFT pour votre avatar</h3>
+      <h3 className='text-lg font-semibold mb-3'>Sélectionnez un UNIQ pour votre avatar</h3>
 
       <div className='mb-4 space-y-3'>
         {/* Filtre par collection */}
@@ -230,11 +219,11 @@ const NftSelector: React.FC<NftSelectorProps> = ({blockchainId, onSelect, curren
 
       {/* Message d'information sur les résultats de recherche */}
       <div className='flex justify-between items-center mb-3'>
-        <div className='text-xs text-gray-400'>{filteredNfts.length > 0 ? `${filteredNfts.length} NFT${filteredNfts.length > 1 ? 's' : ''} trouvé${filteredNfts.length > 1 ? 's' : ''}` : ''}</div>
+        <div className='text-xs text-gray-400'>{filteredUNIQs.length > 0 ? `${filteredUNIQs.length} UNIQ${filteredUNIQs.length > 1 ? 's' : ''} trouvé${filteredUNIQs.length > 1 ? 's' : ''}` : ''}</div>
 
         {totalPages > 1 && (
           <div className='text-xs text-gray-400'>
-            Page {currentPage}/{isNftLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}
+            Page {currentPage}/{isUNIQLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}
           </div>
         )}
       </div>
@@ -243,34 +232,34 @@ const NftSelector: React.FC<NftSelectorProps> = ({blockchainId, onSelect, curren
         <div className='flex justify-center items-center py-8'>
           <div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500'></div>
         </div>
-      ) : filteredNfts.length === 0 ? (
+      ) : filteredUNIQs.length === 0 ? (
         <div className='p-4 bg-dark-900 rounded-lg text-center'>
-          <p className='text-gray-400'>Aucun NFT ne correspond à votre recherche.</p>
+          <p className='text-gray-400'>Aucun UNIQ ne correspond à votre recherche.</p>
         </div>
       ) : (
         <>
           <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-            {displayedNfts.map(nft => {
-              const imageUrl = nft.metadata.content.medias.square?.uri || nft.metadata.content.medias.product?.uri || nft.metadata.content.medias.gallery?.uri || nft.metadata.content.medias.hero?.uri
+            {displayedUNIQs.map(uniq => {
+              const imageUrl = uniq.metadata.content.medias.square?.uri || uniq.metadata.content.medias.product?.uri || uniq.metadata.content.medias.gallery?.uri || uniq.metadata.content.medias.hero?.uri
 
-              const isSelected = selectedNftId === nft.id
-              const collectionName = nft.metadata.content.subName || collections.find(c => c.id === nft.factory?.id || c.id === nft.collection?.id)?.name || 'Collection inconnue'
+              const isSelected = selectedUNIQId === uniq.id
+              const collectionName = uniq.metadata.content.subName || collections.find(c => c.id === uniq.factory?.id || c.id === uniq.collection?.id)?.name || 'Collection inconnue'
 
               return (
                 <div
-                  key={nft.id}
-                  onClick={() => handleSelect(nft)}
+                  key={uniq.id}
+                  onClick={() => handleSelect(uniq)}
                   className={`
                     relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all
                     ${isSelected ? 'border-primary-500 scale-105' : 'border-dark-700 hover:border-dark-500'}
                   `}>
-                  {imageUrl ? <img src={imageUrl} alt={nft.metadata.content.name} className='w-full aspect-square object-cover' loading='lazy' /> : <div className='w-full aspect-square bg-dark-800 flex items-center justify-center text-gray-500'>No Image</div>}
+                  {imageUrl ? <img src={imageUrl} alt={uniq.metadata.content.name} className='w-full aspect-square object-cover' loading='lazy' /> : <div className='w-full aspect-square bg-dark-800 flex items-center justify-center text-gray-500'>No Image</div>}
 
                   <div className='absolute bottom-0 left-0 right-0 bg-dark-900/80 p-2'>
-                    <p className='text-sm font-medium truncate'>{nft.metadata.content.name}</p>
+                    <p className='text-sm font-medium truncate'>{uniq.metadata.content.name}</p>
                     <div className='flex justify-between text-xs text-gray-400'>
-                      <span>#{nft.serialNumber}</span>
-                      <span className='truncate'>{nft.id ? `ID: ${nft.id.slice(0, 6)}...` : ''}</span>
+                      <span>#{uniq.serialNumber}</span>
+                      <span className='truncate'>{uniq.id ? `ID: ${uniq.id.slice(0, 6)}...` : ''}</span>
                     </div>
                     {/* Nom de la collection */}
                     <div className='mt-1 text-xs text-primary-400 truncate'>{collectionName}</div>
@@ -306,4 +295,4 @@ const NftSelector: React.FC<NftSelectorProps> = ({blockchainId, onSelect, curren
   )
 }
 
-export default NftSelector
+export default UNIQSelector

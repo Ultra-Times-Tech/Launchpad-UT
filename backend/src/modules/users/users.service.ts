@@ -109,7 +109,7 @@ export class UsersService {
     }
   }
 
-  async getAvatar(account: string): Promise<{ account: string; nft_id: string } | null> {
+  async getAvatar(account: string): Promise<{ account: string; uniq_id: string } | null> {
     this.logger.log(`Fetching avatar for account: ${account}`);
     
     if (!account) {
@@ -118,14 +118,14 @@ export class UsersService {
     }
     
     try {
-      const row = await this.getTableRow<{ account: string; nft_id: string }>('accavatar', account);
+      const row = await this.getTableRow<{ account: string; uniq_id: string }>('accavatar', account);
       if (!row) {
         // It's okay if avatar is not set, return null instead of throwing error
         this.logger.log(`Avatar not set for account ${account}`);
-        return { account, nft_id: '' }; // Return empty nft_id instead of null
+        return { account, uniq_id: '' };
       }
       // Ultra API returns uint64_t as number sometimes, ensure it's string
-      return { ...row, nft_id: String(row.nft_id) };
+      return { ...row, uniq_id: String(row.uniq_id) };
     } catch (error) {
       this.logger.error(`Error in getAvatar for account ${account}: ${error.message}`);
       if (error instanceof BadRequestException) {

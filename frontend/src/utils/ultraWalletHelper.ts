@@ -118,8 +118,7 @@ export const useUltraWallet = () => {
       }
 
       return true
-    } catch (err) {
-      console.log(err)
+    } catch {
       return false
     }
   }, [hasAttemptedEagerConnect, isInstalled])

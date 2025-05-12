@@ -2,8 +2,8 @@ import {useState, useEffect, useRef} from 'react'
 import useAlerts from '../../hooks/useAlert'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
 import {apiRequestor} from '../../utils/axiosInstanceHelper'
-import {Nft} from '../../utils/nftService'
-import NftSelector from '../../components/NftSelector'
+import {Uniq} from '../../utils/uniqService'
+import NftSelector from '../../components/UniqSelector'
 import useUserAvatar, {refreshUserAvatar, clearAvatarCache} from '../../hooks/useUserAvatar'
 
 interface ProfileData {
@@ -21,7 +21,7 @@ function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
-  const [selectedNft, setSelectedNft] = useState<Nft | null>(null)
+  const [selectedNft, setSelectedNft] = useState<Uniq | null>(null)
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false)
   const [isRemovingAvatar, setIsRemovingAvatar] = useState(false)
   const {imageUrl: avatarImage, isLoading: isLoadingAvatar, avatarNftId, updateLocalAvatar, refreshAvatar} = useUserAvatar(blockchainId)
@@ -59,7 +59,6 @@ function ProfilePage() {
       // Vider le cache pour forcer un rechargement frais
       clearAvatarCache(blockchainId)
       refreshAvatar()
-      console.log('[ProfilePage] Avatar forcé à recharger pour:', blockchainId)
     }
   }, [blockchainId])
 
@@ -109,12 +108,7 @@ function ProfilePage() {
               marketingCommunications: marketingComm,
               avatarNftId: userData.avatarNftId || null,
             })
-
-            console.log('Données utilisateur récupérées:', userData)
-            console.log('sendnotif:', userData.sendnotif, 'converti en:', emailNotif)
-            console.log('sendcomm:', userData.sendcomm, 'converti en:', marketingComm)
           } else {
-            console.log("Aucune donnée utilisateur trouvée. Création d'un nouveau profil.")
             setProfile({
               username: '',
               email: '',
@@ -135,10 +129,7 @@ function ProfilePage() {
 
     // Attendre que le blockchainId soit défini avant de faire les appels API
     if (blockchainId) {
-      console.log('BlockchainId disponible, démarrage des récupérations de données')
       fetchUserData()
-    } else {
-      console.log('Attente du blockchainId avant de récupérer les données de profil')
     }
   }, [blockchainId])
 
@@ -262,8 +253,6 @@ function ProfilePage() {
       const response = await signTransaction(txObject)
 
       if (response && response.data?.transactionHash) {
-        // La mise à jour visuelle est déjà faite, mais on déclenche aussi
-        // la mise à jour "officielle" depuis le serveur en arrière-plan
         if (blockchainId) {
           refreshUserAvatar(blockchainId)
         }
@@ -386,8 +375,6 @@ function ProfilePage() {
         sendcomm: [profile.marketingCommunications ? "1" : "0"]
       }
 
-      console.log('handleToggleEmailNotifications - données envoyées:', updateData)
-
       // Mettre à jour la préférence en base de données
       await apiRequestor.patch(`/users/${userId}`, updateData)
 
@@ -443,8 +430,6 @@ function ProfilePage() {
         sendcomm: [newValue ? "1" : "0"]
       }
 
-      console.log('handleToggleMarketingCommunications - données envoyées:', updateData)
-
       // Mettre à jour la préférence en base de données
       await apiRequestor.patch(`/users/${userId}`, updateData)
 
@@ -462,7 +447,7 @@ function ProfilePage() {
     }
   }
 
-  const handleSelectNft = (nft: Nft) => {
+  const handleSelectNft = (nft: Uniq) => {
     setSelectedNft(nft)
   }
 

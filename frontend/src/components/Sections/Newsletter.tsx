@@ -7,8 +7,6 @@ function Newsletter() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implement newsletter subscription
-    console.log('Subscribing with:', email)
     showAlert('Thank you for subscribing to our newsletter!', 'success', 5000)
     setEmail('')
   }

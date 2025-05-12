@@ -52,13 +52,8 @@ function MintTestPage() {
         maxPrice: "1.00000000 UOS"
       })
 
-      console.log('Transaction formatée:', transactionMint)
-
       try {
         const response = await ultra.signTransaction(transactionMint)
-
-        console.log('Réponse transaction:', response.data)
-        console.log('Transaction Hash:', response.data.transactionHash)
         
         if (response?.data?.transactionHash) {
           setSuccess(`Transaction réussie! Hash: `)

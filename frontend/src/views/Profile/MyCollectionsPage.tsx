@@ -497,7 +497,7 @@ function MyCollectionsPage() {
     try {
       await apiRequestor.delete(`/collections/${currentCollection.id}`)
       
-      showSuccess('Collection supprimée avec succès')
+      showSuccess('Collection supprimée avec succès.')
       
       // Supprimer la collection de l'état local
       setCollections(prev => prev.filter(c => c.id !== currentCollection.id))

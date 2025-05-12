@@ -1,10 +1,9 @@
 import {useState, useEffect} from 'react'
 import {Collection, FeaturedCollectionCardProps, TrendingCollection, NFT} from '../types/collection.types'
 import {collectionsService} from '../services/collections.service'
-import {apiRequestor} from '../utils/axiosInstanceHelper'
 
 export function useCollections() {
-  const [nfts, setNfts] = useState<NFT[]>([])
+  const [UNIQs, setUNIQs] = useState<NFT[]>([])
   const [allCollections, setAllCollections] = useState<Collection[]>([])
   const [featuredCollections, setFeaturedCollections] = useState<FeaturedCollectionCardProps[]>([])
   const [trendingCollections, setTrendingCollections] = useState<TrendingCollection[]>([])
@@ -14,12 +13,6 @@ export function useCollections() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('Fetching data from backend...')
-        
-        // Fetch NFTs
-        const nftResponse = await apiRequestor.get('/nfts')
-        setNfts(nftResponse.data)
-
         // Fetch collections using the dedicated service
         const collections = await collectionsService.getAllCollections()
         setAllCollections(collections)
@@ -45,7 +38,7 @@ export function useCollections() {
   }, [])
 
   return {
-    nfts,
+    UNIQs,
     allCollections,
     featuredCollections,
     trendingCollections,

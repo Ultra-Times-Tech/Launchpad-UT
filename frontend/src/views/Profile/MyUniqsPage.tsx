@@ -1,7 +1,7 @@
 import {useState, useEffect, useRef} from 'react'
 import {Link} from 'react-router-dom'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
-import {fetchUserNfts, Nft, getCachedNfts, getCachedCollections, NftCollection, isNftLoadingComplete} from '../../utils/nftService'
+import {fetchUserUNIQs, Uniq, getCachedUNIQs, getCachedCollections, UNIQsCollection, isUNIQLoadingComplete} from '../../utils/uniqService'
 import useAlerts from '../../hooks/useAlert'
 
 const ITEMS_PER_PAGE = 12
@@ -10,13 +10,13 @@ const INITIAL_COLLECTIONS_TO_SHOW = 10
 function MyUniqsPage() {
   const {blockchainId} = useUltraWallet()
   const {error: showError} = useAlerts()
-  const [nfts, setNfts] = useState<Nft[]>([])
-  const [collections, setCollections] = useState<NftCollection[]>([])
+  const [uniqs, setNfts] = useState<Uniq[]>([])
+  const [collections, setCollections] = useState<UNIQsCollection[]>([])
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasMorePages, setHasMorePages] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [selectedNft, setSelectedNft] = useState<Nft | null>(null)
+  const [selectedNft, setSelectedNft] = useState<Uniq | null>(null)
   const [isNftDetailsOpen, setIsNftDetailsOpen] = useState(false)
   const [pageInputValue, setPageInputValue] = useState('')
   const pageInputRef = useRef<HTMLInputElement>(null)
@@ -39,7 +39,7 @@ function MyUniqsPage() {
       try {
         setIsLoading(true)
         // Charger les NFTs avec un limit de 25 pour avoir rapidement la première page
-        const userNfts = await fetchUserNfts(blockchainId)
+        const userNfts = await fetchUserUNIQs(blockchainId)
         setNfts(userNfts)
 
         // Récupérer les collections
@@ -78,14 +78,8 @@ function MyUniqsPage() {
 
   // Fonction pour déterminer s'il y a une page suivante disponible
   const updateHasMorePages = (nftsCount: number, page: number) => {
-    const isComplete = isNftLoadingComplete(blockchainId || '')
     const hasMore = nftsCount > ITEMS_PER_PAGE * page
     setHasMorePages(hasMore)
-
-    // Si le chargement est complet et qu'on n'a pas plus de NFTs pour la page suivante
-    if (isComplete && !hasMore) {
-      console.log('[MyCollectionsPage] Fin des NFTs atteinte, désactivation du bouton Suivant')
-    }
   }
 
   // Écouter les mises à jour des NFTs en arrière-plan
@@ -94,14 +88,14 @@ function MyUniqsPage() {
       if (blockchainId) {
         const customEvent = event as CustomEvent<{walletId: string}>
         if (customEvent.detail.walletId === blockchainId) {
-          const updatedNfts = getCachedNfts(blockchainId)
+          const updatedNfts = getCachedUNIQs(blockchainId)
           setNfts(updatedNfts)
 
           // Mettre à jour les collections
           const updatedCollections = getCachedCollections(blockchainId)
           setCollections(updatedCollections)
 
-          updateHasMorePages(selectedCollection ? updatedCollections.find(c => c.id === selectedCollection)?.nfts.length || 0 : updatedNfts.length, currentPage)
+          updateHasMorePages(selectedCollection ? updatedCollections.find(c => c.id === selectedCollection)?.uniqs.length || 0 : updatedNfts.length, currentPage)
         }
       }
     }
@@ -138,13 +132,13 @@ function MyUniqsPage() {
     setCollectionSearchQuery('') // Vider la recherche lors du changement de collection
 
     // Mettre à jour l'indicateur de pages supplémentaires
-    const relevantCount = collectionId ? collections.find(c => c.id === collectionId)?.nfts.length || 0 : nfts.length
+    const relevantCount = collectionId ? collections.find(c => c.id === collectionId)?.uniqs.length || 0 : uniqs.length
 
     updateHasMorePages(relevantCount, 1)
   }
 
   // Ouvrir la popup de détails du NFT
-  const handleNftClick = (nft: Nft) => {
+  const handleNftClick = (nft: Uniq) => {
     setSelectedNft(nft)
     setIsNftDetailsOpen(true)
   }
@@ -181,7 +175,7 @@ function MyUniqsPage() {
     // Si une collection est sélectionnée et qu'on a une recherche active
     if (selectedCollection && collectionSearchQuery) {
       // Récupérer les NFTs de cette collection
-      const collectionNfts = collections.find(c => c.id === selectedCollection)?.nfts || []
+      const collectionNfts = collections.find(c => c.id === selectedCollection)?.uniqs || []
       const searchTermLower = collectionSearchQuery.toLowerCase()
 
       // Filtrer les NFTs de cette collection avec recherche étendue
@@ -207,21 +201,21 @@ function MyUniqsPage() {
     // Si aucune collection n'est sélectionnée mais qu'on a une recherche active
     else if (!selectedCollection && collectionSearchQuery) {
       // Filtrer les NFTs par collection correspondant à la recherche
-      return nfts.filter(nft => {
+      return uniqs.filter(nft => {
         const collectionId = nft.factory?.id || nft.collection?.id
         const matchingCollection = collections.find(c => c.id === collectionId && c.name.toLowerCase().includes(collectionSearchQuery.toLowerCase()))
         return !!matchingCollection
       })
     }
     // Si aucune recherche active
-    return nfts
+    return uniqs
   })()
 
   // Filtrer les NFTs selon la collection sélectionnée
   const filteredNfts = selectedCollection
     ? collectionSearchQuery
       ? searchFilteredNfts // Si recherche active dans collection sélectionnée
-      : collections.find(c => c.id === selectedCollection)?.nfts || [] // Collection sélectionnée sans recherche
+      : collections.find(c => c.id === selectedCollection)?.uniqs || [] // Collection sélectionnée sans recherche
     : searchFilteredNfts // Pas de collection sélectionnée
 
   // Filtrer les NFTs pour la page courante
@@ -232,7 +226,7 @@ function MyUniqsPage() {
   // Calcul des informations de pagination
   const totalFilteredCount = filteredNfts.length
   const totalPages = Math.ceil(totalFilteredCount / ITEMS_PER_PAGE)
-  const isLastPage = currentPage >= totalPages && isNftLoadingComplete(blockchainId || '')
+  const isLastPage = currentPage >= totalPages && isUNIQLoadingComplete(blockchainId || '')
 
   // Réinitialiser la page actuelle lorsque la recherche change
   useEffect(() => {
@@ -281,7 +275,7 @@ function MyUniqsPage() {
   }, [selectedCollection]) // le placeholder peut changer si la collection change
 
   // Limiter les descriptions des collections
-  const renderCollectionDescription = (collection: NftCollection | undefined) => {
+  const renderCollectionDescription = (collection: UNIQsCollection | undefined) => {
     if (!collection || !collection.description) {
       return <p>Aucune description disponible.</p>
     }
@@ -544,7 +538,7 @@ function MyUniqsPage() {
                         style={{ width: `${String(totalPages).length * 0.75 + 1}rem` }}
                       />
                     </div>
-                    <span className='text-gray-400'>sur {isNftLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}</span>
+                    <span className='text-gray-400'>sur {isUNIQLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}</span>
                   </div>
 
                   <button onClick={handleNextPage} disabled={isLastPage || !hasMorePages} className={`px-4 py-2 rounded-lg transition-colors ${isLastPage || !hasMorePages ? 'bg-dark-800 text-gray-500 cursor-not-allowed' : 'bg-dark-700 text-white hover:bg-dark-600'}`}>

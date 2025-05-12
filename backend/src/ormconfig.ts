@@ -1,5 +1,4 @@
 import {DataSource} from 'typeorm'
-import {NFTEntity} from './modules/nft/nft.entity'
 import * as path from 'path'
 
 // Determine if we're in production (Vercel) or development
@@ -11,7 +10,7 @@ const dbPath = isProd ? path.join('/tmp', 'database.sqlite') : ':memory:'
 export const AppDataSource = new DataSource({
   type: 'sqlite',
   database: dbPath,
-  entities: [NFTEntity],
+  entities: [],
   synchronize: true,
   logging: false,
 })

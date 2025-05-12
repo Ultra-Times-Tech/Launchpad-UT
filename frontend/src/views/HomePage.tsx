@@ -48,7 +48,7 @@ function HomePage() {
 
   return (
     <div className='bg-dark-950 text-white'>
-      <Slider title={t('slider_title')} description={t('slider_description')} buttonText={t('slider_button')} onButtonClick={() => console.log('Button clicked')} />
+      <Slider title={t('slider_title')} description={t('slider_description')} buttonText={t('slider_button')} />
       <FeaturedCollections collections={featuredCollections} />
       <LatestCollections latestCollections={latestCollections} mintActivities={mintActivities} />
       <TrendingCollections collections={trendingCollections} />

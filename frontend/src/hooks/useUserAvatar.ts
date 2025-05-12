@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getUserAvatar } from '../utils/nftService';
+import { getUserAvatar } from '../utils/uniqService';
 
 // Définition de l'événement customisé pour les mises à jour d'avatar
 export const AVATAR_UPDATE_EVENT = 'avatar_update_event';
@@ -75,7 +75,6 @@ const useUserAvatar = (blockchainId: string | null) => {
     
     // Si nous avons des données en cache récentes et qu'on ne force pas le rafraîchissement
     if (!forceRefresh && cachedData && (now - cachedData.timestamp < 60000)) {
-      console.log('[useUserAvatar] Utilisation du cache pour', blockchainId);
       setImageUrl(cachedData.imageUrl);
       setAvatarNftId(cachedData.nftId);
       return;
@@ -102,8 +101,6 @@ const useUserAvatar = (blockchainId: string | null) => {
       setImageUrl(avatarData.imageUrl);
       setAvatarNftId(avatarData.nftId);
       setError(null);
-      
-      console.log('[useUserAvatar] Avatar chargé:', avatarData);
     } catch (err) {
       setError(err as Error);
       console.error('Error fetching user avatar:', err);

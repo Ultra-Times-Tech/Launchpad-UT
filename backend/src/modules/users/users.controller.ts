@@ -23,27 +23,25 @@ export class UsersController {
     this.logger.log(`GET /users/${account}/username`);
     try {
       const result = await this.usersService.getUsername(account);
-      return result || { account, username: '' }; // Toujours retourner un objet, même si vide
+      return result || { account, username: '' };
     } catch (error) {
       this.logger.error(`Error in getUsername controller for ${account}: ${error.message}`);
-      // Retourner un objet vide au lieu de relancer l'erreur
       return { account, username: '' };
     }
   }
 
   @Get(':account/avatar')
-  @ApiOperation({ summary: "Get a user's avatar NFT ID" })
+  @ApiOperation({ summary: "Get a user's avatar UNIQ ID" })
   @ApiParam({ name: 'account', description: 'The Ultra blockchain account name', type: String })
   @ApiResponse({ status: 200, description: 'Avatar found or empty if not set.', type: Object })
   async getAvatar(@Param('account') account: string) {
     this.logger.log(`GET /users/${account}/avatar`);
     try {
       const result = await this.usersService.getAvatar(account);
-      return result || { account, nft_id: '' }; // Toujours retourner un objet, même si nft_id est vide
+      return result || { account, uniq_id: '' };
     } catch (error) {
       this.logger.error(`Error in getAvatar controller for ${account}: ${error.message}`);
-      // Retourner un objet vide au lieu de relancer l'erreur
-      return { account, nft_id: '' };
+      return { account, uniq_id: '' };
     }
   }
 

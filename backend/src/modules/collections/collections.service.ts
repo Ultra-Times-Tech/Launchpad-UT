@@ -60,7 +60,6 @@ export class CollectionsService {
       },
     }
 
-    console.log('Transformed item:', transformed)
     return transformed
   }
 

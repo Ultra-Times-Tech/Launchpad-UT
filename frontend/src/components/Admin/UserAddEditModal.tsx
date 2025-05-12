@@ -124,29 +124,12 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
 
   const fetchUserData = async (id: string) => {
     try {
-      console.log('Récupération des données utilisateur via API pour ID:', id);
       const response = await apiRequestor.get(`/users/${id}`);
-      
-      // Afficher la réponse complète pour débogage
-      console.log('Réponse API complète:', JSON.stringify(response.data, null, 2));
       
       if (response.data && response.data.data) {
         const userData = response.data.data.attributes;
         
-        console.log('Données utilisateur brutes:', userData);
-        console.log('Wallets bruts:', userData.wallets);
-        
-        // Récupérer directement tous les champs pour vérifier s'ils existent
-        console.log('Tous les champs disponibles:', Object.keys(userData));
-        
-        // Vérifier explicitement les champs de notification
-        console.log('Champ sendnotif existant:', Object.prototype.hasOwnProperty.call(userData, 'sendnotif'));
-        console.log('Valeur sendnotif:', userData.sendnotif);
-        console.log('Champ sendcomm existant:', Object.prototype.hasOwnProperty.call(userData, 'sendcomm'));
-        console.log('Valeur sendcomm:', userData.sendcomm);
-        
-        // Convertir les groupes en array de strings si nécessaire
-        let groups = ['2']; // Valeur par défaut
+        let groups = ['2'];
         if (userData.groups) {
           groups = Object.keys(userData.groups).map(id => id.toString());
         }
@@ -160,8 +143,6 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
               ? JSON.parse(userData.wallets) 
               : userData.wallets;
             
-            console.log('Wallets après parsing:', parsedWallets);
-            
             // Si des wallets existent, les convertir au format field1
             if (parsedWallets && Object.keys(parsedWallets).length > 0) {
               // Convertir tous les wallets au format field1
@@ -174,7 +155,6 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                 if (wallet.field1) {
                   normalizedWallets[key] = { field1: wallet.field1 };
                 } else if (wallet.field2) {
-                  console.log(`Conversion de field2 '${wallet.field2}' en field1`);
                   normalizedWallets[key] = { field1: wallet.field2 };
                 } else {
                   normalizedWallets[key] = { field1: '' };
@@ -182,7 +162,6 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
               }
               
               wallets = normalizedWallets;
-              console.log('Wallets normalisés au format field1:', wallets);
             }
           } catch (err) {
             console.error('Erreur lors du parsing des wallets:', err);
@@ -190,7 +169,6 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
           }
         }
         
-        // Extraire les préférences de notification
         let sendnotif = ['0'];
         let sendcomm = ['0'];
         
@@ -200,15 +178,12 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
           if (userData.sendnotif["1"]) {
             sendnotif = ['1'];
           }
-          console.log('sendnotif (format objet):', userData.sendnotif, '→ normalisé à:', sendnotif);
         } else if (Array.isArray(userData.sendnotif)) {
           // Format array ['1']
           sendnotif = userData.sendnotif.includes('1') ? ['1'] : ['0'];
-          console.log('sendnotif (format array):', userData.sendnotif, '→ normalisé à:', sendnotif);
         } else if (typeof userData.sendNotif === 'string') {
           // Format chaîne directe
           sendnotif = userData.sendNotif === '1' ? ['1'] : ['0'];
-          console.log('sendNotif (format chaîne):', userData.sendNotif, '→ normalisé à:', sendnotif);
         }
         
         // GET: Traitement de sendcomm (format objet {1: "Yes"} ou {0: "No"})
@@ -217,21 +192,13 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
           if (userData.sendcomm["1"]) {
             sendcomm = ['1'];
           }
-          console.log('sendcomm (format objet):', userData.sendcomm, '→ normalisé à:', sendcomm);
         } else if (Array.isArray(userData.sendcomm)) {
           // Format array ['1']
           sendcomm = userData.sendcomm.includes('1') ? ['1'] : ['0'];
-          console.log('sendcomm (format array):', userData.sendcomm, '→ normalisé à:', sendcomm);
         } else if (typeof userData.sendComm === 'string') {
           // Format chaîne directe
           sendcomm = userData.sendComm === '1' ? ['1'] : ['0'];
-          console.log('sendComm (format chaîne):', userData.sendComm, '→ normalisé à:', sendcomm);
         }
-        
-        // Afficher les valeurs finales pour débogage
-        console.log('Préférences de notification extraites:');
-        console.log('- sendnotif (final):', sendnotif);
-        console.log('- sendcomm (final):', sendcomm);
         
         const formattedData = {
           name: userData.name || '',
@@ -250,8 +217,6 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
           password: '',
           password2: '',
         };
-        
-        console.log('Données formatées pour le formulaire:', formattedData);
         
         setFormData(formattedData);
       }
@@ -334,8 +299,6 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
       // Basculer entre '0' et '1'
       const newValue = currentValue === '1' ? '0' : '1';
       
-      console.log(`Toggle ${type}: ${currentValue} → ${newValue}`);
-      
       return {
         ...prev,
         [type]: newValue === '1' ? ['1'] : ['0']
@@ -406,12 +369,6 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
         wallets: formData.wallets || {},
       };
       
-      // Afficher les valeurs de notification pour débogage
-      console.log('Valeurs de notification envoyées à l\'API:');
-      console.log('- sendnotif:', sendnotifArray);
-      console.log('- sendcomm:', sendcommArray);
-      
-      // Ajouter les mots de passe si nécessaire
       if (!userId || (formData.password && formData.password.length > 0)) {
         userData.password = formData.password;
         userData.password2 = formData.password;
@@ -423,9 +380,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
         console.log('Wallets avant envoi (objet):', userData.wallets);
       } else if (typeof userData.wallets === 'string') {
         try {
-          // Si c'est une chaîne, vérifier que c'est un JSON valide
           JSON.parse(userData.wallets);
-          console.log('Wallets avant envoi (chaîne JSON):', userData.wallets);
         } catch {
           // Si ce n'est pas un JSON valide, créer un wallet vide
           userData.wallets = {
@@ -440,8 +395,6 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
           row0: { field1: '' }
         };
       }
-      
-      console.log('Données complètes envoyées à l\'API:', userData);
       
       if (userId) {
         // Mode édition

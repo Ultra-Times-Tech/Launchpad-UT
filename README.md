@@ -1,10 +1,10 @@
 # Launchpad-UT
 
-A modern NFT launchpad platform for Ultra Times, built with React, TypeScript, and NestJS.
+A modern UNIQs launchpad platform for Ultra Times, built with React, TypeScript, and NestJS.
 
 ## Project Overview
 
-Launchpad-UT is a full-stack application that allows users to browse, view, and mint NFTs from various collections. The project consists of:
+Launchpad-UT is a full-stack application that allows users to browse, view, and mint UNIQs from various collections. The project consists of:
 
 - **Frontend**: React application with TypeScript, Tailwind CSS, and Vite
 - **Backend**: NestJS API with TypeORM and SQLite
