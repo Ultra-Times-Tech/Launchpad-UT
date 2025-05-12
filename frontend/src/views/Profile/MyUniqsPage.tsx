@@ -7,7 +7,7 @@ import useAlerts from '../../hooks/useAlert'
 const ITEMS_PER_PAGE = 12
 const INITIAL_COLLECTIONS_TO_SHOW = 10
 
-function MyCollectionsPage() {
+function MyUniqsPage() {
   const {blockchainId} = useUltraWallet()
   const {error: showError} = useAlerts()
   const [nfts, setNfts] = useState<Nft[]>([])
@@ -18,10 +18,15 @@ function MyCollectionsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedNft, setSelectedNft] = useState<Nft | null>(null)
   const [isNftDetailsOpen, setIsNftDetailsOpen] = useState(false)
+  const [pageInputValue, setPageInputValue] = useState('')
+  const pageInputRef = useRef<HTMLInputElement>(null)
   const nftDetailsRef = useRef<HTMLDivElement>(null)
   const [expandedDescriptions, setExpandedDescriptions] = useState<Record<string, boolean>>({})
   const [showAllCollections, setShowAllCollections] = useState(false)
   const [collectionSearchQuery, setCollectionSearchQuery] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const spanRef = useRef<HTMLSpanElement>(null)
+  const [inputWidth, setInputWidth] = useState<number>()
 
   // Charger les NFTs au chargement de la page
   useEffect(() => {
@@ -121,10 +126,16 @@ function MyCollectionsPage() {
     }
   }
 
+  // Effet pour scroller vers le haut lors du changement de page
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentPage])
+
   // Gestion du changement de collection
   const handleCollectionChange = (collectionId: string | null) => {
     setSelectedCollection(collectionId)
     setCurrentPage(1) // Réinitialiser la page lors du changement de collection
+    setCollectionSearchQuery('') // Vider la recherche lors du changement de collection
 
     // Mettre à jour l'indicateur de pages supplémentaires
     const relevantCount = collectionId ? collections.find(c => c.id === collectionId)?.nfts.length || 0 : nfts.length
@@ -262,6 +273,13 @@ function MyCollectionsPage() {
     }
   }, [])
 
+  // Ajuster dynamiquement la largeur de l'input selon le placeholder uniquement
+  useEffect(() => {
+    if (spanRef.current) {
+      setInputWidth(spanRef.current.offsetWidth)
+    }
+  }, [selectedCollection]) // le placeholder peut changer si la collection change
+
   // Limiter les descriptions des collections
   const renderCollectionDescription = (collection: NftCollection | undefined) => {
     if (!collection || !collection.description) {
@@ -316,16 +334,16 @@ function MyCollectionsPage() {
       return (
         <div className='mb-6 px-4 py-3 bg-dark-800 rounded-lg text-gray-300'>
           <span className='font-medium'>
-            Résultats pour "{collectionSearchQuery}" dans la collection "{collectionName}":
+            Résultats pour "{collectionSearchQuery}" dans la collection "{collectionName}" :
           </span>{' '}
-          {filteredNfts.length} NFTs trouvés
+          {filteredNfts.length} UNIQ{filteredNfts.length > 1 ? 's' : ''} trouvé{filteredNfts.length > 1 ? 's' : ''}
         </div>
       )
     }
 
     return (
       <div className='mb-6 px-4 py-3 bg-dark-800 rounded-lg text-gray-300'>
-        <span className='font-medium'>Résultats pour "{collectionSearchQuery}":</span> {filteredNfts.length} NFTs trouvés
+        <span className='font-medium'>Résultats pour "{collectionSearchQuery}" :</span> {filteredCollections.length} collection{filteredCollections.length > 1 ? 's' : ''} trouvée{filteredCollections.length > 1 ? 's' : ''} ({filteredNfts.length} UNIQ{filteredNfts.length > 1 ? 's' : ''})
       </div>
     )
   }
@@ -336,16 +354,39 @@ function MyCollectionsPage() {
         <div className='max-w-5xl mx-auto'>
           {/* Header avec titre et barre de recherche */}
           <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-dark-800'>
-            <h1 className='text-3xl font-bold text-primary-300'>Mes collections</h1>
+            <h1 className='text-3xl font-bold text-primary-300'>Mes UNIQs</h1>
 
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto'>
-              <div className='relative flex-grow w-full sm:w-auto'>
+              <div className='relative sm:w-auto'>
                 <div className='absolute inset-y-0 left-3 flex items-center pointer-events-none'>
                   <svg className='w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
                   </svg>
                 </div>
-                <input type='text' placeholder={getSearchPlaceholder()} className='pl-10 pr-10 py-2 w-full rounded-lg bg-dark-800 text-white border border-dark-700 focus:border-primary-500 focus:outline-none' value={collectionSearchQuery} onChange={e => setCollectionSearchQuery(e.target.value)} />
+                <input
+                  ref={inputRef}
+                  type='text'
+                  placeholder={getSearchPlaceholder()}
+                  className='pl-10 pr-4 py-2 rounded-lg bg-dark-800 text-white border border-dark-700 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/20 transition-colors duration-200'
+                  value={collectionSearchQuery}
+                  onChange={e => setCollectionSearchQuery(e.target.value)}
+                  style={{width: inputWidth ? inputWidth + 'px' : undefined}}
+                />
+                {/* Span caché pour mesurer la largeur du placeholder uniquement */}
+                <span
+                  ref={spanRef}
+                  className='invisible absolute left-0 top-0 whitespace-pre pl-10 pr-4 py-2 font-normal text-base'
+                  style={{
+                    fontFamily: 'inherit',
+                    fontSize: 'inherit',
+                    fontWeight: 'inherit',
+                    paddingLeft: '2.5rem',
+                    paddingRight: '1rem',
+                    boxSizing: 'border-box',
+                    border: '1px solid transparent',
+                  }}>
+                  {getSearchPlaceholder()}
+                </span>
                 {collectionSearchQuery && (
                   <button className='absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-white' onClick={() => setCollectionSearchQuery('')}>
                     <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -367,7 +408,7 @@ function MyCollectionsPage() {
               <h2 className='text-xl font-bold mb-4'>Collections ({filteredCollections.length})</h2>
               <div className='flex flex-wrap gap-3'>
                 <button onClick={() => handleCollectionChange(null)} className={`px-4 py-2 rounded-lg transition-colors ${selectedCollection === null ? 'bg-primary-500 text-white' : 'bg-dark-800 text-white hover:bg-dark-700'}`}>
-                  Toutes ({collections.length})
+                  Tous ({filteredCollections.length})
                 </button>
 
                 {displayedCollections.map(collection => (
@@ -404,15 +445,10 @@ function MyCollectionsPage() {
 
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'>
                 {displayedNfts.map(nft => {
-                  const imageUrl = nft.metadata?.content?.medias?.square?.uri || 
-                                 nft.metadata?.content?.medias?.product?.uri || 
-                                 nft.metadata?.content?.medias?.gallery?.uri || 
-                                 nft.metadata?.content?.medias?.hero?.uri
+                  const imageUrl = nft.metadata?.content?.medias?.square?.uri || nft.metadata?.content?.medias?.product?.uri || nft.metadata?.content?.medias?.gallery?.uri || nft.metadata?.content?.medias?.hero?.uri
 
                   // Récupérer le nom de la collection pour ce NFT
-                  const collectionName = nft.metadata?.content?.subName || 
-                                      collections.find(c => c.id === nft.factory?.id || c.id === nft.collection?.id)?.name || 
-                                      'Collection inconnue'
+                  const collectionName = nft.metadata?.content?.subName || collections.find(c => c.id === nft.factory?.id || c.id === nft.collection?.id)?.name || 'Collection inconnue'
 
                   return (
                     <div key={nft.id} className='bg-dark-800 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 cursor-pointer' onClick={() => handleNftClick(nft)}>
@@ -450,9 +486,66 @@ function MyCollectionsPage() {
                     Précédent
                   </button>
 
-                  <span className='text-gray-400'>
-                    Page {currentPage}/{isNftLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}
-                  </span>
+                  <div className='flex items-center space-x-2'>
+                    <span className='text-gray-400'>Page</span>
+                    <div className='relative'>
+                      <input
+                        ref={pageInputRef}
+                        type='text'
+                        inputMode='numeric'
+                        pattern='[0-9]*'
+                        value={pageInputValue}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            if (pageInputValue === '') {
+                              setPageInputValue('')
+                            } else {
+                              const value = parseInt(pageInputValue)
+                              if (!isNaN(value)) {
+                                if (value < 1) {
+                                  setCurrentPage(1)
+                                } else if (value > totalPages) {
+                                  setCurrentPage(totalPages)
+                                } else {
+                                  setCurrentPage(value)
+                                }
+                              }
+                            }
+                            setPageInputValue('')
+                            e.currentTarget.blur()
+                          }
+                        }}
+                        onBlur={() => {
+                          if (pageInputValue === '') {
+                            setPageInputValue('')
+                          } else {
+                            const value = parseInt(pageInputValue)
+                            if (!isNaN(value)) {
+                              if (value < 1) {
+                                setCurrentPage(1)
+                              } else if (value > totalPages) {
+                                setCurrentPage(totalPages)
+                              } else {
+                                setCurrentPage(value)
+                              }
+                            }
+                          }
+                          setPageInputValue('')
+                        }}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '')
+                          setPageInputValue(value)
+                        }}
+                        onFocus={() => {
+                          setPageInputValue('')
+                        }}
+                        placeholder={currentPage.toString()}
+                        className='px-2 py-1 bg-dark-800 text-white border border-dark-700 rounded-lg focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/20 transition-colors duration-200 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        style={{ width: `${String(totalPages).length * 0.75 + 1}rem` }}
+                      />
+                    </div>
+                    <span className='text-gray-400'>sur {isNftLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}</span>
+                  </div>
 
                   <button onClick={handleNextPage} disabled={isLastPage || !hasMorePages} className={`px-4 py-2 rounded-lg transition-colors ${isLastPage || !hasMorePages ? 'bg-dark-800 text-gray-500 cursor-not-allowed' : 'bg-dark-700 text-white hover:bg-dark-600'}`}>
                     Suivant
@@ -467,12 +560,12 @@ function MyCollectionsPage() {
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' />
                 </svg>
               </div>
-              <h2 className='text-xl font-semibold mb-2'>{collectionSearchQuery ? (selectedCollection ? `Aucun NFT trouvé pour "${collectionSearchQuery}" dans cette collection` : 'Aucun NFT trouvé pour cette recherche') : selectedCollection ? 'Aucun NFT dans cette collection' : 'Aucune collection pour le moment'}</h2>
-              <p className='text-gray-400 mb-6'>{collectionSearchQuery ? "Essayez avec d'autres termes de recherche." : selectedCollection ? 'Cette collection ne contient pas de NFTs ou ils sont en cours de chargement.' : 'Commencez à créer votre collection en acquérant de nouveaux NFTs'}</p>
+              <h2 className='text-xl font-semibold mb-2'>{collectionSearchQuery ? (selectedCollection ? `Aucun UNIQs trouvés pour "${collectionSearchQuery}" dans cette collection` : 'Aucun UNIQs trouvés pour cette recherche') : selectedCollection ? 'Aucun NFT dans cet UNIQ' : 'Aucun UNIQ pour le moment'}</h2>
+              <p className='text-gray-400 mb-6'>{collectionSearchQuery ? "Essayez avec d'autres termes de recherche." : selectedCollection ? 'Cette collection ne contient pas de UNIQs ou ils sont en cours de chargement.' : 'Commencez à créer votre collection en acquérant de nouveaux UNIQs'}</p>
               <div className='flex justify-center gap-4'>
                 {selectedCollection && (
-                  <button onClick={() => handleCollectionChange(null)} className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors inline-block'>
-                    Voir toutes les collections
+                  <button onClick={() => setCollectionSearchQuery('')} className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors inline-block'>
+                    Voir tous les UNIQs
                   </button>
                 )}
                 <Link to='/collections' className='px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors inline-block'>
@@ -504,16 +597,8 @@ function MyCollectionsPage() {
                 {/* Image du NFT et attributs */}
                 <div className='md:w-1/2'>
                   <div className='relative aspect-square rounded-lg overflow-hidden bg-dark-900 mb-4'>
-                    {selectedNft.metadata?.content?.medias?.square?.uri || 
-                     selectedNft.metadata?.content?.medias?.product?.uri || 
-                     selectedNft.metadata?.content?.medias?.gallery?.uri || 
-                     selectedNft.metadata?.content?.medias?.hero?.uri ? (
-                      <img src={selectedNft.metadata?.content?.medias?.square?.uri || 
-                              selectedNft.metadata?.content?.medias?.product?.uri || 
-                              selectedNft.metadata?.content?.medias?.gallery?.uri || 
-                              selectedNft.metadata?.content?.medias?.hero?.uri} 
-                           alt={selectedNft.metadata?.content?.name || `NFT #${selectedNft.serialNumber}`} 
-                           className='w-full h-full object-cover' />
+                    {selectedNft.metadata?.content?.medias?.square?.uri || selectedNft.metadata?.content?.medias?.product?.uri || selectedNft.metadata?.content?.medias?.gallery?.uri || selectedNft.metadata?.content?.medias?.hero?.uri ? (
+                      <img src={selectedNft.metadata?.content?.medias?.square?.uri || selectedNft.metadata?.content?.medias?.product?.uri || selectedNft.metadata?.content?.medias?.gallery?.uri || selectedNft.metadata?.content?.medias?.hero?.uri} alt={selectedNft.metadata?.content?.name || `NFT #${selectedNft.serialNumber}`} className='w-full h-full object-cover' />
                     ) : (
                       <div className='w-full h-full flex items-center justify-center text-gray-500'>Aucune image</div>
                     )}
@@ -606,4 +691,4 @@ function MyCollectionsPage() {
   )
 }
 
-export default MyCollectionsPage
+export default MyUniqsPage

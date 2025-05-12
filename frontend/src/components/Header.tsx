@@ -77,7 +77,7 @@ const LanguageButton = ({lang, isActive, onClick}: LanguageButtonProps) => {
 const DesktopNavigation = ({t, closeMenu}: {t: TranslationFunction; closeMenu: () => void}) => (
   <nav className='hidden lg:flex items-center justify-center flex-1 px-8 font-quicksand'>
     <div className='flex space-x-8'>
-      {(['home', 'collections', 'authors', 'shop', 'contact'] as const).map(item => (
+      {(['home', 'collections', 'contact'] as const).map(item => (
         <Link key={item} to={`/${item === 'home' ? '' : item}`} className='text-white hover:text-primary-300 transition-colors px-2' onClick={closeMenu}>
           {t(item)}
         </Link>
@@ -185,8 +185,8 @@ const ProfileDropdown = ({isOpen, blockchainId, t, handleDisconnect, setIsOpen, 
         <Link to='/profile' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsOpen(false)}>
           {t('profile_settings' as const)}
         </Link>
-        <Link to='/my-collections' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsOpen(false)}>
-          {t('my_collections' as const)}
+        <Link to='/my-uniqs' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsOpen(false)}>
+          {t('my_uniqs' as const)}
         </Link>
         <button onClick={handleDisconnect} className='w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-700 transition-colors'>
           {t('disconnect' as const)}
@@ -207,7 +207,7 @@ const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDi
     <div className={`fixed top-16 left-0 right-0 bg-dark-900 border-b border-dark-700 transition-all duration-300 ease-in-out lg:hidden z-40 ${isOpen ? 'translate-y-0 opacity-100 visible' : 'translate-y-[-100%] opacity-0 invisible'}`}>
       <div className='px-4 sm:px-6 py-4'>
         <nav className='flex flex-col space-y-4'>
-          {(['home', 'collections', 'authors', 'shop', 'contact'] as const).map(item => (
+          {(['home', 'collections', 'contact'] as const).map(item => (
             <Link key={item} to={`/${item === 'home' ? '' : item}`} onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>
               {t(item)}
             </Link>
@@ -239,8 +239,8 @@ const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDi
               <Link to='/profile' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
                 {t('profile_settings' as const)}
               </Link>
-              <Link to='/my-collections' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
-                {t('my_collections' as const)}
+              <Link to='/my-uniqs' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
+                {t('my_uniqs' as const)}
               </Link>
               <button onClick={handleDisconnect} className='w-full text-left py-2 text-red-400 hover:text-red-500 transition-colors'>
                 {t('disconnect' as const)}

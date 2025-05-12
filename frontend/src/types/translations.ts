@@ -1,11 +1,10 @@
 export type TranslationKey = 
   | 'home'
   | 'collections'
-  | 'authors'
-  | 'shop'
   | 'contact'
   | 'connect_wallet'
   | 'profile_settings'
+  | 'my_uniqs'
   | 'my_collections'
   | 'disconnect'
   | 'connected_wallet'

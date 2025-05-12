@@ -11,7 +11,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import {AlertContainer} from './components/Alert/Alert'
 import ProfilePage from './views/Profile/ProfilePage'
-import MyCollectionsPage from './views/Profile/MyCollectionsPage'
+import MyUniqsPage from './views/Profile/MyUniqsPage'
 import MainContent from './components/MainContent'
 import MentionsLegalesPage from './views/Legal/LegalPage'
 import PrivacyPolicyPage from './views/Legal/PrivacyPolicyPage'
@@ -36,7 +36,7 @@ function App() {
           {/* Routes protégées nécessitant une connexion wallet */}
           <Route element={<ProtectedRoute />}>
             <Route path='/profile' element={<ProfilePage />} />
-            <Route path='/my-collections' element={<MyCollectionsPage />} />
+            <Route path='/my-uniqs' element={<MyUniqsPage />} />
           </Route>
           
           {/* Admin */}

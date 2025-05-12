@@ -3,11 +3,10 @@ import { TranslationKey } from "../types/translations"
 const de: Record<TranslationKey, string> = {
   home: 'Startseite',
   collections: 'Sammlungen',
-  authors: 'Autoren',
-  shop: 'Shop',
   contact: 'Kontakt',
   connect_wallet: 'Wallet Verbinden',
   profile_settings: 'Profileinstellungen',
+  my_uniqs: 'Meine UNIQS',
   my_collections: 'Meine Sammlungen',
   disconnect: 'Trennen',
   connected_wallet: 'Wallet Verbunden',
