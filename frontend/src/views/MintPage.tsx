@@ -2,6 +2,20 @@ import {useEffect, useState, useRef} from 'react'
 import {useParams, Link} from 'react-router-dom'
 import MintCard from '../components/Card/MintCard'
 import {getAssetUrl} from '../utils/imageHelper'
+import {useUltraWallet} from '../utils/ultraWalletHelper'
+import {createMintTransaction} from '../utils/transactionHelper'
+
+interface UltraError {
+  message?: string;
+  data?: {
+    error?: {
+      what?: string;
+      code?: number;
+      name?: string;
+    };
+  };
+  code?: number;
+}
 
 interface MintItem {
   id: number
@@ -183,6 +197,7 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
 
 function MintPage() {
   const {category, id} = useParams<{category: string; id: string}>()
+  const {isConnected, isLoading: walletLoading, error: walletError, blockchainId} = useUltraWallet()
   const [loading, setLoading] = useState(true)
   const [factory, setFactory] = useState<Factory | null>(null)
   const [mintedItems, setMintedItems] = useState<MintItem[]>([])
@@ -190,7 +205,18 @@ function MintPage() {
   const [mintAmount, setMintAmount] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedMint, setSelectedMint] = useState<MintItem | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [txHash, setTxHash] = useState<string | null>(null)
   const itemsPerPage = 5
+
+  useEffect(() => {
+    if (!isConnected) {
+      setError(null)
+      setSuccess(null)
+      setTxHash(null)
+    }
+  }, [isConnected])
 
   useEffect(() => {
     const loadData = async () => {
@@ -213,8 +239,8 @@ function MintPage() {
             description: category === '1' 
               ? 'A stunning Dark Street Cubism painting inspired by an Ultra\'s Movement Elder design. This exclusive creation is personally signed by C-la. By acquiring this Art, you\'re automatically entered into a special raffle that occurs every 5 UniQ purchases (excluding Vouchers), giving you a chance to win a high-rarity ViT UniQ from the UT Collection.'
               : 'Transform your digital Ultra Street-Cubism collection into a physical masterpiece. This voucher entitles you to receive a printed version of your UniQ on a premium 60cm x 80cm dibond support, ensuring durability and longevity. (Shipping costs not included) For more information, contact Ultra Times teams on Discord: https://discord.gg/R2zvShJAyh',
-            mintPrice: '0 UOS',
-            supply: 1,
+            mintPrice: '10.00000000 UOS',
+            supply: 10,
             minted: 0,
             collectionName: collectionNames[id || '1'] || 'Ultra Street-Cubism',
           })
@@ -251,8 +277,122 @@ function MintPage() {
     loadData()
   }, [category, id])
 
-  const handleMint = () => {
-    alert(`Minting ${mintAmount} items for ${parseFloat(factory?.mintPrice || '0') * mintAmount} UOS`)
+  const handleMint = async () => {
+    setError(null)
+    setSuccess(null)
+    setTxHash(null)
+
+    if (!isConnected || !blockchainId) {
+      setError('Portefeuille non connecté')
+      return
+    }
+
+    try {
+      const ultra = window.ultra
+      if (!ultra) {
+        setError('Ultra wallet non disponible')
+        return
+      }
+
+      const mintPrice = factory?.mintPrice ? parseFloat(factory.mintPrice.split(' ')[0]) : 1.0;
+      const totalPrice = (mintPrice * mintAmount).toFixed(8);
+
+      const transactionMint = createMintTransaction({
+        blockchainId,
+        tokenFactoryId: "4337",
+        index: "2",
+        maxPrice: `${totalPrice} UOS`
+      })
+
+      try {
+        const response = await ultra.signTransaction(transactionMint)
+        
+        if (response?.data?.transactionHash) {
+          setSuccess('Transaction réussie !')
+          setTxHash(response.data.transactionHash)
+          
+          const newMint: MintItem = {
+            id: mintedItems.length + 1,
+            name: factory?.name || '',
+            image: category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniq-phygital.png'),
+            price: factory?.mintPrice || '',
+            timestamp: 'just now',
+            minter: {
+              address: blockchainId,
+              username: blockchainId.slice(0, 6),
+            },
+            transactionHash: response.data.transactionHash,
+            tokenId: `#${1234 + mintedItems.length}`,
+            rarity: 'Legendary',
+          }
+          
+          setMintedItems([newMint, ...mintedItems])
+          
+          if (factory) {
+            setFactory({
+              ...factory,
+              minted: factory.minted + mintAmount
+            })
+          }
+        } else {
+          console.error('Réponse invalide:', response)
+          setError('La transaction n\'a pas retourné de hash')
+        }
+      } catch (err: unknown) {
+        const ultraError = err as UltraError
+        console.error('Détails de l\'erreur:', {
+          message: ultraError?.message,
+          data: ultraError?.data,
+          code: ultraError?.code
+        })
+
+        switch (ultraError?.message) {
+          case 'Transaction rejected':
+          case 'Transaction declined':
+            setError("L'utilisateur a refusé la transaction.")
+            break
+          case 'Wallet window closed':
+            setError("La fenêtre du portefeuille a été fermée.")
+            break
+          case 'purchase limit reached':
+            setError("Limite d'achat atteinte pour cette option.")
+            break
+          case 'unauthorized buyer':
+            setError('Acheteur non autorisé pour cette option.')
+            break
+          case 'purchase window closed':
+            setError("La fenêtre d'achat est fermée.")
+            break
+          case 'insufficient UOS payment':
+            setError("Paiement UOS insuffisant.")
+            break
+          case 'invalid factory ID':
+            setError("ID de factory invalide.")
+            break
+          case 'insufficient balance for maximum payment':
+            setError("Solde insuffisant pour le paiement maximum.")
+            break
+          case 'Network error':
+            setError("Erreur réseau.")
+            break
+          case 'Invalid transaction data':
+            setError("Données de transaction invalides.")
+            break
+          case 'Contract execution error':
+            setError("Erreur d'exécution du contrat.")
+            break
+          default:
+            if (ultraError?.data?.error?.what) {
+              setError(`Erreur blockchain: ${ultraError.data.error.what}`)
+            } else {
+              setError(`Erreur: ${ultraError?.message || 'Erreur inconnue'}`)
+            }
+        }
+      }
+    } catch (err) {
+      console.error('Erreur globale:', err)
+      setError('Erreur inattendue lors de la transaction')
+    }
   }
 
   const incrementMintAmount = () => {
@@ -385,9 +525,41 @@ function MintPage() {
                   <span className='text-primary-300 font-bold text-xl'>{parseFloat(factory.mintPrice) * mintAmount} UOS</span>
                 </div>
 
-                <button onClick={handleMint} className='w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 shadow-lg transform hover:translate-y-[-2px]'>
-                  MINT NOW
+                <button 
+                  onClick={handleMint} 
+                  disabled={!isConnected || walletLoading || !factory} 
+                  className='w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 shadow-lg transform hover:translate-y-[-2px] disabled:opacity-50 disabled:cursor-not-allowed'>
+                  {walletLoading ? 'Transaction en cours...' : 'MINT NOW'}
                 </button>
+                
+                {error && (
+                  <div className='mt-4 p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-300'>
+                    {error}
+                  </div>
+                )}
+
+                {success && txHash && (
+                  <div className='mt-4 p-4 bg-green-500/20 border border-green-500 rounded-lg text-green-300'>
+                    {success}
+                    <a 
+                      href={`https://explorer.testnet.ultra.io/tx/${txHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 mt-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
+                    >
+                      <span>Voir la transaction</span>
+                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </a>
+                  </div>
+                )}
+
+                {walletError && (
+                  <div className='mt-4 p-4 bg-yellow-500/20 border border-yellow-500 rounded-lg text-yellow-300'>
+                    Erreur portefeuille: {walletError}
+                  </div>
+                )}
               </div>
 
               {/* Mint Phases */}
