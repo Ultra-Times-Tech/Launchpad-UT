@@ -100,10 +100,10 @@ function MyUniqsPage() {
       }
     }
 
-    document.addEventListener('nftUpdate', handleNftUpdate)
+    document.addEventListener('uniqUpdate', handleNftUpdate)
 
     return () => {
-      document.removeEventListener('nftUpdate', handleNftUpdate)
+      document.removeEventListener('uniqUpdate', handleNftUpdate)
     }
   }, [blockchainId, currentPage, selectedCollection])
 

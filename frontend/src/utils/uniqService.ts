@@ -65,7 +65,6 @@ interface ApiError {
 }
 
 // Événement global pour signaler les mises à jour de NFT
-export const nftUpdateEvent = new CustomEvent('nftUpdate')
 
 // Stockage global des UNIQs par wallet pour éviter des requêtes répétées
 const uniqCache: Record<

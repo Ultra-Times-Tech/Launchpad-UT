@@ -3,7 +3,7 @@ import {useParams, Link} from 'react-router-dom'
 import MintCard from '../components/Card/MintCard'
 import {getAssetUrl} from '../utils/imageHelper'
 import {useUltraWallet} from '../utils/ultraWalletHelper'
-import {createMintTransaction} from '../utils/transactionHelper'
+import {createMintTransaction, calculateTotalPrice} from '../utils/transactionHelper'
 
 interface UltraError {
   message?: string;
@@ -71,10 +71,6 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
 
   const handleZoomToggle = () => {
     setIsZoomed(!isZoomed)
-  }
-
-  const shortenAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
   const shortenHash = (hash: string) => {
@@ -164,8 +160,28 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
               <div className='flex justify-between items-center text-sm'>
                 <span className='text-gray-400'>Minted by</span>
                 <div className='flex items-center space-x-2'>
-                  <span className='text-primary-300'>{mint.minter.username}</span>
-                  <span className='text-gray-500'>({shortenAddress(mint.minter.address)})</span>
+                  {mint.minter.username && mint.minter.username !== mint.minter.address.slice(0, 6) ? (
+                    <>
+                      <span className='text-primary-300'>{mint.minter.username}</span>
+                      <a 
+                        href={`https://explorer.testnet.ultra.io/account/${mint.minter.address}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className='text-gray-500 hover:text-primary-300 transition-colors'
+                      >
+                        ({mint.minter.address})
+                      </a>
+                    </>
+                  ) : (
+                    <a 
+                      href={`https://explorer.testnet.ultra.io/account/${mint.minter.address}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className='text-primary-300 hover:text-primary-400 transition-colors'
+                    >
+                      {mint.minter.address}
+                    </a>
+                  )}
                 </div>
               </div>
 
@@ -178,7 +194,7 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
                 <div className='flex justify-between items-center text-sm'>
                   <span className='text-gray-400'>Transaction</span>
                   <a 
-                    href={`https://explorer.ultra.io/tx/${mint.transactionHash}`} 
+                    href={`https://explorer.testnet.ultra.io/tx/${mint.transactionHash}`} 
                     target='_blank' 
                     rel='noopener noreferrer' 
                     className='text-primary-300 hover:text-primary-400 transition-colors'
@@ -257,10 +273,10 @@ function MintPage() {
             price: '0 UOS',
             timestamp: `${index * 3 + 2} minutes ago`,
             minter: {
-              address: `0x${Math.random().toString(16).slice(2)}abcdef${Math.random().toString(16).slice(2)}`,
+              address: `ultra${(10000 + index).toString().padStart(8, '0')}`,
               username: ['CryptoWhale', 'NFTHunter', 'PixelMaster', 'ArtCollector', 'CryptoArtist'][index],
             },
-            transactionHash: `0x${Math.random().toString(16).slice(2)}abcdef${Math.random().toString(16).slice(2)}`,
+            transactionHash: `e632c1912a0edea37aef901749${index}c2554fe8a37f011ac9424b4f3cae124049b3`,
             tokenId: `#${1234 + index}`,
             rarity: 'Legendary',
           }))
@@ -294,14 +310,19 @@ function MintPage() {
         return
       }
 
-      const mintPrice = factory?.mintPrice ? parseFloat(factory.mintPrice.split(' ')[0]) : 1.0;
-      const totalPrice = (mintPrice * mintAmount).toFixed(8);
+      if (!factory?.mintPrice) {
+        setError('Prix de mint non disponible')
+        return
+      }
+
+      const totalPrice = calculateTotalPrice(factory.mintPrice, mintAmount)
 
       const transactionMint = createMintTransaction({
         blockchainId,
         tokenFactoryId: "4337",
         index: "2",
-        maxPrice: `${totalPrice} UOS`
+        maxPrice: totalPrice,
+        quantity: mintAmount
       })
 
       try {
@@ -311,22 +332,23 @@ function MintPage() {
           setSuccess('Transaction réussie !')
           setTxHash(response.data.transactionHash)
           
-          const newMint: MintItem = {
-            id: mintedItems.length + 1,
+          // Ajouter un nombre de mints correspondant à mintAmount avec les bons liens
+          const newMints = Array.from({ length: mintAmount }, (_, i) => ({
+            id: mintedItems.length + i + 1,
             name: factory?.name || '',
             image: category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniq-phygital.png'),
             price: factory?.mintPrice || '',
             timestamp: 'just now',
             minter: {
               address: blockchainId,
-              username: blockchainId.slice(0, 6),
+              username: '',
             },
             transactionHash: response.data.transactionHash,
-            tokenId: `#${1234 + mintedItems.length}`,
+            tokenId: `#${1234 + mintedItems.length + i}`,
             rarity: 'Legendary',
-          }
+          }))
           
-          setMintedItems([newMint, ...mintedItems])
+          setMintedItems([...newMints, ...mintedItems])
           
           if (factory) {
             setFactory({
@@ -522,7 +544,9 @@ function MintPage() {
 
                 <div className='flex justify-between items-center'>
                   <span className='text-gray-400'>Total price:</span>
-                  <span className='text-primary-300 font-bold text-xl'>{parseFloat(factory.mintPrice) * mintAmount} UOS</span>
+                  <span className='text-primary-300 font-bold text-xl'>
+                    {factory.mintPrice ? calculateTotalPrice(factory.mintPrice, mintAmount) : '0 UOS'}
+                  </span>
                 </div>
 
                 <button 
@@ -541,17 +565,30 @@ function MintPage() {
                 {success && txHash && (
                   <div className='mt-4 p-4 bg-green-500/20 border border-green-500 rounded-lg text-green-300'>
                     {success}
-                    <a 
-                      href={`https://explorer.testnet.ultra.io/tx/${txHash}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 mt-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
-                    >
-                      <span>Voir la transaction</span>
-                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
-                    </a>
+                    <div className="flex flex-col space-y-2 mt-2">
+                      <a 
+                        href={`https://explorer.testnet.ultra.io/tx/${txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
+                      >
+                        <span>Voir la transaction</span>
+                        <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </a>
+                      {blockchainId && (
+                        <Link 
+                          to="/my-uniqs"
+                          className="flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
+                        >
+                          <span>Voir mes UNIQs</span>
+                          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -654,7 +691,13 @@ function MintPage() {
           <div className='space-y-4'>
             {currentMints.map(mint => (
               <div key={mint.id} onClick={() => setSelectedMint(mint)} className='cursor-pointer'>
-                <MintCard {...mint} collectionName={factory.collectionName} itemName={factory.name} />
+                <MintCard 
+                  {...mint} 
+                  collectionName={factory.collectionName} 
+                  itemName={factory.name}
+                  transactionHash={mint.transactionHash}
+                  minter={mint.minter}
+                />
               </div>
             ))}
           </div>

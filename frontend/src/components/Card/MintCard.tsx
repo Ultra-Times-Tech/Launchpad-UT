@@ -7,9 +7,14 @@ export interface MintProps {
   price: string
   timestamp: string
   image: string
+  transactionHash?: string
+  minter?: {
+    address: string
+    username: string
+  }
 }
 
-function MintCard({collectionName, itemName, price, timestamp, image}: MintProps) {
+function MintCard({collectionName, itemName, price, timestamp, image, transactionHash, minter}: MintProps) {
   return (
     <div className='group relative bg-dark-800 bg-opacity-50 p-5 rounded-2xl hover:bg-opacity-70 transition-all duration-300 backdrop-blur-sm border border-dark-700 hover:border-primary-500 hover:shadow-lg hover:shadow-primary-500/10'>
       <div className='flex items-center space-x-5'>
@@ -27,6 +32,32 @@ function MintCard({collectionName, itemName, price, timestamp, image}: MintProps
 
           <p className='text-sm text-gray-400 font-quicksand truncate mb-2 group-hover:text-gray-300 transition-colors duration-300'>
             from <span className='text-primary-400'>{collectionName}</span>
+            {minter && (
+              <> by {minter.username && minter.username !== minter.address.slice(0, 6) ? (
+                <>
+                  <a 
+                    href={`https://explorer.testnet.ultra.io/account/${minter.address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-300 hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {minter.username}
+                  </a>
+                </>
+              ) : (
+                <a 
+                  href={`https://explorer.testnet.ultra.io/account/${minter.address}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-300 hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {minter.address.slice(0, 6)}
+                </a>
+              )}
+              </>
+            )}
           </p>
 
           <div className='flex justify-between items-center'>
@@ -38,7 +69,20 @@ function MintCard({collectionName, itemName, price, timestamp, image}: MintProps
                 <span>{price}</span>
               </span>
             </div>
-            <span className='text-xs text-gray-500 group-hover:text-gray-400 transition-colors duration-300'>{timestamp}</span>
+            <div className="flex items-center space-x-2">
+              {transactionHash && (
+                <a 
+                  href={`https://explorer.testnet.ultra.io/tx/${transactionHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-300 hover:text-primary-400 transition-colors text-xs"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Tx ↗
+                </a>
+              )}
+              <span className='text-xs text-gray-500 group-hover:text-gray-400 transition-colors duration-300'>{timestamp}</span>
+            </div>
           </div>
         </div>
       </div>

@@ -62,10 +62,10 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
       }
     }
 
-    document.addEventListener('UNIQUpdate', handleUNIQUpdate)
+    document.addEventListener('uniqUpdate', handleUNIQUpdate)
 
     return () => {
-      document.removeEventListener('UNIQUpdate', handleUNIQUpdate)
+      document.removeEventListener('uniqUpdate', handleUNIQUpdate)
     }
   }, [blockchainId])
 
