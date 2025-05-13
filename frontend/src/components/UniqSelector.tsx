@@ -24,6 +24,16 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
   const [hasMorePages, setHasMorePages] = useState(false)
   const [totalFilteredCount, setTotalFilteredCount] = useState(0)
 
+  // Fonction utilitaire pour récupérer l'URL de l'image de manière sécurisée
+  const getImageUrl = (uniq: Uniq): string | null => {
+    if (!uniq || !uniq.metadata || !uniq.metadata.content || !uniq.metadata.content.medias) {
+      return null
+    }
+
+    const {medias} = uniq.metadata.content
+    return medias.square?.uri || medias.product?.uri || medias.gallery?.uri || medias.hero?.uri || null
+  }
+
   useEffect(() => {
     const loadUNIQs = async () => {
       if (!blockchainId) return
@@ -78,7 +88,7 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
       filtered = filtered.filter(uniq => {
         if (uniq.factory?.id === selectedCollection) return true
         if (uniq.collection?.id === selectedCollection) return true
-        if (uniq.metadata.content.subName === selectedCollection) return true
+        if (uniq.metadata?.content?.subName === selectedCollection) return true
         return false
       })
     }
@@ -88,7 +98,7 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
       const query = searchQuery.toLowerCase().trim()
       filtered = filtered.filter(
         uniq =>
-          uniq.metadata.content.name?.toLowerCase().includes(query) ||
+          uniq.metadata?.content?.name?.toLowerCase().includes(query) ||
           uniq.serialNumber?.toString().includes(query) ||
           uniq.id?.toLowerCase().includes(query) ||
           uniq.attributes?.some((attr: {key: string; value: string | number}) => attr.key.toLowerCase().includes(query) || (typeof attr.value === 'string' && attr.value.toLowerCase().includes(query)) || (typeof attr.value === 'number' && attr.value.toString().includes(query)))
@@ -240,10 +250,12 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
         <>
           <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
             {displayedUNIQs.map(uniq => {
-              const imageUrl = uniq.metadata.content.medias.square?.uri || uniq.metadata.content.medias.product?.uri || uniq.metadata.content.medias.gallery?.uri || uniq.metadata.content.medias.hero?.uri
+              // Utiliser la fonction utilitaire pour récupérer l'URL de manière sécurisée
+              const imageUrl = getImageUrl(uniq)
 
               const isSelected = selectedUNIQId === uniq.id
-              const collectionName = uniq.metadata.content.subName || collections.find(c => c.id === uniq.factory?.id || c.id === uniq.collection?.id)?.name || 'Collection inconnue'
+              // Vérifier également metadata et content ici pour éviter les erreurs
+              const collectionName = uniq.metadata?.content?.subName || collections.find(c => c.id === uniq.factory?.id || c.id === uniq.collection?.id)?.name || 'Collection inconnue'
 
               return (
                 <div
@@ -253,12 +265,12 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
                     relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all
                     ${isSelected ? 'border-primary-500 scale-105' : 'border-dark-700 hover:border-dark-500'}
                   `}>
-                  {imageUrl ? <img src={imageUrl} alt={uniq.metadata.content.name} className='w-full aspect-square object-cover' loading='lazy' /> : <div className='w-full aspect-square bg-dark-800 flex items-center justify-center text-gray-500'>No Image</div>}
+                  {imageUrl ? <img src={imageUrl} alt={uniq.metadata?.content?.name || 'UNIQ'} className='w-full aspect-square object-cover' loading='lazy' /> : <div className='w-full aspect-square bg-dark-800 flex items-center justify-center text-gray-500'>No Image</div>}
 
                   <div className='absolute bottom-0 left-0 right-0 bg-dark-900/80 p-2'>
-                    <p className='text-sm font-medium truncate'>{uniq.metadata.content.name}</p>
+                    <p className='text-sm font-medium truncate'>{uniq.metadata?.content?.name || 'Sans nom'}</p>
                     <div className='flex justify-between text-xs text-gray-400'>
-                      <span>#{uniq.serialNumber}</span>
+                      <span>#{uniq.serialNumber || '?'}</span>
                       <span className='truncate'>{uniq.id ? `ID: ${uniq.id.slice(0, 6)}...` : ''}</span>
                     </div>
                     {/* Nom de la collection */}
