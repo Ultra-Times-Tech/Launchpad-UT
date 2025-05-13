@@ -31,7 +31,7 @@ export class UsersController {
   }
 
   @Get(':account/avatar')
-  @ApiOperation({ summary: "Get a user's avatar NFT ID" })
+  @ApiOperation({ summary: "Get a user's avatar UNIQ ID" })
   @ApiParam({ name: 'account', description: 'The Ultra blockchain account name', type: String })
   @ApiResponse({ status: 200, description: 'Avatar found or empty if not set.', type: Object })
   async getAvatar(@Param('account') account: string) {

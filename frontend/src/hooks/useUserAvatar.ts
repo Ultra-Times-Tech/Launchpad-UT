@@ -7,7 +7,7 @@ export const AVATAR_UPDATE_EVENT = 'avatar_update_event';
 // Type pour les données d'avatar en cache
 interface AvatarCacheData {
   imageUrl: string | null;
-  nftId: string | null;
+  uniqId: string | null;
   timestamp: number;
 }
 
@@ -18,15 +18,15 @@ const avatarCache: Record<string, AvatarCacheData> = {};
 export const refreshUserAvatar = (
   blockchainId: string | null, 
   forceUpdate: boolean = false,
-  nftData?: { nftId: string | null, imageUrl: string | null }
+  uniqData?: { nftId: string | null, imageUrl: string | null }
 ) => {
   if (!blockchainId) return;
   
   // Si des données sont fournies, mettre immédiatement à jour le cache
-  if (nftData) {
+  if (uniqData) {
     avatarCache[blockchainId] = {
-      imageUrl: nftData.imageUrl,
-      nftId: nftData.nftId,
+      imageUrl: uniqData.imageUrl,
+      uniqId: uniqData.nftId,
       timestamp: Date.now()
     };
   }
@@ -36,7 +36,7 @@ export const refreshUserAvatar = (
     detail: { 
       blockchainId, 
       forceUpdate,
-      nftData
+      uniqData
     } 
   });
   
@@ -76,7 +76,7 @@ const useUserAvatar = (blockchainId: string | null) => {
     // Si nous avons des données en cache récentes et qu'on ne force pas le rafraîchissement
     if (!forceRefresh && cachedData && (now - cachedData.timestamp < 60000)) {
       setImageUrl(cachedData.imageUrl);
-      setAvatarNftId(cachedData.nftId);
+      setAvatarNftId(cachedData.uniqId);
       return;
     }
 
@@ -94,7 +94,7 @@ const useUserAvatar = (blockchainId: string | null) => {
       // Mettre à jour le cache
       avatarCache[blockchainId] = {
         imageUrl: avatarData.imageUrl,
-        nftId: avatarData.nftId,
+        uniqId: avatarData.nftId,
         timestamp: now
       };
       

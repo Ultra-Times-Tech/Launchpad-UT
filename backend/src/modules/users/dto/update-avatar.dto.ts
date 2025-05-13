@@ -8,5 +8,5 @@ export class UpdateAvatarDto {
   })
   @IsNotEmpty()
   @IsString()
-  uniqId: string
+  nftId: string
 }
