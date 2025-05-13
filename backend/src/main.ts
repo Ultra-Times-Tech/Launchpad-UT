@@ -4,12 +4,24 @@ import {AppDataSource} from './ormconfig'
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger'
 import * as dotenv from 'dotenv'
 import * as basicAuth from 'express-basic-auth'
+import * as fs from 'fs'
+import * as path from 'path'
+import * as express from 'express'
 
 async function bootstrap() {
   dotenv.config()
   try {
+    // Assurer que le dossier uploads existe
+    const uploadsDir = path.join(process.cwd(), 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
     const app = await NestFactory.create(AppModule)
 
+    // Configuration pour servir les fichiers statiques directement
+    app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+    
     app.use(
       '/docs',
       basicAuth({
