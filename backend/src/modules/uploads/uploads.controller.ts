@@ -1,7 +1,7 @@
-import { Controller, Post, UseInterceptors, UploadedFile, Get, Param, Res, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFile, Get, Param, Res, HttpException, HttpStatus, Redirect } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadsService } from './uploads.service';
-import { ApiTags, ApiConsumes, ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiConsumes, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { FileUploadDto } from './dto/file-upload.dto';
 import { Response } from 'express';
 import { join } from 'path';
@@ -13,11 +13,23 @@ export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Upload une image' })
+  @ApiOperation({ summary: 'Upload une image vers le CDN' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Image à uploader',
     type: FileUploadDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Image uploadée avec succès',
+    schema: {
+      properties: {
+        originalname: { type: 'string' },
+        url: { type: 'string', description: 'URL du CDN' },
+        size: { type: 'number' },
+        mimetype: { type: 'string' },
+      },
+    },
   })
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: any) {
@@ -38,13 +50,20 @@ export class UploadsController {
   }
 
   @Get(':filename')
+  @ApiOperation({ summary: 'Obtenir une image depuis le CDN' })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirection vers l\'URL du CDN',
+  })
   async getFile(@Param('filename') filename: string, @Res() res: Response) {
-    const filePath = join(process.cwd(), 'uploads', filename);
-    
-    if (!existsSync(filePath)) {
+    try {
+      // Construction de l'URL CDN
+      const cdnUrl = `https://launchpad-ut-cdn.fra1.cdn.digitaloceanspaces.com/images/${filename}`;
+      
+      // Redirection vers l'URL du CDN
+      return res.redirect(cdnUrl);
+    } catch (error) {
       throw new HttpException('Fichier non trouvé', HttpStatus.NOT_FOUND);
     }
-    
-    return res.sendFile(filePath);
   }
 } 

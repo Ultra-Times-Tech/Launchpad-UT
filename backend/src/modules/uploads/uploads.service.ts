@@ -1,18 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { S3Service } from './s3.service';
 
 @Injectable()
 export class UploadsService {
+  constructor(private readonly s3Service: S3Service) {}
+
   async saveFile(file: any) {
     if (!file) {
       throw new Error('Aucun fichier fourni');
     }
 
+    // Upload le fichier vers DigitalOcean Spaces
+    const fileUrl = await this.s3Service.uploadFile(file, 'images');
+
     const response = {
       filename: file.filename,
       originalname: file.originalname,
-      path: `uploads/${file.filename}`,
+      url: fileUrl,
       size: file.size,
       mimetype: file.mimetype,
     };

@@ -15,7 +15,7 @@ class UploadService {
 
       return {
         filename: response.data.filename,
-        path: response.data.path
+        url: response.data.url
       };
     } catch (error) {
       console.error('Erreur lors de l\'upload d\'image:', error);
@@ -23,13 +23,19 @@ class UploadService {
     }
   }
 
-  getImageUrl(filename: string): string {
+  getImageUrl(filename: string | undefined): string {
+    // Si nous avons une URL complète du CDN, l'utiliser directement
+    if (filename && filename.startsWith('http')) {
+      return filename;
+    }
+    
+    // Sinon, construire l'URL via l'API locale
     const isProduction = import.meta.env.PROD;
     const baseUrl = isProduction 
       ? 'https://launchpad-2ycml.ondigitalocean.app/api' 
       : '/api';
     
-    return `${baseUrl}/uploads/${filename}`;
+    return `${baseUrl}/uploads/${filename || ''}`;
   }
 }
 

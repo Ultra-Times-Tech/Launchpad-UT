@@ -96,12 +96,12 @@ const ImageUploadTest: React.FC = () => {
           <div className="mb-4">
             <p className="text-sm font-medium mb-1">URL de l'image:</p>
             <code className="block p-2 bg-gray-100 rounded overflow-x-auto">
-              {uploadService.getImageUrl(uploadedImage.filename)}
+              {uploadedImage.url}
             </code>
           </div>
           <div className="relative w-full h-64 bg-gray-100 rounded-lg overflow-hidden">
             <img
-              src={uploadService.getImageUrl(uploadedImage.filename)}
+              src={uploadedImage.url}
               alt="Image uploadée"
               className="absolute inset-0 w-full h-full object-contain"
             />

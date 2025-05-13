@@ -1,21 +1,16 @@
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { UploadsController } from './uploads.controller';
 import { UploadsService } from './uploads.service';
-import { extname } from 'path';
+import { S3Service } from './s3.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule,
     MulterModule.register({
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `image-${uniqueSuffix}${ext}`);
-        },
-      }),
+      storage: memoryStorage(), // Utiliser memoryStorage pour les uploads vers S3
       fileFilter: (req, file, callback) => {
         // Vérifier que le mimetype commence par 'image/' pour n'autoriser que les images
         if (file.mimetype.startsWith('image/')) {
@@ -30,7 +25,7 @@ import { extname } from 'path';
     }),
   ],
   controllers: [UploadsController],
-  providers: [UploadsService],
+  providers: [UploadsService, S3Service],
   exports: [UploadsService],
 })
 export class UploadsModule {} 
