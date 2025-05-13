@@ -41,7 +41,7 @@ class CollectionsService {
             year: 'numeric',
           }),
           totalItems: 1000,
-          floorPrice: '0.5 ETH',
+          floorPrice: '0.5 UOS',
           comingSoon: collection.attributes.state === 0,
         }))
     } catch (error) {
@@ -63,7 +63,7 @@ class CollectionsService {
           image: collection.attributes.image || 'https://picsum.photos/400/300?random=11',
           artist: 'Ultra Times',
           totalItems: 500,
-          floorPrice: '0.4 ETH',
+          floorPrice: '0.4 UOS',
           category: 'Power Boosters',
         }))
     } catch (error) {
@@ -84,7 +84,7 @@ class CollectionsService {
         description: 'A collection of unique digital assets from the Ultra Times ecosystem.',
         image: collection.attributes.image || '/banners/vit-banner.png',
         totalItems: 1000,
-        floorPrice: '0.5 ETH',
+        floorPrice: '0.5 UOS',
         creator: 'Ultra Times',
         releaseDate: new Date(collection.attributes.modified).toLocaleDateString('en-US', {
           year: 'numeric',
