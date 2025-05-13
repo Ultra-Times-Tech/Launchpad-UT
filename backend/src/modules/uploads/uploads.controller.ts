@@ -4,8 +4,6 @@ import { UploadsService } from './uploads.service';
 import { ApiTags, ApiConsumes, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { FileUploadDto } from './dto/file-upload.dto';
 import { Response } from 'express';
-import { join } from 'path';
-import { existsSync } from 'fs';
 
 @ApiTags('uploads')
 @Controller('uploads')
