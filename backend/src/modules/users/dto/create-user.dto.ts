@@ -30,7 +30,7 @@ class UserParams {
 
 class WalletRow {
   @IsString()
-  field2: string
+  field1: string
 }
 
 export class CreateUserDto {
@@ -59,6 +59,11 @@ export class CreateUserDto {
   @IsString()
   password: string
 
+  @ApiProperty({description: 'Confirmation password'})
+  @IsNotEmpty()
+  @IsString()
+  password2: string
+
   @ApiProperty({description: 'User groups'})
   @IsArray()
   @IsString({each: true})
@@ -83,6 +88,18 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   sendEmail?: string
+
+  @ApiPropertyOptional({description: 'Send notifications'})
+  @IsOptional()
+  @IsArray()
+  @IsString({each: true})
+  sendnotif?: string[]
+
+  @ApiPropertyOptional({description: 'Send communications'})
+  @IsOptional()
+  @IsArray()
+  @IsString({each: true})
+  sendcomm?: string[]
 
   @ApiPropertyOptional({description: 'Additional user parameters'})
   @IsOptional()

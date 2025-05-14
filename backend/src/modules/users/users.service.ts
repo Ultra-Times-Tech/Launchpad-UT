@@ -212,7 +212,6 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     try {
       const url = `${this.apiUrl}/api/index.php/v1/users`;
-      this.logger.log(`POST ${url}`);
       const response = await axios.post<UserResponse>(url, createUserDto, { headers: this.getHeaders() });
       return response.data;
     } catch (error) {
