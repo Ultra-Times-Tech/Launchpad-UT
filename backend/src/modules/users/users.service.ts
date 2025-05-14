@@ -48,7 +48,6 @@ export class UsersService {
     }
     
     try {
-      this.logger.debug(`Making request to ${ULTRA_API_TESTNET_ENDPOINT}/v1/chain/get_table_rows for table ${table}, account ${account}`);
       const response = await axios.post(`${ULTRA_API_TESTNET_ENDPOINT}/v1/chain/get_table_rows`, {
         json: true,
         code: ULTRA_AVATAR_CONTRACT,

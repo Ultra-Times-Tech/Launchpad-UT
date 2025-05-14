@@ -11,7 +11,7 @@ import { TranslationProvider } from './contexts/TranslationContext.tsx'
 const basePath = import.meta.env.PROD ? '' : import.meta.env.VITE_APP_PATHNAME || ''
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <ApolloProvider client={client}>
       <AlertProvider>
         <TranslationProvider>
@@ -21,5 +21,5 @@ createRoot(document.getElementById('root')!).render(
         </TranslationProvider>
       </AlertProvider>
     </ApolloProvider>
-  </StrictMode>
+  // </StrictMode>
 )

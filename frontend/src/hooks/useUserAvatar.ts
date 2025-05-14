@@ -91,7 +91,6 @@ const useUserAvatar = (blockchainId: string | null) => {
     try {
       const avatarData = await getUserAvatar(blockchainId);
       
-      // Mettre à jour le cache
       avatarCache[blockchainId] = {
         imageUrl: avatarData.imageUrl,
         uniqId: avatarData.nftId,

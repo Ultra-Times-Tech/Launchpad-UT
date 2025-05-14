@@ -35,7 +35,6 @@ export class UsersController {
   @ApiParam({ name: 'account', description: 'The Ultra blockchain account name', type: String })
   @ApiResponse({ status: 200, description: 'Avatar found or empty if not set.', type: Object })
   async getAvatar(@Param('account') account: string) {
-    this.logger.log(`GET /users/${account}/avatar`);
     try {
       const result = await this.usersService.getAvatar(account);
       return result || { account, nft_id: '' };

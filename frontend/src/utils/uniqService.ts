@@ -108,7 +108,6 @@ export const fetchUserUNIQs = async (walletId: string, limit = 25, forceRefresh 
 
   try {
     const initialUNIQs = await fetchUNIQBatch(cleanedWalletId, limit, 0)
-
     const collections = organizeUNIQsByCollection(initialUNIQs.uniqs)
 
     uniqCache[cleanedWalletId] = {
