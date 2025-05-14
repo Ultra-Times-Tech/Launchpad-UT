@@ -11,7 +11,15 @@ import {ThemeProvider, createTheme} from '@mui/material/styles'
 
 // Interface utilisateur
 interface UserWallet {
-  field2: string
+  field1?: string;
+  field2?: string;
+}
+
+// Interface pour le format des wallets reçus de l'API
+interface ParsedWallets {
+  [key: string]: {
+    field1: string;
+  };
 }
 
 interface User {
@@ -215,15 +223,113 @@ const UserManager = () => {
       {
         header: 'Wallet',
         accessorFn: row => {
-          return row.attributes['wallet-id'] || (row.attributes.wallets && Object.keys(row.attributes.wallets).length > 0 ? Object.keys(row.attributes.wallets)[0] : 'Non défini')
+          // Récupérer la valeur du wallet depuis row0.field1
+          if (row.attributes.wallets) {
+            let walletsObj = row.attributes.wallets;
+            
+            // Si wallets est une chaîne JSON, la parser
+            if (typeof walletsObj === 'string') {
+              try {
+                walletsObj = JSON.parse(walletsObj) as ParsedWallets;
+              } catch (e) {
+                console.error('Erreur lors du parsing des wallets:', e);
+                return 'Format invalide';
+              }
+            }
+            
+            // Utiliser une vérification de type plus générique pour éviter les erreurs TypeScript
+            if (walletsObj && 
+                typeof walletsObj === 'object' && 
+                'row0' in walletsObj && 
+                walletsObj.row0 && 
+                typeof walletsObj.row0 === 'object' &&
+                'field1' in walletsObj.row0) {
+              // Vérifier si field1 contient une valeur non vide
+              const walletValue = (walletsObj as ParsedWallets).row0.field1;
+              if (walletValue && walletValue.trim() !== '') {
+                return walletValue;
+              }
+              
+              // Si field1 est vide, vérifier s'il y a d'autres champs (row1, etc.)
+              for (const key of Object.keys(walletsObj)) {
+                if (key !== 'row0' && 
+                    walletsObj[key] && 
+                    typeof walletsObj[key] === 'object' &&
+                    'field1' in walletsObj[key] &&
+                    walletsObj[key].field1 && 
+                    walletsObj[key].field1.trim() !== '') {
+                  return walletsObj[key].field1;
+                }
+              }
+            }
+          }
+          
+          // En dernier recours, utiliser wallet-id s'il existe
+          if (row.attributes['wallet-id']) {
+            return row.attributes['wallet-id'];
+          }
+          
+          return 'Non défini';
         },
         id: 'wallet',
+        size: 150,
         Cell: ({row}) => {
-          const walletId = row.original.attributes['wallet-id'] || (row.original.attributes.wallets && Object.keys(row.original.attributes.wallets).length > 0 ? Object.keys(row.original.attributes.wallets)[0] : 'Non défini')
+          // Extraire la valeur du wallet depuis row0.field1
+          let walletValue = 'Non défini';
+          
+          if (row.original.attributes.wallets) {
+            let walletsObj = row.original.attributes.wallets;
+            
+            // Si wallets est une chaîne JSON, la parser
+            if (typeof walletsObj === 'string') {
+              try {
+                walletsObj = JSON.parse(walletsObj) as ParsedWallets;
+              } catch (e) {
+                console.error('Erreur lors du parsing des wallets:', e);
+                walletValue = 'Format invalide';
+              }
+            }
+            
+            // Utiliser une vérification de type plus générique pour éviter les erreurs TypeScript
+            if (walletsObj && 
+                typeof walletsObj === 'object' && 
+                'row0' in walletsObj && 
+                walletsObj.row0 && 
+                typeof walletsObj.row0 === 'object' &&
+                'field1' in walletsObj.row0) {
+              // Vérifier si field1 contient une valeur non vide
+              const firstWalletValue = (walletsObj as ParsedWallets).row0.field1;
+              if (firstWalletValue && firstWalletValue.trim() !== '') {
+                walletValue = firstWalletValue;
+              } else {
+                // Si field1 est vide, vérifier s'il y a d'autres champs (row1, etc.)
+                for (const key of Object.keys(walletsObj)) {
+                  if (key !== 'row0' && 
+                      walletsObj[key] && 
+                      typeof walletsObj[key] === 'object' &&
+                      'field1' in walletsObj[key] &&
+                      walletsObj[key].field1 && 
+                      walletsObj[key].field1.trim() !== '') {
+                    walletValue = walletsObj[key].field1;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+          
+          // En dernier recours, utiliser wallet-id s'il existe
+          if (walletValue === 'Non défini' && row.original.attributes['wallet-id']) {
+            walletValue = row.original.attributes['wallet-id'];
+          }
 
           return (
-            <span onClick={() => handleRowClick(row.original.id)} className='cursor-pointer w-full block'>
-              {walletId === 'Non défini' ? walletId : `${walletId.slice(0, 8)}...${walletId.slice(-4)}`}
+            <span 
+              onClick={() => handleRowClick(row.original.id)} 
+              className='cursor-pointer w-full block overflow-x-auto whitespace-nowrap text-ellipsis'
+              title={walletValue}
+            >
+              {walletValue}
             </span>
           )
         },
