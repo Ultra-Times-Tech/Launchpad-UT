@@ -11,6 +11,7 @@
       "sourceMapPathOverrides": {
         "webpack:///./src/*": "${webRoot}/src/*"
       },
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-user-data",
       "preLaunchTask": "start-frontend"
     },
     {
