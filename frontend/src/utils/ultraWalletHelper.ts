@@ -81,6 +81,8 @@ export const useUltraWallet = () => {
           console.error('Failed to get chain ID:', chainErr)
         }
 
+        await fetch('/api/auth/ultra-token', { method: 'GET', credentials: 'include' })
+
         return true
       } catch (err) {
         const ultraErr = err as UltraWalletError

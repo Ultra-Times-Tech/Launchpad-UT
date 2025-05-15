@@ -1,8 +1,6 @@
 import {apiRequestor} from './axiosInstanceHelper'
 import {cleanWalletId} from './ultraWalletHelper'
 
-const ULTRA_GRAPHQL_ENDPOINT = 'https://staging.api.ultra.io/graphql'
-
 export interface Uniq {
   id: string
   serialNumber: string
@@ -194,10 +192,6 @@ const fetchUNIQBatch = async (
   uniqs: Uniq[]
   totalCount: number
 }> => {
-  const authResponse = await apiRequestor.get('/auth/ultra-token')
-  const authToken = authResponse.data.access_token
-
-  // Requête GraphQL pour récupérer les UNIQs
   const query = `
     query UniqsOfWallet($walletId: WalletId!, $pagination: PaginationInput) {
       uniqsOfWallet(walletId: $walletId, pagination: $pagination) {
@@ -273,88 +267,18 @@ const fetchUNIQBatch = async (
     }
   `
 
-  const variables = {
-    walletId,
-    pagination: {
-      limit,
-      skip,
-    },
-  }
-
-  const response = await fetch(ULTRA_GRAPHQL_ENDPOINT, {
+  const response = await fetch('/api/auth/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${authToken}`,
     },
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
+    credentials: 'include', // Envoie le cookie sécurisé
+    body: JSON.stringify({query, variables: {walletId, pagination: {limit, skip}}}),
   })
-
-  const responseData = await response.json()
-
-  if (responseData.errors) {
-    console.error('[fetchUNIQBatch] Erreurs GraphQL:', responseData.errors)
-    throw new Error('Failed to fetch UNIQs')
-  }
-
-  const result = responseData.data.uniqsOfWallet
-
-  const processedUNIQs = result.data.map(
-    (uniq: {
-      id: string
-      serialNumber: string
-      metadata?: {
-        content?: {
-          name: string
-          description?: string
-          subName?: string
-          attributes?: Array<{key: string; value: string | number}>
-          medias: {
-            square?: {uri: string}
-            product?: {uri: string}
-            gallery?: {uri: string}
-            hero?: {uri: string}
-          }
-        }
-      }
-      factory?: {
-        id: string
-        metadata?: {
-          content?: {
-            name?: string
-            description?: string
-            medias?: {
-              square?: {uri: string}
-              product?: {uri: string}
-              gallery?: {uri: string}
-              hero?: {uri: string}
-            }
-          }
-        }
-      }
-      mintDate?: string
-      owner?: string
-      type?: string
-    }) => {
-      const attributes =
-        uniq.metadata?.content?.attributes?.map((attr: {key: string; value: string | number}) => ({
-          key: attr.key,
-          value: attr.value,
-        })) || []
-
-      return {
-        ...uniq,
-        attributes,
-      }
-    }
-  )
-
+  const result = await response.json()
   return {
-    uniqs: processedUNIQs,
-    totalCount: result.totalCount,
+    uniqs: result.data.uniqsOfWallet.data,
+    totalCount: result.data.uniqsOfWallet.totalCount,
   }
 }
 
@@ -397,7 +321,6 @@ const loadRemainingUNIQs = async (walletId: string, limit: number, totalCount: n
         break
       }
     }
-
   } catch (error) {
     console.error('[loadRemainingUNIQs] Erreur lors du chargement:', error)
   }

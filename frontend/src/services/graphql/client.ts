@@ -1,35 +1,11 @@
-import {ApolloClient, InMemoryCache, createHttpLink} from '@apollo/client'
-import {setContext} from '@apollo/client/link/context'
-import { apiRequestor } from '../../utils/axiosInstanceHelper'
-
-const GRAPHQL_URL = 'https://staging.api.ultra.io/graphql'
-
-const getAuthToken = async () => {
-  try {
-    const response = await apiRequestor.get('/auth/ultra-token')
-    return response.data.access_token
-  } catch (error) {
-    console.error('Error getting auth token:', error)
-    return null
-  }
-}
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'
 
 const httpLink = createHttpLink({
-  uri: GRAPHQL_URL,
-})
-
-const authLink = setContext(async (_, {headers}) => {
-  const token = await getAuthToken()
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : '',
-      'x-apollo-operation-name': 'ultratimes',
-    },
-  }
+  uri: '/api/auth/graphql',
+  credentials: 'include',
 })
 
 export const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: httpLink,
   cache: new InMemoryCache(),
 })

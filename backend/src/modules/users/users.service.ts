@@ -132,39 +132,6 @@ export class UsersService {
     }
   }
 
-  async updateUsername(account: string, username: string): Promise<void> {
-    this.logger.log(`Attempting to update username for ${account} to ${username}`);
-
-    try {
-      const tokenResponse = await this.authService.getUltraToken();
-      const accessToken = tokenResponse.access_token;
-
-      const response = await axios.post(`${ULTRA_API_TESTNET_ENDPOINT}/v1/chain/push_transaction`, {
-        actions: [{
-          account: ULTRA_AVATAR_CONTRACT,
-          name: 'updatename',
-          authorization: [{ actor: account, permission: 'active' }],
-          data: {
-            account: account,
-            username: username,
-          },
-        }],
-        blocksBehind: 3,
-        expireSeconds: 30,
-      }, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      this.logger.log(`Username updated successfully for ${account}: ${response.data}`);
-    } catch (error) {
-      this.logger.error(`Error updating username for ${account}: ${error.message}`, error.stack);
-      throw new InternalServerErrorException(`Failed to update username for ${account}`);
-    }
-  }
-
   // Ultra Times API
 
   async findAll(filters?: UserFiltersDto): Promise<UsersResponse> {
@@ -226,7 +193,6 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponse> {
     try {
       const url = `${this.apiUrl}/api/index.php/v1/users/${id}`;
-      this.logger.log(`PATCH ${url}`);
       const response = await axios.patch<UserResponse>(url, updateUserDto, { headers: this.getHeaders() });
       return response.data;
     } catch (error) {

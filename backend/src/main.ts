@@ -7,6 +7,7 @@ import * as basicAuth from 'express-basic-auth'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as express from 'express'
+import * as cookieParser from 'cookie-parser'
 
 async function bootstrap() {
   dotenv.config()
@@ -22,6 +23,8 @@ async function bootstrap() {
     // Configuration pour servir les fichiers statiques directement
     app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
     
+    app.use(cookieParser())
+
     app.use(
       '/docs',
       basicAuth({
@@ -60,7 +63,7 @@ async function bootstrap() {
     app.enableCors({
       origin: ['https://launchpad-ut.vercel.app', 'http://localhost:5173', 'https://localhost:5173', 'https://launchpad-ut-backend.vercel.app', 'https://launchpad-2ycml.ondigitalocean.app'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      credentials: false,
+      credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
       exposedHeaders: ['Content-Disposition'],
       preflightContinue: false,
