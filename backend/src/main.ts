@@ -61,7 +61,13 @@ async function bootstrap() {
     }
 
     app.enableCors({
-      origin: ['https://launchpad-ut.vercel.app', 'http://localhost:5173', 'https://localhost:5173', 'https://launchpad-ut-backend.vercel.app', 'https://launchpad-2ycml.ondigitalocean.app'],
+      origin: [
+        'https://launchpad-2ycml.ondigitalocean.app',
+        'https://launchpad-ut.vercel.app',
+        'http://localhost:5173',
+        'https://localhost:5173',
+        'https://launchpad-ut-backend.vercel.app'
+      ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
