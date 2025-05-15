@@ -83,6 +83,12 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
     setLoading(true)
     let filtered = [...UNIQs]
 
+    // Filtrer les UNIQs qui n'ont pas de médias
+    filtered = filtered.filter(uniq => {
+      const medias = uniq.metadata?.content?.medias
+      return medias && (medias.square?.uri || medias.product?.uri || medias.gallery?.uri || medias.hero?.uri)
+    })
+
     // Filtrer par collection si nécessaire
     if (selectedCollection !== 'all') {
       filtered = filtered.filter(uniq => {
