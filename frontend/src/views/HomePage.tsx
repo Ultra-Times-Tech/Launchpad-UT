@@ -38,20 +38,20 @@ function HomePage() {
     )
   }
 
-  const latestCollections = allCollections.slice(0, 5).map((collection: Collection) => ({
+  const latestCollections = allCollections?.slice(0, 5).map((collection: Collection) => ({
     id: collection.attributes.id,
     name: collection.attributes.name,
     description: 'Collection from Ultra Times ecosystem',
     image: collection.attributes.image || 'https://picsum.photos/800/500?random=1',
     artist: 'Ultra Times'
-  }))
+  })) || []
 
   return (
     <div className='bg-dark-950 text-white'>
       <Slider title={t('slider_title')} description={t('slider_description')} buttonText={t('slider_button')} />
-      <FeaturedCollections collections={featuredCollections} />
+      <FeaturedCollections collections={featuredCollections || []} />
       <LatestCollections latestCollections={latestCollections} mintActivities={mintActivities} />
-      <TrendingCollections collections={trendingCollections} />
+      <TrendingCollections collections={trendingCollections || []} />
       <Newsletter />
     </div>
   )

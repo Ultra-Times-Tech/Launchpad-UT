@@ -1,81 +1,70 @@
-import {useState, useEffect} from 'react'
+import {useState, useMemo} from 'react'
 import CollectionCard from '../components/Card/CollectionCard'
 import FilterBar, {FilterCategory, SortOption, PriceRange} from '../components/FilterBar/FilterBar'
-import {CollectionCardProps} from '../types/collection.types'
-import {collectionsService} from '../services/collections.service'
-import {generateMockCollections, isPriceInRange} from '../data/collections.data'
 import {useTranslation} from '../hooks/useTranslation'
+import {useCollections} from '../hooks/useCollections'
 
 function CollectionsPage() {
   const {t} = useTranslation()
+  const {allCollections, loading, error} = useCollections()
   const [currentPage, setCurrentPage] = useState(1)
-  const [collections, setCollections] = useState<CollectionCardProps[]>([])
-  const [loading, setLoading] = useState(true)
   const [selectedCategories, setSelectedCategories] = useState<Set<FilterCategory>>(new Set())
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<Set<PriceRange>>(new Set())
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [searchQuery, setSearchQuery] = useState('')
-  const [error, setError] = useState<string | null>(null)
 
   const collectionsPerPage = 9
 
-  // Filter and sort collections
-  const filteredCollections = collections
-    .filter(collection => {
-      const matchesSearch = collection.name.toLowerCase().includes(searchQuery.toLowerCase()) || collection.artist.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesCategory = selectedCategories.size === 0 || (collection.category && selectedCategories.has(collection.category as FilterCategory))
-      const matchesPriceRange = selectedPriceRanges.size === 0 || Array.from(selectedPriceRanges).some(range => isPriceInRange(collection.floorPrice, range))
+  // Mapping des collections pour l'affichage
+  const mappedCollections = useMemo(() => {
+    return (allCollections || []).map(collection => ({
+      id: collection.attributes.id,
+      name: collection.attributes.name,
+      description: 'Collection from Ultra Times ecosystem',
+      image: collection.attributes.image || '',
+      artist: 'Ultra Times',
+      totalItems: 1000,
+      floorPrice: '0.5',
+      category: collection.attributes.is_trending ? 'game-assets' : collection.attributes.is_featured ? 'art' : 'collectibles',
+    }))
+  }, [allCollections])
 
-      return matchesSearch && matchesCategory && matchesPriceRange
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'price-high':
-          return parseFloat(b.floorPrice) - parseFloat(a.floorPrice)
-        case 'price-low':
-          return parseFloat(a.floorPrice) - parseFloat(b.floorPrice)
-        case 'oldest':
-          return a.id - b.id
-        case 'popularity':
-          return b.totalItems - a.totalItems
-        default: // newest
-          return b.id - a.id
-      }
-    })
+  // Filtrage et tri
+  const filteredCollections = useMemo(() => {
+    return mappedCollections
+      .filter(collection => {
+        const matchesSearch = collection.name.toLowerCase().includes(searchQuery.toLowerCase()) || collection.artist.toLowerCase().includes(searchQuery.toLowerCase())
+        const matchesCategory = selectedCategories.size === 0 || (collection.category && selectedCategories.has(collection.category as FilterCategory))
+        const matchesPriceRange =
+          selectedPriceRanges.size === 0 ||
+          Array.from(selectedPriceRanges).some(range => {
+            const price = parseFloat(collection.floorPrice)
+            if (range === '0-100') return price < 100
+            if (range === '100-500') return price >= 100 && price < 500
+            if (range === '500-1000') return price >= 500 && price < 1000
+            if (range === '1000+') return price >= 1000
+            return true
+          })
+        return matchesSearch && matchesCategory && matchesPriceRange
+      })
+      .sort((a, b) => {
+        switch (sortBy) {
+          case 'price-high':
+            return parseFloat(b.floorPrice) - parseFloat(a.floorPrice)
+          case 'price-low':
+            return parseFloat(a.floorPrice) - parseFloat(b.floorPrice)
+          case 'oldest':
+            return a.id - b.id
+          case 'popularity':
+            return b.totalItems - a.totalItems
+          default: // newest
+            return b.id - a.id
+        }
+      })
+  }, [mappedCollections, searchQuery, selectedCategories, selectedPriceRanges, sortBy])
 
   const totalPages = Math.ceil(filteredCollections.length / collectionsPerPage)
   const currentCollections = filteredCollections.slice((currentPage - 1) * collectionsPerPage, currentPage * collectionsPerPage)
-
-  useEffect(() => {
-    const fetchCollections = async () => {
-      setLoading(true)
-      try {
-        const apiCollections = await collectionsService.getAllCollections()
-
-        const mappedCollections = apiCollections.map(collection => ({
-          id: collection.attributes.id,
-          name: collection.attributes.name,
-          description: 'Collection from Ultra Times ecosystem',
-          image: collection.attributes.image || '',
-          artist: 'Ultra Times',
-          totalItems: 1000,
-          floorPrice: '0.5',
-          category: collection.attributes.is_trending ? 'game-assets' : collection.attributes.is_featured ? 'art' : 'collectibles',
-        }))
-
-        setCollections(mappedCollections)
-        setError(null)
-      } catch (error) {
-        console.error('Error fetching collections:', error)
-        setError('Failed to load collections. Please try again later.')
-        setCollections(generateMockCollections(4))
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchCollections()
-  }, [])
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
@@ -129,7 +118,7 @@ function CollectionsPage() {
     )
   }
 
-  if (error && collections.length === 0) {
+  if (error && mappedCollections.length === 0) {
     return (
       <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
         <div className='text-center'>
@@ -161,7 +150,7 @@ function CollectionsPage() {
         {/* Collections Grid */}
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
           {currentCollections.map(collection => (
-            <CollectionCard key={collection.id} id={collection.id} name={collection.name} description={collection.description} category={collection.category} image={collection.image} artist={collection.artist} totalItems={collection.totalItems} floorPrice={collection.floorPrice} />
+            <CollectionCard key={collection.id} {...collection} />
           ))}
         </div>
 
