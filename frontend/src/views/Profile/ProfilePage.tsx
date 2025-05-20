@@ -5,7 +5,7 @@ import {apiRequestor} from '../../utils/axiosInstanceHelper'
 import {Uniq} from '../../utils/uniqService'
 import NftSelector from '../../components/UniqSelector'
 import useUserAvatar, {refreshUserAvatar, clearAvatarCache} from '../../hooks/useUserAvatar'
-import { useTranslation } from '../../contexts/TranslationContext'
+import {useTranslation} from '../../contexts/TranslationContext'
 
 interface ProfileData {
   email: string
@@ -43,7 +43,7 @@ function ProfilePage() {
   // Fonction pour traduire les messages d'erreur du wallet
   const translateWalletError = (error: string | null): string => {
     if (!error) return t('transaction_failed')
-    
+
     const lowerError = error.toLowerCase()
     if (lowerError.includes('rejected') || lowerError.includes('refused')) {
       return t('transaction_rejected')
@@ -304,9 +304,6 @@ function ProfilePage() {
     setIsRemovingAvatar(true)
 
     try {
-      // Mise à jour visuelle immédiate avant la transaction
-      updateLocalAvatar(null)
-
       const txObject = {
         action: 'clearavatar',
         contract: 'ultra.avatar',
@@ -318,7 +315,7 @@ function ProfilePage() {
       const response = await signTransaction(txObject)
 
       if (response && response.data?.transactionHash) {
-        // Mettre à jour en arrière-plan depuis le serveur
+        updateLocalAvatar(null)
         if (blockchainId) {
           refreshUserAvatar(blockchainId)
         }
