@@ -468,7 +468,7 @@ function ProfilePage() {
     <div className='min-h-screen bg-dark-950 text-white py-12'>
       <div className='container mx-auto px-4'>
         <div className='max-w-2xl mx-auto'>
-          <h1 className='text-3xl font-bold text-primary-300 mb-8'>{t('profile_title')}</h1>
+          <h1 className='text-3xl font-bold text-primary-300 mb-2'>{t('profile_title')}</h1>
           <p className='text-gray-600 mb-8'>{t('profile_subtitle')}</p>
 
           <div className='bg-dark-800 rounded-xl p-6 shadow-lg'>
