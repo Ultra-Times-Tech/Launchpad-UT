@@ -21,7 +21,7 @@ function HomePage() {
       <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
         <div className='flex flex-col items-center'>
           <div className='w-16 h-16 border-t-4 border-primary-500 border-solid rounded-full animate-spin'></div>
-          <p className='mt-4 text-xl font-cabin'>Loading content...</p>
+          <p className='mt-4 text-xl font-cabin'>{t('loading')}</p>
         </div>
       </div>
     )

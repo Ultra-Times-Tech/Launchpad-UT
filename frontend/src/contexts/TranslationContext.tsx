@@ -4,7 +4,7 @@ import { translations, Language, TranslationKey } from '../translations'
 interface TranslationContextType {
   currentLang: Language
   setCurrentLang: (lang: Language) => void
-  t: (key: TranslationKey) => string
+  t: (key: TranslationKey, params?: Record<string, any>) => string
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined)
@@ -27,8 +27,14 @@ export const TranslationProvider: React.FC<{ children: ReactNode }> = ({ childre
     localStorage.setItem('language', currentLang)
   }, [currentLang])
 
-  const t = (key: TranslationKey): string => {
-    return translations[currentLang][key]
+  const t = (key: TranslationKey, params?: Record<string, any>): string => {
+    const translation = translations[currentLang][key]
+    if (typeof translation === 'string' && params) {
+      return translation.replace(/\{(\w+)\}/g, (_, key) => {
+        return params[key]?.toString() || `{${key}}`
+      })
+    }
+    return translation
   }
 
   return (

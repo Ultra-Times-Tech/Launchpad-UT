@@ -1,5 +1,6 @@
 import {Link} from 'react-router-dom'
 import {getAssetUrl} from '../../utils/imageHelper'
+import {useTranslation} from '../../hooks/useTranslation'
 
 export interface FactoryCardProps {
   id: number
@@ -13,6 +14,8 @@ export interface FactoryCardProps {
 }
 
 function FactoryCard({id, collectionId, name, description, image, mintPrice, supply, minted}: FactoryCardProps) {
+  const {t} = useTranslation()
+
   return (
     <div className='bg-dark-800 rounded-xl overflow-hidden'>
       <div className='relative h-40'>
@@ -25,7 +28,7 @@ function FactoryCard({id, collectionId, name, description, image, mintPrice, sup
 
         <div className='space-y-2 mb-4'>
           <div className='flex items-center justify-end space-x-1 text-sm'>
-            <span className='text-gray-400'>Mint Price:</span>
+            <span className='text-gray-400'>{t('mint_price')}</span>
             <span className='text-primary-300 font-medium'>{mintPrice}</span>
           </div>
 
@@ -34,13 +37,13 @@ function FactoryCard({id, collectionId, name, description, image, mintPrice, sup
           </div>
 
           <div className='flex justify-between text-sm'>
-            <span className='text-gray-400'>{minted} minted</span>
-            <span className='text-gray-400'>Total supply: {supply}</span>
+            <span className='text-gray-400'>{minted} {t('minted')}</span>
+            <span className='text-gray-400'>{t('total_supply')} {supply}</span>
           </div>
         </div>
 
         <Link to={`/mint/${id}/${collectionId}`} className='block w-full'>
-          <button className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200'>ACCÈS AU MINT</button>
+          <button className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200'>{t('mint_access')}</button>
         </Link>
       </div>
     </div>

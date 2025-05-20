@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { FaTrash, FaPlus, FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface SliderImage {
   id: string;
@@ -30,6 +31,7 @@ const DraggableImage = ({
   isLast: boolean;
   total: number;
 }) => {
+  const { t } = useTranslation();
   const [{ isDragging }, drag] = useDrag({
     type: 'image',
     item: { index },
@@ -56,11 +58,11 @@ const DraggableImage = ({
         hover:shadow-xl hover:ring-2 hover:ring-primary-400`}
       style={{ width: '100%', aspectRatio: '16/9' }}
       role="article"
-      aria-label={`Slide ${index + 1} sur ${total}`}
+      aria-label={t('slider_manager_position', { current: index + 1, total })}
     >
       <img
         src={image.url}
-        alt={image.alt || `Slide ${index + 1}`}
+        alt={image.alt || t('slider_manager_position', { current: index + 1, total })}
         className="w-full h-full object-cover"
       />
       
@@ -75,7 +77,7 @@ const DraggableImage = ({
               className={`p-2 rounded-full ${isFirst 
                 ? 'bg-gray-600 cursor-not-allowed' 
                 : 'bg-primary-500 hover:bg-primary-600'} text-white transition-colors`}
-              aria-label="Déplacer vers le haut"
+              aria-label={t('slider_manager_move_up')}
             >
               <FaArrowUp />
             </button>
@@ -85,7 +87,7 @@ const DraggableImage = ({
               className={`p-2 rounded-full ${isLast 
                 ? 'bg-gray-600 cursor-not-allowed' 
                 : 'bg-primary-500 hover:bg-primary-600'} text-white transition-colors`}
-              aria-label="Déplacer vers le bas"
+              aria-label={t('slider_manager_move_down')}
             >
               <FaArrowDown />
             </button>
@@ -95,7 +97,7 @@ const DraggableImage = ({
           <button
             onClick={() => onDelete(image.id)}
             className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors"
-            aria-label="Supprimer l'image"
+            aria-label={t('slider_manager_delete_image')}
           >
             <FaTrash />
           </button>
@@ -104,13 +106,14 @@ const DraggableImage = ({
 
       {/* Indicateur de position */}
       <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white py-2 px-3 text-sm font-quicksand">
-        Position {index + 1} sur {total}
+        {t('slider_manager_position', { current: index + 1, total })}
       </div>
     </div>
   );
 };
 
 const SliderManager = () => {
+  const { t } = useTranslation();
   const [images, setImages] = useState<SliderImage[]>([
     { id: '1', url: 'https://picsum.photos/800/400?random=1', order: 0, alt: 'Image slider 1' },
     { id: '2', url: 'https://picsum.photos/800/400?random=2', order: 1, alt: 'Image slider 2' },
@@ -145,7 +148,7 @@ const SliderManager = () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
-    fileInput.setAttribute('aria-label', 'Sélectionner une image à ajouter');
+    fileInput.setAttribute('aria-label', t('slider_manager_select_image'));
     fileInput.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
@@ -169,18 +172,18 @@ const SliderManager = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div className="space-y-2">
-          <h3 className="text-xl font-cabin text-gray-100">Images du Slider Principal</h3>
-          <p className="text-sm text-gray-400">Glissez-déposez les images ou utilisez les flèches pour réorganiser</p>
+          <h3 className="text-xl font-cabin text-gray-100">{t('slider_manager_title')}</h3>
+          <p className="text-sm text-gray-400">{t('slider_manager_subtitle')}</p>
         </div>
         <button
           onClick={handleAddImage}
           className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-gray-800"
         >
-          <FaPlus /> Ajouter une image
+          <FaPlus /> {t('slider_manager_add_image')}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="Liste des images du slider">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label={t('slider_manager_title')}>
         {images.map((image, index) => (
           <DraggableImage
             key={image.id}
@@ -199,12 +202,12 @@ const SliderManager = () => {
 
       {images.length === 0 && (
         <div className="text-center py-12 bg-gray-800 rounded-lg">
-          <p className="text-gray-400">Aucune image dans le slider</p>
+          <p className="text-gray-400">{t('slider_manager_no_images')}</p>
           <button
             onClick={handleAddImage}
             className="mt-4 text-primary-400 hover:text-primary-300 underline"
           >
-            Ajouter votre première image
+            {t('slider_manager_add_first_image')}
           </button>
         </div>
       )}

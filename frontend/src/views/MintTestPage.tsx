@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react'
 import {useUltraWallet} from '../utils/ultraWalletHelper'
 import {createMintTransaction} from '../utils/transactionHelper'
+import {useTranslation} from '../hooks/useTranslation'
 
 interface UltraError {
   message?: string;

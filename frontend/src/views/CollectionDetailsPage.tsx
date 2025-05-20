@@ -5,6 +5,7 @@ import FactoryCard from '../components/Card/FactoryCard'
 import {CollectionDetailsProps} from '../types/collection.types'
 import {collectionsService} from '../services/collections.service'
 import {getMockCollection} from '../data/collections.data'
+import {useTranslation} from '../hooks/useTranslation'
 
 function CollectionDetailsPage() {
   const {id} = useParams<{id: string}>()
@@ -12,6 +13,7 @@ function CollectionDetailsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'story' | 'features'>('story')
+  const {t} = useTranslation()
 
   useEffect(() => {
     const fetchCollection = async () => {
@@ -48,7 +50,7 @@ function CollectionDetailsPage() {
       <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
         <div className='flex flex-col items-center'>
           <div className='w-16 h-16 border-t-4 border-primary-500 border-solid rounded-full animate-spin'></div>
-          <p className='mt-4 text-xl'>Loading collection...</p>
+          <p className='mt-4 text-xl'>{t('loading_collection')}</p>
         </div>
       </div>
     )
@@ -89,7 +91,7 @@ function CollectionDetailsPage() {
             <span className='bg-primary-600 px-3 py-1 rounded-full text-sm font-semibold'>{collection.totalItems} Items</span>
             <span className='bg-green-600 px-3 py-1 rounded-full text-sm font-semibold'>Floor: {collection.floorPrice}</span>
           </div>
-          <p className='text-sm text-gray-300'>by {collection.creator}</p>
+          <p className='text-sm text-gray-300'>{t('by')} {collection.creator}</p>
         </div>
       </div>
 

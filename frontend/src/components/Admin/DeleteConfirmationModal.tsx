@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { FaTimes, FaExclamationTriangle } from 'react-icons/fa';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
@@ -13,9 +14,11 @@ const DeleteConfirmationModal = ({
   isOpen,
   onClose,
   onConfirm,
-  title = 'Confirmer la suppression',
-  message = 'Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.'
+  title,
+  message
 }: DeleteConfirmationModalProps) => {
+  const { t } = useTranslation();
+  
   if (!isOpen) return null;
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -39,32 +42,32 @@ const DeleteConfirmationModal = ({
         <div className="flex justify-between items-center p-4 bg-gray-700">
           <h2 className="text-xl font-semibold text-white flex items-center">
             <FaExclamationTriangle className="text-yellow-500 mr-2" />
-            {title}
+            {title || t('delete_modal_title')}
           </h2>
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-600 transition-colors"
-            aria-label="Fermer"
+            aria-label={t('close')}
           >
             <FaTimes className="text-gray-300" />
           </button>
         </div>
 
         <div className="p-6">
-          <p className="text-gray-300 mb-6">{message}</p>
+          <p className="text-gray-300 mb-6">{message || t('delete_modal_message')}</p>
 
           <div className="flex justify-end space-x-4">
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
             >
-              Annuler
+              {t('delete_modal_cancel')}
             </button>
             <button
               onClick={onConfirm}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
-              Supprimer
+              {t('delete_modal_delete')}
             </button>
           </div>
         </div>

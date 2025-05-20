@@ -1,5 +1,6 @@
 import CollectionCard from '../Card/CollectionCard'
 import {useSlider} from '../../hooks/useSlider'
+import {useTranslation} from '../../hooks/useTranslation'
 
 interface TrendingCollection {
   id: number
@@ -21,12 +22,13 @@ function TrendingCollections({collections}: TrendingCollectionsProps) {
     itemsCount: collections.length,
     slidesPerView: 4,
   })
+  const {t} = useTranslation()
 
   return (
     <div className='bg-dark-900 py-16'>
       <div className='container mx-auto px-4'>
         <div className='flex justify-between items-center mb-12'>
-          <h2 className='text-2xl font-cabin font-bold text-primary-300'>Trending Collections</h2>
+          <h2 className='text-2xl font-cabin font-bold text-primary-300'>{t('trending_collections')}</h2>
         </div>
 
         <div className='relative group'>

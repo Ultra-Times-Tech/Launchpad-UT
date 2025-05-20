@@ -1,4 +1,5 @@
 import {Link} from 'react-router-dom'
+import {useTranslation} from '../../hooks/useTranslation'
 
 export interface MintProps {
   id: number
@@ -15,6 +16,8 @@ export interface MintProps {
 }
 
 function MintCard({collectionName, itemName, price, timestamp, image, transactionHash, minter}: MintProps) {
+  const {t} = useTranslation()
+
   return (
     <div className='group relative bg-dark-800 bg-opacity-50 p-5 rounded-2xl hover:bg-opacity-70 transition-all duration-300 backdrop-blur-sm border border-dark-700 hover:border-primary-500 hover:shadow-lg hover:shadow-primary-500/10'>
       <div className='flex items-center space-x-5'>
@@ -31,9 +34,9 @@ function MintCard({collectionName, itemName, price, timestamp, image, transactio
           </Link>
 
           <p className='text-sm text-gray-400 font-quicksand truncate mb-2 group-hover:text-gray-300 transition-colors duration-300'>
-            from <span className='text-primary-400'>{collectionName}</span>
+            {t('from')} <span className='text-primary-400'>{collectionName}</span>
             {minter && (
-              <> by {minter.username && minter.username !== minter.address.slice(0, 6) ? (
+              <> {t('by')} {minter.username && minter.username !== minter.address.slice(0, 6) ? (
                 <>
                   <a 
                     href={`https://explorer.testnet.ultra.io/account/${minter.address}`}

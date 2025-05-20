@@ -1,7 +1,10 @@
 import {Link} from 'react-router-dom'
 import {getAssetUrl} from '../utils/imageHelper'
+import {useTranslation} from '../contexts/TranslationContext'
 
 function Footer() {
+  const {t} = useTranslation()
+
   return (
     <footer className='bg-dark-900 text-white py-12 border-t border-dark-700'>
       <div className='container mx-auto px-4'>
@@ -11,26 +14,44 @@ function Footer() {
               <img src={getAssetUrl('/logos/logo-ut.png')} alt='Ultra Times Logo' className='h-8 w-auto' />
               <span className='text-xl font-cabin font-semibold text-primary-300'>Ultra Times</span>
             </div>
-            <p className='text-sm mb-4 font-quicksand text-gray-300'>Découvrez les dernières actualités et tendances du monde de la blockchain.</p>
-            <p className='text-xs text-gray-400'>© 2025 Ultra Times. All rights reserved.</p>
+            <p className='text-sm mb-4 font-quicksand text-gray-300'>{t('footer_about_description')}</p>
+            <p className='text-xs text-gray-400'>
+              © {new Date().getFullYear()} Ultra Times - {t('footer_rights_reserved')}
+            </p>
           </div>
 
           <div className='text-center md:text-left'>
-            <h3 className='font-cabin font-semibold mb-4 text-primary-300'>Tags</h3>
+            <h3 className='font-cabin font-semibold mb-4 text-primary-300'>{t('footer_quick_links')}</h3>
             <div className='flex flex-wrap gap-2 justify-center md:justify-start'>
-              <span className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300'>HEALTH</span>
-              <span className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300'>LIFESTYLE</span>
-              <span className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300'>SOCIAL</span>
-              <span className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300'>ENTERTAINMENT</span>
-              <span className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300'>NEWS</span>
-              <span className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300'>BUSINESS</span>
-              <span className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300'>SCIENCE</span>
-              <span className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300'>GADGETS</span>
+              <Link to='/' className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
+                {t('home')}
+              </Link>
+              <Link to='/collections' className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
+                {t('collections')}
+              </Link>
+              <Link to='/contact' className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
+                {t('contact')}
+              </Link>
             </div>
           </div>
 
           <div className='text-center md:text-left'>
-            <h3 className='font-cabin font-semibold mb-4 text-primary-300'>Social</h3>
+            <h3 className='font-cabin font-semibold mb-4 text-primary-300'>{t('footer_legal')}</h3>
+            <div className='space-y-2 font-quicksand flex flex-col items-center md:items-start'>
+              <Link to='/legal' className='text-gray-300 hover:text-primary-300 transition-colors'>
+                {t('footer_legal')}
+              </Link>
+              <Link to='/terms' className='text-gray-300 hover:text-primary-300 transition-colors'>
+                {t('footer_terms')}
+              </Link>
+              <Link to='/privacy' className='text-gray-300 hover:text-primary-300 transition-colors'>
+                {t('footer_privacy')}
+              </Link>
+            </div>
+          </div>
+
+          <div className='text-center md:text-left'>
+            <h3 className='font-cabin font-semibold mb-4 text-primary-300'>{t('footer_social')}</h3>
             <div className='space-y-3 font-quicksand flex flex-col items-center md:items-start'>
               <a href='https://twitter.com' target='_blank' rel='noopener noreferrer' className='flex items-center space-x-2 text-gray-300 hover:text-primary-300 transition-colors'>
                 <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewBox='0 0 24 24'>
@@ -38,44 +59,18 @@ function Footer() {
                 </svg>
                 <span>Twitter</span>
               </a>
-              <a href='https://instagram.com' target='_blank' rel='noopener noreferrer' className='flex items-center space-x-2 text-gray-300 hover:text-primary-300 transition-colors'>
+              <a href='https://discord.com' target='_blank' rel='noopener noreferrer' className='flex items-center space-x-2 text-gray-300 hover:text-primary-300 transition-colors'>
                 <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewBox='0 0 24 24'>
-                  <path d='M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z' />
+                  <path d='M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z' />
                 </svg>
-                <span>Instagram</span>
+                <span>Discord</span>
               </a>
-              <a href='https://facebook.com' target='_blank' rel='noopener noreferrer' className='flex items-center space-x-2 text-gray-300 hover:text-primary-300 transition-colors'>
+              <a href='https://telegram.org' target='_blank' rel='noopener noreferrer' className='flex items-center space-x-2 text-gray-300 hover:text-primary-300 transition-colors'>
                 <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewBox='0 0 24 24'>
-                  <path d='M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z' />
+                  <path d='M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z' />
                 </svg>
-                <span>Facebook</span>
+                <span>Telegram</span>
               </a>
-            </div>
-          </div>
-
-          <div className='text-center md:text-left'>
-            <h3 className='font-cabin font-semibold mb-4 text-primary-300'>À propos</h3>
-            <div className='space-y-2 font-quicksand flex flex-col items-center md:items-start'>
-              <div>
-                <Link to='/legal' className='text-gray-300 hover:text-primary-300 transition-colors'>
-                  Legal Information
-                </Link>
-              </div>
-              <div>
-                <Link to='/terms' className='text-gray-300 hover:text-primary-300 transition-colors'>
-                  Terms of Sale
-                </Link>
-              </div>
-              <div>
-                <Link to='/privacy' className='text-gray-300 hover:text-primary-300 transition-colors'>
-                  Privacy Policy
-                </Link>
-              </div>
-              <div>
-                <Link to='/contact' className='text-gray-300 hover:text-primary-300 transition-colors'>
-                  Contact
-                </Link>
-              </div>
             </div>
           </div>
         </div>

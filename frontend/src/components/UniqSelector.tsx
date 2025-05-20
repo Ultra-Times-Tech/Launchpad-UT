@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {Uniq, fetchUserUNIQs, getCachedCollections, getCachedUNIQs, UNIQsCollection, isUNIQLoadingComplete} from '../utils/uniqService'
+import {useTranslation} from '../hooks/useTranslation'
 
 interface UNIQSelectorProps {
   blockchainId: string
@@ -10,6 +11,7 @@ interface UNIQSelectorProps {
 const ITEMS_PER_PAGE = 12
 
 const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, currentAvatarId}) => {
+  const {t} = useTranslation()
   const [UNIQs, setUNIQs] = useState<Uniq[]>([])
   const [filteredUNIQs, setFilteredUNIQs] = useState<Uniq[]>([])
   const [displayedUNIQs, setDisplayedUNIQs] = useState<Uniq[]>([])
@@ -23,6 +25,7 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMorePages, setHasMorePages] = useState(false)
   const [totalFilteredCount, setTotalFilteredCount] = useState(0)
+  const [pageInputValue, setPageInputValue] = useState('')
 
   // Fonction utilitaire pour récupérer l'URL de l'image de manière sécurisée
   const getImageUrl = (uniq: Uniq): string | null => {
@@ -172,7 +175,7 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
       <div className='p-4 bg-red-900/30 text-red-200 rounded-lg'>
         <p>{error}</p>
         <button onClick={() => setInitialLoading(true)} className='mt-2 px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-700 transition-colors'>
-          Réessayer
+          {t('retry')}
         </button>
       </div>
     )
@@ -181,25 +184,25 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
   if (UNIQs.length === 0) {
     return (
       <div className='p-4 bg-dark-900 rounded-lg'>
-        <p className='text-gray-400'>Vous ne possédez aucun UNIQs pour le moment.</p>
+        <p className='text-gray-400'>{t('no_uniqs')}</p>
       </div>
     )
   }
 
   return (
     <div>
-      <h3 className='text-lg font-semibold mb-3'>Sélectionnez un UNIQ pour votre avatar</h3>
+      <h3 className='text-lg font-semibold mb-3'>{t('select_uniq_avatar')}</h3>
 
       <div className='mb-4 space-y-3'>
         {/* Filtre par collection */}
         {collections.length > 0 && (
           <div>
             <label htmlFor='collection-filter' className='block text-sm font-medium text-gray-400 mb-1'>
-              Collection
+              {t('collection')}
             </label>
             <div className='relative'>
               <select id='collection-filter' value={selectedCollection} onChange={handleCollectionChange} className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-white focus:outline-none focus:border-primary-500 appearance-none pr-10'>
-                <option value='all'>Toutes les collections ({collections.length})</option>
+                <option value='all'>{t('all_collections', { count: collections.length })}</option>
                 {collections.map(collection => (
                   <option key={collection.id} value={collection.id}>
                     {collection.name} ({collection.totalItems})
@@ -217,7 +220,13 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
 
         {/* Barre de recherche */}
         <div className='relative'>
-          <input type='text' value={searchQuery} onChange={handleSearchChange} placeholder='Rechercher par nom, ID, numéro de série ou attribut...' className='w-full px-4 py-2 pl-10 bg-dark-900 border border-dark-700 rounded-lg text-white focus:outline-none focus:border-primary-500' />
+          <input 
+            type='text' 
+            value={searchQuery} 
+            onChange={handleSearchChange} 
+            placeholder={t('search_uniq')} 
+            className='w-full px-4 py-2 pl-10 bg-dark-900 border border-dark-700 rounded-lg text-white focus:outline-none focus:border-primary-500' 
+          />
           <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
             <svg className='w-5 h-5 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
@@ -235,11 +244,13 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
 
       {/* Message d'information sur les résultats de recherche */}
       <div className='flex justify-between items-center mb-3'>
-        <div className='text-xs text-gray-400'>{filteredUNIQs.length > 0 ? `${filteredUNIQs.length} UNIQ${filteredUNIQs.length > 1 ? 's' : ''} trouvé${filteredUNIQs.length > 1 ? 's' : ''}` : ''}</div>
+        <div className='text-xs text-gray-400'>
+          {filteredUNIQs.length > 0 ? `${filteredUNIQs.length} ${filteredUNIQs.length > 1 ? t('uniqs') : t('uniq')}` : ''}
+        </div>
 
         {totalPages > 1 && (
           <div className='text-xs text-gray-400'>
-            Page {currentPage}/{isUNIQLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}
+            {t('page')} {currentPage} {t('of')} {isUNIQLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}
           </div>
         )}
       </div>
@@ -250,7 +261,7 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
         </div>
       ) : filteredUNIQs.length === 0 ? (
         <div className='p-4 bg-dark-900 rounded-lg text-center'>
-          <p className='text-gray-400'>Aucun UNIQ ne correspond à votre recherche.</p>
+          <p className='text-gray-400'>{t('no_uniqs_found').replace('{query}', searchQuery)}</p>
         </div>
       ) : (
         <>
@@ -261,7 +272,7 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
 
               const isSelected = selectedUNIQId === uniq.id
               // Vérifier également metadata et content ici pour éviter les erreurs
-              const collectionName = uniq.metadata?.content?.subName || collections.find(c => c.id === uniq.factory?.id || c.id === uniq.collection?.id)?.name || 'Collection inconnue'
+              const collectionName = uniq.metadata?.content?.subName || collections.find(c => c.id === uniq.factory?.id || c.id === uniq.collection?.id)?.name || t('unknown_collection')
 
               return (
                 <div
@@ -271,13 +282,13 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
                     relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all
                     ${isSelected ? 'border-primary-500 scale-105' : 'border-dark-700 hover:border-dark-500'}
                   `}>
-                  {imageUrl ? <img src={imageUrl} alt={uniq.metadata?.content?.name || 'UNIQ'} className='w-full aspect-square object-cover' loading='lazy' /> : <div className='w-full aspect-square bg-dark-800 flex items-center justify-center text-gray-500'>No Image</div>}
+                  {imageUrl ? <img src={imageUrl} alt={uniq.metadata?.content?.name || 'UNIQ'} className='w-full aspect-square object-cover' loading='lazy' /> : <div className='w-full aspect-square bg-dark-800 flex items-center justify-center text-gray-500'>{t('no_image')}</div>}
 
                   <div className='absolute bottom-0 left-0 right-0 bg-dark-900/80 p-2'>
-                    <p className='text-sm font-medium truncate'>{uniq.metadata?.content?.name || 'Sans nom'}</p>
+                    <p className='text-sm font-medium truncate'>{uniq.metadata?.content?.name || t('unnamed')}</p>
                     <div className='flex justify-between text-xs text-gray-400'>
                       <span>#{uniq.serialNumber || '?'}</span>
-                      <span className='truncate'>{uniq.id ? `ID: ${uniq.id.slice(0, 6)}...` : ''}</span>
+                      <span className='truncate'>{uniq.id ? `${t('id')}: ${uniq.id.slice(0, 6)}...` : ''}</span>
                     </div>
                     {/* Nom de la collection */}
                     <div className='mt-1 text-xs text-primary-400 truncate'>{collectionName}</div>
@@ -295,15 +306,75 @@ const UNIQSelector: React.FC<UNIQSelectorProps> = ({blockchainId, onSelect, curr
             })}
           </div>
 
-          {/* Pagination */}
+          {/* Pagination améliorée */}
           {totalPages > 1 && (
             <div className='flex items-center justify-center space-x-4 mt-6'>
               <button onClick={handlePreviousPage} disabled={currentPage === 1} className={`px-4 py-2 rounded-lg transition-colors ${currentPage === 1 ? 'bg-dark-800 text-gray-500 cursor-not-allowed' : 'bg-dark-700 text-white hover:bg-dark-600'}`}>
-                Précédent
+                {t('previous')}
               </button>
 
+              <div className='flex items-center space-x-2'>
+                <span className='text-gray-400'>{t('page')}</span>
+                <div className='relative'>
+                  <input
+                    type='text'
+                    inputMode='numeric'
+                    pattern='[0-9]*'
+                    value={pageInputValue}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        if (pageInputValue === '') {
+                          setPageInputValue('')
+                        } else {
+                          const value = parseInt(pageInputValue)
+                          if (!isNaN(value)) {
+                            if (value < 1) {
+                              setCurrentPage(1)
+                            } else if (value > totalPages) {
+                              setCurrentPage(totalPages)
+                            } else {
+                              setCurrentPage(value)
+                            }
+                          }
+                        }
+                        setPageInputValue('')
+                        e.currentTarget.blur()
+                      }
+                    }}
+                    onBlur={() => {
+                      if (pageInputValue === '') {
+                        setPageInputValue('')
+                      } else {
+                        const value = parseInt(pageInputValue)
+                        if (!isNaN(value)) {
+                          if (value < 1) {
+                            setCurrentPage(1)
+                          } else if (value > totalPages) {
+                            setCurrentPage(totalPages)
+                          } else {
+                            setCurrentPage(value)
+                          }
+                        }
+                      }
+                      setPageInputValue('')
+                    }}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '')
+                      setPageInputValue(value)
+                    }}
+                    onFocus={() => {
+                      setPageInputValue('')
+                    }}
+                    placeholder={currentPage.toString()}
+                    className='px-2 py-1 bg-dark-800 text-white border border-dark-700 rounded-lg focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500/20 transition-colors duration-200 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                    style={{ width: `${String(totalPages).length * 0.75 + 1}rem` }}
+                  />
+                </div>
+                <span className='text-gray-400'>{t('of')} {isUNIQLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}</span>
+              </div>
+
               <button onClick={handleNextPage} disabled={isLastPage || !hasMorePages} className={`px-4 py-2 rounded-lg transition-colors ${isLastPage || !hasMorePages ? 'bg-dark-800 text-gray-500 cursor-not-allowed' : 'bg-dark-700 text-white hover:bg-dark-600'}`}>
-                Suivant
+                {t('next')}
               </button>
             </div>
           )}

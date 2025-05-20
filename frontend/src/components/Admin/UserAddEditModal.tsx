@@ -4,6 +4,7 @@ import { FaTimes, FaCheck } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import useAlerts from '../../hooks/useAlert';
 import { AxiosError } from 'axios';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface UserWallet {
   field1: string;
@@ -58,6 +59,7 @@ interface ApiUserPayload {
 }
 
 const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditModalProps) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<UserData>({
     name: '',
     username: '',
@@ -226,7 +228,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
         const axiosError = error as AxiosError;
         console.error('Détails de l\'erreur de réponse:', axiosError.response?.status, axiosError.response?.data);
       }
-      showError('Impossible de charger les données de l\'utilisateur.');
+      showError(t('user_modal_error_load_user'));
     } finally {
       setIsLoading(false);
     }
@@ -308,30 +310,29 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
 
   const validateForm = () => {
     if (!formData.name || !formData.username || !formData.email) {
-      showError('Veuillez remplir tous les champs obligatoires.');
+      showError(t('user_modal_error_required_fields'));
       return false;
     }
 
-    // Vérification du mot de passe avec les nouvelles règles
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{12,}$/;
 
     if (!userId && (!formData.password || !passwordRegex.test(formData.password))) {
-      showError('Le mot de passe doit contenir au moins 12 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.');
+      showError(t('user_modal_error_password_requirements'));
       return false;
     }
 
     if (!userId && formData.password !== formData.password2) {
-      showError('Les mots de passe ne correspondent pas.');
+      showError(t('user_modal_error_passwords_mismatch'));
       return false;
     }
 
     if (userId && formData.password && formData.password.length > 0 && !passwordRegex.test(formData.password)) {
-      showError('Le nouveau mot de passe doit contenir au moins 12 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.');
+      showError(t('user_modal_error_password_requirements'));
       return false;
     }
 
     if (userId && formData.password && formData.password !== formData.password2) {
-      showError('Les mots de passe ne correspondent pas.');
+      showError(t('user_modal_error_passwords_mismatch'));
       return false;
     }
 
@@ -399,18 +400,18 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
       if (userId) {
         // Mode édition
         await apiRequestor.patch(`/users/${userId}`, userData);
-        success('Utilisateur mis à jour avec succès !');
+        success(t('user_modal_success_update'));
       } else {
         // Mode création
         await apiRequestor.post('/users', userData);
-        success('Utilisateur créé avec succès !');
+        success(t('user_modal_success_create'));
       }
       
       onSuccess();
       handleClose();
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement:', err);
-      showError('Impossible d\'enregistrer l\'utilisateur.');
+      showError(t('user_modal_error_save_user'));
     } finally {
       setIsLoading(false);
     }
@@ -447,7 +448,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
       >
         <div className="flex justify-between items-center p-4 bg-gray-700 sticky top-0 z-10">
           <h2 className="text-xl font-semibold text-white">
-            {userId ? 'Modifier l\'utilisateur' : 'Ajouter un utilisateur'}
+            {userId ? t('user_modal_title_edit') : t('user_modal_title_add')}
           </h2>
           <button
             onClick={handleClose}
@@ -461,14 +462,14 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
         {isLoading ? (
           <div className="p-6 flex-1 flex flex-col items-center justify-center min-h-[400px]">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
-            <p className="text-gray-400">Chargement des données...</p>
+            <p className="text-gray-400">{t('user_modal_loading')}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 flex-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
-                  Nom complet *
+                  {t('user_modal_full_name')} *
                 </label>
                 <input
                   type="text"
@@ -483,7 +484,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
 
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
-                  Nom d'utilisateur *
+                  {t('user_modal_username')} *
                 </label>
                 <input
                   type="text"
@@ -498,7 +499,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-                  Email *
+                  {t('user_modal_email')} *
                 </label>
                 <input
                   type="email"
@@ -513,7 +514,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
 
               <div>
                 <label htmlFor="state" className="block text-sm font-medium text-gray-300 mb-1">
-                  Statut
+                  {t('user_modal_status')}
                 </label>
                 <div className="relative">
                   <select
@@ -523,8 +524,8 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                     onChange={handleInputChange}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500 appearance-none"
                   >
-                    <option value="0">Actif</option>
-                    <option value="1">Bloqué</option>
+                    <option value="0">{t('user_modal_status_active')}</option>
+                    <option value="1">{t('user_modal_status_blocked')}</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
                     <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -538,7 +539,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                 <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-                      Mot de passe *
+                      {t('user_modal_password')} *
                     </label>
                     <input
                       type="password"
@@ -551,20 +552,30 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                       minLength={12}
                     />
                     <div className="mt-2 text-xs text-gray-400 space-y-1">
-                      <p>Le mot de passe doit contenir :</p>
+                      <p>{t('user_modal_password_requirements')}</p>
                       <ul className="list-disc list-inside pl-2 space-y-1">
-                        <li className={formData.password && formData.password.length >= 12 ? "text-green-500" : ""}>12 caractères minimum</li>
-                        <li className={formData.password && /[A-Z]/.test(formData.password) ? "text-green-500" : ""}>1 lettre majuscule</li>
-                        <li className={formData.password && /[a-z]/.test(formData.password) ? "text-green-500" : ""}>1 lettre minuscule</li>
-                        <li className={formData.password && /\d/.test(formData.password) ? "text-green-500" : ""}>1 chiffre</li>
-                        <li className={formData.password && /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(formData.password) ? "text-green-500" : ""}>1 caractère spécial</li>
+                        <li className={formData.password && formData.password.length >= 12 ? "text-green-500" : ""}>
+                          {t('user_modal_password_min_length')}
+                        </li>
+                        <li className={formData.password && /[A-Z]/.test(formData.password) ? "text-green-500" : ""}>
+                          {t('user_modal_password_uppercase')}
+                        </li>
+                        <li className={formData.password && /[a-z]/.test(formData.password) ? "text-green-500" : ""}>
+                          {t('user_modal_password_lowercase')}
+                        </li>
+                        <li className={formData.password && /\d/.test(formData.password) ? "text-green-500" : ""}>
+                          {t('user_modal_password_number')}
+                        </li>
+                        <li className={formData.password && /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(formData.password) ? "text-green-500" : ""}>
+                          {t('user_modal_password_special')}
+                        </li>
                       </ul>
                     </div>
                   </div>
 
                   <div>
                     <label htmlFor="password2" className="block text-sm font-medium text-gray-300 mb-1">
-                      Confirmer le mot de passe *
+                      {t('user_modal_confirm_password')} *
                     </label>
                     <input
                       type="password"
@@ -577,67 +588,15 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                       minLength={12}
                     />
                     <p className={`mt-2 text-xs ${formData.password && formData.password2 && formData.password === formData.password2 ? "text-green-500" : "text-gray-400"}`}>
-                      Les mots de passe doivent correspondre
+                      {t('user_modal_passwords_must_match')}
                     </p>
-                  </div>
-                </div>
-              )}
-
-              {userId && (
-                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-                      Nouveau mot de passe
-                    </label>
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      placeholder="Laisser vide pour ne pas changer"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      minLength={12}
-                    />
-                    {formData.password && formData.password.length > 0 && (
-                      <div className="mt-2 text-xs text-gray-400 space-y-1">
-                        <p>Le mot de passe doit contenir :</p>
-                        <ul className="list-disc list-inside pl-2 space-y-1">
-                          <li className={formData.password && formData.password.length >= 12 ? "text-green-500" : ""}>12 caractères minimum</li>
-                          <li className={formData.password && /[A-Z]/.test(formData.password) ? "text-green-500" : ""}>1 lettre majuscule</li>
-                          <li className={formData.password && /[a-z]/.test(formData.password) ? "text-green-500" : ""}>1 lettre minuscule</li>
-                          <li className={formData.password && /\d/.test(formData.password) ? "text-green-500" : ""}>1 chiffre</li>
-                          <li className={formData.password && /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(formData.password) ? "text-green-500" : ""}>1 caractère spécial</li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor="password2" className="block text-sm font-medium text-gray-300 mb-1">
-                      Confirmer le nouveau mot de passe
-                    </label>
-                    <input
-                      type="password"
-                      id="password2"
-                      name="password2"
-                      value={formData.password2}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      minLength={12}
-                    />
-                    {formData.password && formData.password.length > 0 && (
-                      <p className={`mt-2 text-xs ${formData.password && formData.password2 && formData.password === formData.password2 ? "text-green-500" : "text-gray-400"}`}>
-                        Les mots de passe doivent correspondre
-                      </p>
-                    )}
                   </div>
                 </div>
               )}
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Wallet
+                  {t('user_modal_wallet')}
                 </label>
                 <div className="space-y-3">
                   {formData.wallets && typeof formData.wallets === 'object' && Object.keys(formData.wallets).length > 0 ? (
@@ -646,14 +605,14 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                         type="text"
                         value={(formData.wallets as {[key: string]: UserWallet}).row0?.field1 || ''}
                         onChange={(e) => handleWalletChange('row0', e.target.value)}
-                        placeholder="Identifiant du wallet"
+                        placeholder={t('user_modal_wallet_placeholder')}
                         className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                       <button
                         type="button"
                         onClick={removeWalletRow}
                         className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
-                        title="Supprimer le wallet"
+                        title={t('user_modal_wallet_remove')}
                       >
                         <FaTimes size={14} />
                       </button>
@@ -664,24 +623,24 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                       onClick={addWalletRow}
                       className="px-4 py-2 bg-gray-700 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
                     >
-                      + Ajouter un wallet
+                      {t('user_modal_wallet_add')}
                     </button>
                   )}
                 </div>
                 {userId && (
                   <p className="mt-2 text-xs text-gray-400">
-                    L'identifiant du wallet devrait être au format alphanumérique
+                    {t('user_modal_wallet_format_info')}
                   </p>
                 )}
               </div>
 
               <div className="md:col-span-2">
-                <h3 className="text-lg font-semibold text-primary-300 mb-4">Préférences</h3>
+                <h3 className="text-lg font-semibold text-primary-300 mb-4">{t('user_modal_preferences')}</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between py-3 border-b border-dark-700">
                     <div>
-                      <h4 className="font-medium">Notifications par e-mail</h4>
-                      <p className="text-sm text-gray-400">Recevoir des mises à jour par e-mail concernant l'activité</p>
+                      <h4 className="font-medium">{t('user_modal_email_notifications')}</h4>
+                      <p className="text-sm text-gray-400">{t('user_modal_email_notifications_desc')}</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input 
@@ -695,8 +654,8 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                   </div>
                   <div className="flex items-center justify-between py-3 border-b border-dark-700">
                     <div>
-                      <h4 className="font-medium">Communications marketing</h4>
-                      <p className="text-sm text-gray-400">Recevoir des mises à jour concernant les nouvelles collections</p>
+                      <h4 className="font-medium">{t('user_modal_marketing_communications')}</h4>
+                      <p className="text-sm text-gray-400">{t('user_modal_marketing_communications_desc')}</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input 
@@ -713,7 +672,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Groupes d'utilisateurs
+                  {t('user_modal_user_groups')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {availableGroups.map(group => (
@@ -730,12 +689,12 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                       {formData.groups.includes(group.id) && (
                         <FaCheck className="mr-2 h-3 w-3" />
                       )}
-                      <span>{group.name}</span>
+                      <span>{t(`user_modal_group_${group.id === '2' ? 'registered_users' : group.id === '6' ? 'managers' : 'super_users'}`)}</span>
                     </button>
                   ))}
                 </div>
                 <p className="mt-2 text-xs text-gray-400">
-                  Cliquez sur un groupe pour le sélectionner/désélectionner
+                  {t('user_modal_user_groups_info')}
                 </p>
               </div>
             </div>
@@ -747,7 +706,7 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                 className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
                 disabled={isLoading}
               >
-                Annuler
+                {t('user_modal_cancel')}
               </button>
               <button
                 type="submit"
@@ -760,10 +719,10 @@ const UserAddEditModal = ({ isOpen, onClose, userId, onSuccess }: UserAddEditMod
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Enregistrement...
+                    {t('user_modal_saving')}
                   </span>
                 ) : (
-                  'Enregistrer'
+                  t('user_modal_save')
                 )}
               </button>
             </div>

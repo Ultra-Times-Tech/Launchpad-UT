@@ -5,6 +5,7 @@ import SliderManager from '../components/Admin/SliderManager';
 import UserManager from '../components/Admin/UserManager';
 import { FaImages, FaUsers, FaCog } from 'react-icons/fa';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface MenuItem {
   id: string;
@@ -35,11 +36,12 @@ const contentVariants = {
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('slider');
+  const { t } = useTranslation();
 
   const menuItems: MenuItem[] = [
-    { id: 'slider', label: 'Gestion des Sliders', icon: <FaImages /> },
-    { id: 'users', label: 'Utilisateurs', icon: <FaUsers /> },
-    { id: 'settings', label: 'Paramètres', icon: <FaCog /> },
+    { id: 'slider', label: t('admin_slider_management'), icon: <FaImages /> },
+    { id: 'users', label: t('admin_users'), icon: <FaUsers /> },
+    { id: 'settings', label: t('admin_settings'), icon: <FaCog /> },
   ];
 
   const renderContent = () => {
@@ -58,7 +60,7 @@ const AdminDashboard = () => {
             {activeTab === 'users' && <UserManager />}
             {activeTab === 'settings' && (
               <div className="text-gray-300 p-4 rounded-lg bg-gray-800">
-                Paramètres à venir
+                {t('admin_settings_coming_soon')}
               </div>
             )}
           </DndProvider>
@@ -72,7 +74,7 @@ const AdminDashboard = () => {
       {/* Sidebar */}
       <div className="w-full md:w-64 bg-gray-800 text-gray-100">
         <div className="p-6 border-b border-gray-700">
-          <h1 className="text-2xl font-cabin font-bold text-primary-300">Administration</h1>
+          <h1 className="text-2xl font-cabin font-bold text-primary-300">{t('admin_title')}</h1>
         </div>
         <nav className="mt-6" role="navigation" aria-label="Menu principal">
           {menuItems.map((item) => (

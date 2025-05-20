@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react'
 import MintCard from '../Card/MintCard'
+import {useTranslation} from '../../hooks/useTranslation'
 // Utils
 import { getAssetUrl } from '../../utils/imageHelper'
 
@@ -27,6 +28,7 @@ interface LatestCollectionsProps {
 
 function LatestCollections({latestCollections, mintActivities}: LatestCollectionsProps) {
   const [currentCollectionIndex, setCurrentCollectionIndex] = useState(0)
+  const {t} = useTranslation()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -40,7 +42,7 @@ function LatestCollections({latestCollections, mintActivities}: LatestCollection
 
   return (
     <div className='container mx-auto px-4 py-12 mb-12'>
-      <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300'>Latest Collections</h2>
+      <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300'>{t('latest_collections')}</h2>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
         <div className='lg:col-span-2'>
@@ -59,7 +61,7 @@ function LatestCollections({latestCollections, mintActivities}: LatestCollection
         </div>
 
         <div className='h-[300px] sm:h-[400px] lg:h-[500px] bg-dark-900 rounded-2xl p-4 sm:p-6 backdrop-blur-sm bg-opacity-50 shadow-xl'>
-          <h3 className='text-lg sm:text-xl font-cabin font-bold mb-4 sm:mb-6 text-primary-300 px-2'>Mint Activities</h3>
+          <h3 className='text-lg sm:text-xl font-cabin font-bold mb-4 sm:mb-6 text-primary-300 px-2'>{t('mint_activities')}</h3>
           <div className='space-y-4 h-[calc(100%-3rem)] sm:h-[calc(100%-3.5rem)] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-dark-700 scrollbar-track-transparent hover:scrollbar-thumb-primary-500/50'>
             {mintActivities.map(activity => (
               <MintCard key={activity.id} {...activity} />

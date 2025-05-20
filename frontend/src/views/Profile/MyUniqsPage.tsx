@@ -3,11 +3,13 @@ import {Link} from 'react-router-dom'
 import {useUltraWallet} from '../../utils/ultraWalletHelper'
 import {fetchUserUNIQs, Uniq, getCachedUNIQs, getCachedCollections, UNIQsCollection, isUNIQLoadingComplete} from '../../utils/uniqService'
 import useAlerts from '../../hooks/useAlert'
+import {useTranslation} from '../../hooks/useTranslation'
 
 const ITEMS_PER_PAGE = 12
 const INITIAL_COLLECTIONS_TO_SHOW = 10
 
 function MyUniqsPage() {
+  const {t} = useTranslation()
   const {blockchainId} = useUltraWallet()
   const {error: showError} = useAlerts()
   const [uniqs, setNfts] = useState<Uniq[]>([])
@@ -159,7 +161,7 @@ function MyUniqsPage() {
 
   // Placeholder text dynamique pour la barre de recherche
   const getSearchPlaceholder = () => {
-    return selectedCollection ? 'Rechercher un UNIQ' : 'Rechercher une collection'
+    return selectedCollection ? t('search_uniq') : t('search_collection')
   }
 
   // Filtrer et trier les collections
@@ -328,16 +330,17 @@ function MyUniqsPage() {
       return (
         <div className='mb-6 px-4 py-3 bg-dark-800 rounded-lg text-gray-300'>
           <span className='font-medium'>
-            Résultats pour "{collectionSearchQuery}" dans la collection "{collectionName}" :
+            {t('search_results_in_collection').replace('{query}', collectionSearchQuery).replace('{collection}', collectionName || '')}
           </span>{' '}
-          {filteredNfts.length} UNIQ{filteredNfts.length > 1 ? 's' : ''} trouvé{filteredNfts.length > 1 ? 's' : ''}
+          {filteredNfts.length > 0 ? `${filteredNfts.length} ${filteredNfts.length > 1 ? t('uniqs') : t('uniq')}` : ''}
         </div>
       )
     }
 
     return (
       <div className='mb-6 px-4 py-3 bg-dark-800 rounded-lg text-gray-300'>
-        <span className='font-medium'>Résultats pour "{collectionSearchQuery}" :</span> {filteredCollections.length} collection{filteredCollections.length > 1 ? 's' : ''} trouvée{filteredCollections.length > 1 ? 's' : ''} ({filteredNfts.length} UNIQ{filteredNfts.length > 1 ? 's' : ''})
+        <span className='font-medium'>{t('search_results').replace('{query}', collectionSearchQuery)}</span>{' '}
+        {filteredCollections.length > 0 ? `${filteredCollections.length} ${filteredCollections.length > 1 ? t('collections') : t('collection')}` : ''} ({filteredNfts.length > 0 ? `${filteredNfts.length} ${filteredNfts.length > 1 ? t('uniqs') : t('uniq')}` : ''})
       </div>
     )
   }
@@ -348,7 +351,7 @@ function MyUniqsPage() {
         <div className='max-w-5xl mx-auto'>
           {/* Header avec titre et barre de recherche */}
           <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-dark-800'>
-            <h1 className='text-3xl font-bold text-primary-300'>Mes UNIQs</h1>
+            <h1 className='text-3xl font-bold text-primary-300'>{t('my_uniqs')}</h1>
 
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto'>
               <div className='relative sm:w-auto'>
@@ -391,7 +394,7 @@ function MyUniqsPage() {
               </div>
 
               <Link to='/collections' className='px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors whitespace-nowrap w-full sm:w-auto text-center'>
-                Explorer les collections
+                {t('explore_collections')}
               </Link>
             </div>
           </div>
@@ -399,10 +402,10 @@ function MyUniqsPage() {
           {/* Sélecteur de collections */}
           {collections.length > 0 && !isLoading && (
             <div className='mb-8'>
-              <h2 className='text-xl font-bold mb-4'>Collections ({filteredCollections.length})</h2>
+              <h2 className='text-xl font-bold mb-4'>{t('collections')} ({filteredCollections.length})</h2>
               <div className='flex flex-wrap gap-3'>
                 <button onClick={() => handleCollectionChange(null)} className={`px-4 py-2 rounded-lg transition-colors ${selectedCollection === null ? 'bg-primary-500 text-white' : 'bg-dark-800 text-white hover:bg-dark-700'}`}>
-                  Tous ({filteredCollections.length})
+                  {t('all_collections').replace('{count}', filteredCollections.length.toString())}
                 </button>
 
                 {displayedCollections.map(collection => (
@@ -413,7 +416,7 @@ function MyUniqsPage() {
 
                 {hasMoreCollections && (
                   <button onClick={() => setShowAllCollections(!showAllCollections)} className='px-4 py-2 rounded-lg bg-dark-800 text-white hover:bg-dark-700 transition-colors'>
-                    {showAllCollections ? 'Afficher moins' : `Afficher ${filteredCollections.length - INITIAL_COLLECTIONS_TO_SHOW} de plus`}
+                    {showAllCollections ? t('show_less_collections') : t('show_more_collections').replace('{count}', (filteredCollections.length - INITIAL_COLLECTIONS_TO_SHOW).toString())}
                   </button>
                 )}
               </div>
@@ -442,12 +445,12 @@ function MyUniqsPage() {
                   const imageUrl = nft.metadata?.content?.medias?.square?.uri || nft.metadata?.content?.medias?.product?.uri || nft.metadata?.content?.medias?.gallery?.uri || nft.metadata?.content?.medias?.hero?.uri
 
                   // Récupérer le nom de la collection pour ce NFT
-                  const collectionName = nft.metadata?.content?.subName || collections.find(c => c.id === nft.factory?.id || c.id === nft.collection?.id)?.name || 'Collection inconnue'
+                  const collectionName = nft.metadata?.content?.subName || collections.find(c => c.id === nft.factory?.id || c.id === nft.collection?.id)?.name || t('unknown_collection')
 
                   return (
                     <div key={nft.id} className='bg-dark-800 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 cursor-pointer' onClick={() => handleNftClick(nft)}>
                       <div className='relative h-48'>
-                        {imageUrl ? <img src={imageUrl} alt={nft.metadata?.content?.name || `NFT #${nft.serialNumber}`} className='w-full h-full object-cover' /> : <div className='w-full h-full bg-dark-800 flex items-center justify-center text-gray-500'>Aucune image</div>}
+                        {imageUrl ? <img src={imageUrl} alt={nft.metadata?.content?.name || `NFT #${nft.serialNumber}`} className='w-full h-full object-cover' /> : <div className='w-full h-full bg-dark-800 flex items-center justify-center text-gray-500'>{t('no_image')}</div>}
                         <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent'></div>
                         <div className='absolute bottom-4 left-4'>
                           <h3 className='text-lg font-semibold text-white'>{nft.metadata?.content?.name || `NFT #${nft.serialNumber}`}</h3>
@@ -456,7 +459,7 @@ function MyUniqsPage() {
                       <div className='p-4'>
                         <div className='flex justify-between items-center mb-2'>
                           <div className='text-sm'>
-                            <span className='text-gray-400'>Serie #</span>
+                            <span className='text-gray-400'>{t('serial_number')}</span>
                             <span className='text-primary-300 ml-1'>{nft.serialNumber}</span>
                           </div>
                           <div className='text-sm'>
@@ -464,8 +467,8 @@ function MyUniqsPage() {
                           </div>
                         </div>
                         <div className='flex justify-between items-center'>
-                          <span className='text-xs text-gray-400'>ID: {nft.id ? nft.id.slice(0, 8) : ''}</span>
-                          <span className='text-primary-300 hover:text-primary-400 text-sm font-medium'>Voir les détails →</span>
+                          <span className='text-xs text-gray-400'>{t('uniq_id')}: {nft.id ? nft.id.slice(0, 8) : ''}</span>
+                          <span className='text-primary-300 hover:text-primary-400 text-sm font-medium'>{t('view_details')} →</span>
                         </div>
                       </div>
                     </div>
@@ -477,11 +480,11 @@ function MyUniqsPage() {
               {totalPages > 1 && (
                 <div className='flex items-center justify-center space-x-4 mt-6'>
                   <button onClick={handlePreviousPage} disabled={currentPage === 1} className={`px-4 py-2 rounded-lg transition-colors ${currentPage === 1 ? 'bg-dark-800 text-gray-500 cursor-not-allowed' : 'bg-dark-700 text-white hover:bg-dark-600'}`}>
-                    Précédent
+                    {t('previous')}
                   </button>
 
                   <div className='flex items-center space-x-2'>
-                    <span className='text-gray-400'>Page</span>
+                    <span className='text-gray-400'>{t('page')}</span>
                     <div className='relative'>
                       <input
                         ref={pageInputRef}
@@ -538,11 +541,11 @@ function MyUniqsPage() {
                         style={{ width: `${String(totalPages).length * 0.75 + 1}rem` }}
                       />
                     </div>
-                    <span className='text-gray-400'>sur {isUNIQLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}</span>
+                    <span className='text-gray-400'>{t('of')} {isUNIQLoadingComplete(blockchainId || '') ? totalPages : totalPages + '+'}</span>
                   </div>
 
                   <button onClick={handleNextPage} disabled={isLastPage || !hasMorePages} className={`px-4 py-2 rounded-lg transition-colors ${isLastPage || !hasMorePages ? 'bg-dark-800 text-gray-500 cursor-not-allowed' : 'bg-dark-700 text-white hover:bg-dark-600'}`}>
-                    Suivant
+                    {t('next')}
                   </button>
                 </div>
               )}
@@ -554,16 +557,16 @@ function MyUniqsPage() {
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' />
                 </svg>
               </div>
-              <h2 className='text-xl font-semibold mb-2'>{collectionSearchQuery ? (selectedCollection ? `Aucun UNIQs trouvés pour "${collectionSearchQuery}" dans cette collection` : 'Aucun UNIQs trouvés pour cette recherche') : selectedCollection ? 'Aucun NFT dans cet UNIQ' : 'Aucun UNIQ pour le moment'}</h2>
-              <p className='text-gray-400 mb-6'>{collectionSearchQuery ? "Essayez avec d'autres termes de recherche." : selectedCollection ? 'Cette collection ne contient pas de UNIQs ou ils sont en cours de chargement.' : 'Commencez à créer votre collection en acquérant de nouveaux UNIQs'}</p>
+              <h2 className='text-xl font-semibold mb-2'>{collectionSearchQuery ? (selectedCollection ? t('no_uniqs_found_in_collection').replace('{query}', collectionSearchQuery) : t('no_uniqs_found').replace('{query}', collectionSearchQuery)) : selectedCollection ? t('no_uniqs_in_collection') : t('no_uniqs')}</h2>
+              <p className='text-gray-400 mb-6'>{collectionSearchQuery ? t('try_other_search_terms') : selectedCollection ? t('collection_empty_or_loading') : t('start_collecting')}</p>
               <div className='flex justify-center gap-4'>
                 {selectedCollection && (
                   <button onClick={() => setCollectionSearchQuery('')} className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors inline-block'>
-                    Voir tous les UNIQs
+                    {t('view_all_uniqs')}
                   </button>
                 )}
                 <Link to='/collections' className='px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors inline-block'>
-                  Explorer les collections
+                  {t('explore_collections')}
                 </Link>
               </div>
             </div>
@@ -577,7 +580,7 @@ function MyUniqsPage() {
           <div ref={nftDetailsRef} className='bg-dark-800 rounded-xl overflow-hidden max-w-3xl w-full max-h-[90vh] flex flex-col' onClick={e => e.stopPropagation()}>
             {/* Header de la popup */}
             <div className='sticky top-0 bg-dark-800 p-4 border-b border-dark-700 flex justify-between items-center'>
-              <h2 className='text-xl font-semibold text-primary-300'>Détails du NFT</h2>
+              <h2 className='text-xl font-semibold text-primary-300'>{t('uniq_details')}</h2>
               <button onClick={handleCloseNftDetails} className='p-1 rounded-full hover:bg-dark-700 transition-colors'>
                 <svg className='w-6 h-6 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -594,14 +597,14 @@ function MyUniqsPage() {
                     {selectedNft.metadata?.content?.medias?.square?.uri || selectedNft.metadata?.content?.medias?.product?.uri || selectedNft.metadata?.content?.medias?.gallery?.uri || selectedNft.metadata?.content?.medias?.hero?.uri ? (
                       <img src={selectedNft.metadata?.content?.medias?.square?.uri || selectedNft.metadata?.content?.medias?.product?.uri || selectedNft.metadata?.content?.medias?.gallery?.uri || selectedNft.metadata?.content?.medias?.hero?.uri} alt={selectedNft.metadata?.content?.name || `NFT #${selectedNft.serialNumber}`} className='w-full h-full object-cover' />
                     ) : (
-                      <div className='w-full h-full flex items-center justify-center text-gray-500'>Aucune image</div>
+                      <div className='w-full h-full flex items-center justify-center text-gray-500'>{t('no_image')}</div>
                     )}
                   </div>
 
                   {/* Attributs */}
                   {selectedNft.attributes && selectedNft.attributes.length > 0 && (
                     <div className='mt-4'>
-                      <h3 className='text-lg font-semibold mb-2'>Attributs</h3>
+                      <h3 className='text-lg font-semibold mb-2'>{t('attributes')}</h3>
                       <div className='grid grid-cols-2 gap-2'>
                         {selectedNft.attributes.map((attr, index) => (
                           <div key={index} className='bg-dark-900 p-2 rounded-lg'>
@@ -619,22 +622,22 @@ function MyUniqsPage() {
                   <h1 className='text-2xl font-bold text-white mb-2'>{selectedNft.metadata?.content?.name || `NFT #${selectedNft.serialNumber}`}</h1>
 
                   <div className='mb-4'>
-                    <span className='text-sm text-gray-400'>Collection</span>
-                    <p className='text-primary-300 font-medium'>{selectedNft.metadata?.content?.subName || collections.find(c => c.id === selectedNft.factory?.id || c.id === selectedNft.collection?.id)?.name || 'Collection inconnue'}</p>
+                    <span className='text-sm text-gray-400'>{t('collection')}</span>
+                    <p className='text-primary-300 font-medium'>{selectedNft.metadata?.content?.subName || collections.find(c => c.id === selectedNft.factory?.id || c.id === selectedNft.collection?.id)?.name || t('unknown_collection')}</p>
                   </div>
 
                   <div className='grid grid-cols-2 gap-4 mb-6'>
                     <div>
-                      <span className='text-sm text-gray-400'>ID du NFT</span>
+                      <span className='text-sm text-gray-400'>{t('uniq_id')}</span>
                       <p className='text-white font-medium break-all'>{selectedNft.id}</p>
                     </div>
                     <div>
-                      <span className='text-sm text-gray-400'>Numéro de série</span>
+                      <span className='text-sm text-gray-400'>{t('serial_number')}</span>
                       <p className='text-white font-medium'>{selectedNft.serialNumber}</p>
                     </div>
                     {selectedNft.mintDate && (
                       <div>
-                        <span className='text-sm text-gray-400'>Date de mint</span>
+                        <span className='text-sm text-gray-400'>{t('mint_date')}</span>
                         <p className='text-white font-medium'>{new Date(selectedNft.mintDate).toLocaleDateString()}</p>
                       </div>
                     )}
@@ -643,7 +646,7 @@ function MyUniqsPage() {
                   {/* Description */}
                   {selectedNft.metadata?.content?.description && (
                     <div className='mb-6'>
-                      <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                      <h3 className='text-lg font-semibold mb-2'>{t('description')}</h3>
                       <div className='text-gray-300 text-sm'>
                         {selectedNft.metadata.content.description.split('\n').map((line, index) => {
                           if (line.trim() === '') return null
@@ -675,7 +678,7 @@ function MyUniqsPage() {
             {/* Footer de la popup */}
             <div className='sticky bottom-0 bg-dark-800 p-4 border-t border-dark-700 flex justify-end'>
               <button onClick={handleCloseNftDetails} className='px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors'>
-                Fermer
+                {t('close')}
               </button>
             </div>
           </div>

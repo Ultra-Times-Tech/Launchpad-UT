@@ -4,6 +4,7 @@ import MintCard from '../components/Card/MintCard'
 import {getAssetUrl} from '../utils/imageHelper'
 import {useUltraWallet} from '../utils/ultraWalletHelper'
 import {createMintTransaction, calculateTotalPrice} from '../utils/transactionHelper'
+import {useTranslation} from '../hooks/useTranslation'
 
 interface UltraError {
   message?: string;
@@ -57,6 +58,7 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
   const [isZoomed, setIsZoomed] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const imageRef = useRef<HTMLImageElement>(null)
+  const {t} = useTranslation()
 
   if (!mint) return null
 
@@ -109,7 +111,7 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
                   <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4' />
                   </svg>
-                  <span>Click to zoom out</span>
+                  <span>{t('click_to_zoom_out')}</span>
                 </div>
               </div>
             )}
@@ -148,17 +150,17 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
           <div className='p-6 space-y-4'>
             <div>
               <h3 className='text-xl font-bold text-primary-300 mb-1'>{mint.name}</h3>
-              <p className='text-sm text-gray-400'>Token ID: {mint.tokenId}</p>
+              <p className='text-sm text-gray-400'>{t('token_id')} {mint.tokenId}</p>
             </div>
 
             <div className='space-y-3'>
               <div className='flex justify-between items-center text-sm'>
-                <span className='text-gray-400'>Price</span>
+                <span className='text-gray-400'>{t('price')}</span>
                 <span className='text-white font-medium'>{mint.price}</span>
               </div>
 
               <div className='flex justify-between items-center text-sm'>
-                <span className='text-gray-400'>Minted by</span>
+                <span className='text-gray-400'>{t('minted_by')}</span>
                 <div className='flex items-center space-x-2'>
                   {mint.minter.username && mint.minter.username !== mint.minter.address.slice(0, 6) ? (
                     <>
@@ -186,13 +188,13 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
               </div>
 
               <div className='flex justify-between items-center text-sm'>
-                <span className='text-gray-400'>Time</span>
+                <span className='text-gray-400'>{t('time')}</span>
                 <span className='text-white'>{mint.timestamp}</span>
               </div>
 
               <div className='pt-3 border-t border-dark-700'>
                 <div className='flex justify-between items-center text-sm'>
-                  <span className='text-gray-400'>Transaction</span>
+                  <span className='text-gray-400'>{t('transaction')}</span>
                   <a 
                     href={`https://explorer.testnet.ultra.io/tx/${mint.transactionHash}`} 
                     target='_blank' 
@@ -225,6 +227,7 @@ function MintPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
   const itemsPerPage = 5
+  const {t} = useTranslation()
 
   useEffect(() => {
     if (!isConnected) {
@@ -299,19 +302,19 @@ function MintPage() {
     setTxHash(null)
 
     if (!isConnected || !blockchainId) {
-      setError('Portefeuille non connecté')
+      setError(t('wallet_not_connected'))
       return
     }
 
     try {
       const ultra = window.ultra
       if (!ultra) {
-        setError('Ultra wallet non disponible')
+        setError(t('ultra_wallet_not_available'))
         return
       }
 
       if (!factory?.mintPrice) {
-        setError('Prix de mint non disponible')
+        setError(t('mint_price_not_available'))
         return
       }
 
@@ -329,7 +332,7 @@ function MintPage() {
         const response = await ultra.signTransaction(transactionMint)
         
         if (response?.data?.transactionHash) {
-          setSuccess('Transaction réussie !')
+          setSuccess(t('transaction_success'))
           setTxHash(response.data.transactionHash)
           
           // Ajouter un nombre de mints correspondant à mintAmount avec les bons liens
@@ -358,7 +361,7 @@ function MintPage() {
           }
         } else {
           console.error('Réponse invalide:', response)
-          setError('La transaction n\'a pas retourné de hash')
+          setError(t('unknown_error'))
         }
       } catch (err: unknown) {
         const ultraError = err as UltraError
@@ -371,49 +374,49 @@ function MintPage() {
         switch (ultraError?.message) {
           case 'Transaction rejected':
           case 'Transaction declined':
-            setError("L'utilisateur a refusé la transaction.")
+            setError(t('transaction_rejected'))
             break
           case 'Wallet window closed':
-            setError("La fenêtre du portefeuille a été fermée.")
+            setError(t('wallet_window_closed'))
             break
           case 'purchase limit reached':
-            setError("Limite d'achat atteinte pour cette option.")
+            setError(t('purchase_limit_reached'))
             break
           case 'unauthorized buyer':
-            setError('Acheteur non autorisé pour cette option.')
+            setError(t('unauthorized_buyer'))
             break
           case 'purchase window closed':
-            setError("La fenêtre d'achat est fermée.")
+            setError(t('purchase_window_closed'))
             break
           case 'insufficient UOS payment':
-            setError("Paiement UOS insuffisant.")
+            setError(t('insufficient_uos_payment'))
             break
           case 'invalid factory ID':
-            setError("ID de factory invalide.")
+            setError(t('invalid_factory_id'))
             break
           case 'insufficient balance for maximum payment':
-            setError("Solde insuffisant pour le paiement maximum.")
+            setError(t('insufficient_balance'))
             break
           case 'Network error':
-            setError("Erreur réseau.")
+            setError(t('network_error'))
             break
           case 'Invalid transaction data':
-            setError("Données de transaction invalides.")
+            setError(t('invalid_transaction_data'))
             break
           case 'Contract execution error':
-            setError("Erreur d'exécution du contrat.")
+            setError(t('contract_execution_error'))
             break
           default:
             if (ultraError?.data?.error?.what) {
-              setError(`Erreur blockchain: ${ultraError.data.error.what}`)
+              setError(`${t('blockchain_error')} ${ultraError.data.error.what}`)
             } else {
-              setError(`Erreur: ${ultraError?.message || 'Erreur inconnue'}`)
+              setError(`${t('unknown_error')}: ${ultraError?.message || ''}`)
             }
         }
       }
     } catch (err) {
       console.error('Erreur globale:', err)
-      setError('Erreur inattendue lors de la transaction')
+      setError(t('unexpected_error'))
     }
   }
 
@@ -438,7 +441,7 @@ function MintPage() {
       <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
         <div className='flex flex-col items-center'>
           <div className='w-16 h-16 border-t-4 border-primary-500 border-solid rounded-full animate-spin'></div>
-          <p className='mt-4 text-xl'>Loading mint page...</p>
+          <p className='mt-4 text-xl'>{t('loading_mint_page')}</p>
         </div>
       </div>
     )
@@ -509,7 +512,7 @@ function MintPage() {
               {/* Progress Bar */}
               <div className='mb-6'>
                 <div className='flex justify-between items-center mb-2'>
-                  <span className='text-gray-300 font-medium'>Mint Progress</span>
+                  <span className='text-gray-300 font-medium'>{t('mint_progress')}</span>
                   <span className='text-primary-300 font-medium'>
                     {factory.minted}/{factory.supply}
                   </span>
@@ -518,14 +521,14 @@ function MintPage() {
                   <div className='bg-gradient-to-r from-primary-400 to-primary-600 h-2.5 rounded-full transition-all duration-500' style={{width: `${(factory.minted / factory.supply) * 100}%`}}></div>
                 </div>
                 <div className='text-center mt-2'>
-                  <span className='bg-primary-600/30 text-primary-300 px-3 py-1 rounded-full text-xs font-medium'>Phase private active</span>
+                  <span className='bg-primary-600/30 text-primary-300 px-3 py-1 rounded-full text-xs font-medium'>{t('phase_private_active')}</span>
                 </div>
               </div>
 
               {/* Mint Amount Selector */}
               <div className='space-y-4'>
                 <div className='flex justify-between items-center'>
-                  <span className='text-gray-300'>Mint Amount</span>
+                  <span className='text-gray-300'>{t('mint_amount')}</span>
                   <div className='flex items-center space-x-3'>
                     <button onClick={decrementMintAmount} className='w-8 h-8 flex items-center justify-center bg-dark-600 hover:bg-dark-500 rounded-lg text-white transition-colors'>
                       -
@@ -538,12 +541,12 @@ function MintPage() {
                 </div>
 
                 <div className='flex justify-between items-center text-sm'>
-                  <span className='text-gray-400'>Price per item:</span>
+                  <span className='text-gray-400'>{t('price_per_item')}</span>
                   <span className='text-primary-300 font-medium'>{factory.mintPrice}</span>
                 </div>
 
                 <div className='flex justify-between items-center'>
-                  <span className='text-gray-400'>Total price:</span>
+                  <span className='text-gray-400'>{t('total_price')}</span>
                   <span className='text-primary-300 font-bold text-xl'>
                     {factory.mintPrice ? calculateTotalPrice(factory.mintPrice, mintAmount) : '0 UOS'}
                   </span>
@@ -553,7 +556,7 @@ function MintPage() {
                   onClick={handleMint} 
                   disabled={!isConnected || walletLoading || !factory} 
                   className='w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 shadow-lg transform hover:translate-y-[-2px] disabled:opacity-50 disabled:cursor-not-allowed'>
-                  {walletLoading ? 'Transaction en cours...' : 'MINT NOW'}
+                  {walletLoading ? t('transaction_in_progress') : t('mint_now')}
                 </button>
                 
                 {error && (
@@ -572,7 +575,7 @@ function MintPage() {
                         rel="noopener noreferrer"
                         className="flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
                       >
-                        <span>Voir la transaction</span>
+                        <span>{t('view_transaction')}</span>
                         <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
@@ -582,7 +585,7 @@ function MintPage() {
                           to="/my-uniqs"
                           className="flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
                         >
-                          <span>Voir mes UNIQs</span>
+                          <span>{t('view_my_uniqs')}</span>
                           <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
@@ -594,14 +597,14 @@ function MintPage() {
 
                 {walletError && (
                   <div className='mt-4 p-4 bg-yellow-500/20 border border-yellow-500 rounded-lg text-yellow-300'>
-                    Erreur portefeuille: {walletError}
+                    {t('wallet_error')} {walletError}
                   </div>
                 )}
               </div>
 
               {/* Mint Phases */}
               <div className='mt-6 pt-6 border-t border-dark-700'>
-                <h3 className='font-bold text-sm text-primary-300 mb-3'>Mint Phases</h3>
+                <h3 className='font-bold text-sm text-primary-300 mb-3'>{t('mint_phases')}</h3>
                 <div className='space-y-3'>
                   {phases.map((phase, index) => (
                     <div key={index} className='flex items-center'>
@@ -625,7 +628,7 @@ function MintPage() {
               <img src={category === '1' ? getAssetUrl('/banners/dark-counseller.png') : getAssetUrl('/banners/phygital.png')} alt='Marketing' className='w-full h-full object-cover' />
               <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent'></div>
             </div>
-            <h3 className='text-xl font-bold text-primary-300 mb-2'>Exclusive Benefits</h3>
+            <h3 className='text-xl font-bold text-primary-300 mb-2'>{t('exclusive_benefits')}</h3>
             <p className='text-gray-300'>
               {category === '1' 
                 ? 'Get a chance to win a high-rarity ViT UniQ through our special raffle system. Every 5 UniQ purchases (excluding Vouchers) enters you into a draw for exclusive rewards.'
@@ -634,34 +637,34 @@ function MintPage() {
           </div>
 
           <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300'>
-            <h3 className='text-xl font-bold text-primary-300 mb-4'>Collection Details</h3>
+            <h3 className='text-xl font-bold text-primary-300 mb-4'>{t('collection_details')}</h3>
             <div className='relative pl-8 before:content-[""] before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-primary-600'>
               <div className='mb-6 relative'>
                 <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
                   <span className='text-white text-xs font-bold'>1</span>
                 </div>
-                <h4 className='text-white font-bold mb-1'>Limited Edition</h4>
+                <h4 className='text-white font-bold mb-1'>{t('limited_edition')}</h4>
                 <p className='text-gray-400 text-sm'>Only 2 unique pieces available</p>
               </div>
               <div className='mb-6 relative'>
                 <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
                   <span className='text-white text-xs font-bold'>2</span>
                 </div>
-                <h4 className='text-white font-bold mb-1'>Artist Signed</h4>
+                <h4 className='text-white font-bold mb-1'>{t('artist_signed')}</h4>
                 <p className='text-gray-400 text-sm'>Each piece signed by C-la</p>
               </div>
               <div className='mb-6 relative'>
                 <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
                   <span className='text-white text-xs font-bold'>3</span>
                 </div>
-                <h4 className='text-white font-bold mb-1'>Physical Conversion</h4>
+                <h4 className='text-white font-bold mb-1'>{t('physical_conversion')}</h4>
                 <p className='text-gray-400 text-sm'>Option to convert to physical artwork</p>
               </div>
               <div className='relative'>
                 <div className='absolute left-[-30px] top-0 w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center'>
                   <span className='text-white text-xs font-bold'>4</span>
                 </div>
-                <h4 className='text-white font-bold mb-1'>Special Raffle</h4>
+                <h4 className='text-white font-bold mb-1'>{t('special_raffle')}</h4>
                 <p className='text-gray-400 text-sm'>Chance to win ViT UniQ rewards</p>
               </div>
             </div>
@@ -671,7 +674,7 @@ function MintPage() {
         {/* Recently Minted Section */}
         <div className='mt-12'>
           <div className='flex justify-between items-center mb-6'>
-            <h2 className='text-2xl font-bold text-primary-300'>Recently Minted</h2>
+            <h2 className='text-2xl font-bold text-primary-300'>{t('recently_minted')}</h2>
             <div className='flex items-center space-x-2'>
               <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className={`p-2 rounded-lg ${currentPage === 1 ? 'text-gray-600 cursor-not-allowed' : 'text-primary-300 hover:bg-dark-800'}`}>
                 <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -679,7 +682,7 @@ function MintPage() {
                 </svg>
               </button>
               <span className='text-gray-400 text-sm'>
-                Page {currentPage} of {totalPages}
+                {t('page')} {currentPage} {t('of')} {totalPages}
               </span>
               <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className={`p-2 rounded-lg ${currentPage === totalPages ? 'text-gray-600 cursor-not-allowed' : 'text-primary-300 hover:bg-dark-800'}`}>
                 <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>

@@ -4,8 +4,10 @@ import FilterBar, {FilterCategory, SortOption, PriceRange} from '../components/F
 import {CollectionCardProps} from '../types/collection.types'
 import {collectionsService} from '../services/collections.service'
 import {generateMockCollections, isPriceInRange} from '../data/collections.data'
+import {useTranslation} from '../hooks/useTranslation'
 
 function CollectionsPage() {
+  const {t} = useTranslation()
   const [currentPage, setCurrentPage] = useState(1)
   const [collections, setCollections] = useState<CollectionCardProps[]>([])
   const [loading, setLoading] = useState(true)
@@ -121,7 +123,7 @@ function CollectionsPage() {
       <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
         <div className='flex flex-col items-center'>
           <div className='w-16 h-16 border-t-4 border-primary-500 border-solid rounded-full animate-spin'></div>
-          <p className='mt-4 text-xl'>Loading collections...</p>
+          <p className='mt-4 text-xl'>{t('loading_collections')}</p>
         </div>
       </div>
     )
@@ -132,7 +134,7 @@ function CollectionsPage() {
       <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
         <div className='text-center'>
           <h2 className='text-2xl font-bold text-red-500 mb-4'>Error</h2>
-          <p className='text-gray-300'>{error}</p>
+          <p className='text-gray-300'>{t('error_loading_collections')}</p>
         </div>
       </div>
     )
@@ -144,8 +146,8 @@ function CollectionsPage() {
       <div className='relative h-80 w-full'>
         <img src='https://picsum.photos/1920/600?random=5' alt='Collections Banner' className='w-full h-full object-cover' />
         <div className='absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center'>
-          <h1 className='text-5xl font-cabin font-bold mb-4 text-primary-300'>NFT Collections</h1>
-          <p className='text-xl max-w-2xl text-center font-quicksand'>Explore our exclusive digital art collections created by world-renowned artists</p>
+          <h1 className='text-5xl font-cabin font-bold mb-4 text-primary-300'>{t('collections_title')}</h1>
+          <p className='text-xl max-w-2xl text-center font-quicksand'>{t('collections_subtitle')}</p>
         </div>
       </div>
 
@@ -168,7 +170,7 @@ function CollectionsPage() {
           <div className='flex justify-center mt-12'>
             <div className='flex space-x-2'>
               <button onClick={() => handlePageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className={`px-4 py-2 rounded-lg ${currentPage === 1 ? 'bg-dark-700 text-gray-500 cursor-not-allowed' : 'bg-dark-800 text-white hover:bg-primary-600 transition-colors'}`}>
-                Previous
+                {t('previous')}
               </button>
 
               {Array.from({length: totalPages}, (_, i) => i + 1).map(number => (
@@ -178,7 +180,7 @@ function CollectionsPage() {
               ))}
 
               <button onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? 'bg-dark-700 text-gray-500 cursor-not-allowed' : 'bg-dark-800 text-white hover:bg-primary-600 transition-colors'}`}>
-                Next
+                {t('next')}
               </button>
             </div>
           </div>

@@ -5,6 +5,7 @@ import {apiRequestor} from '../../utils/axiosInstanceHelper'
 import {Uniq} from '../../utils/uniqService'
 import NftSelector from '../../components/UniqSelector'
 import useUserAvatar, {refreshUserAvatar, clearAvatarCache} from '../../hooks/useUserAvatar'
+import { useTranslation } from '../../contexts/TranslationContext'
 
 interface ProfileData {
   email: string
@@ -37,7 +38,24 @@ function ProfilePage() {
   const [newEmail, setNewEmail] = useState(profile.email)
   const [newUsername, setNewUsername] = useState(profile.username || '')
   const [usernameValid, setUsernameValid] = useState(true)
-  const [loading, setLoading] = useState(false)
+  const {t} = useTranslation()
+
+  // Fonction pour traduire les messages d'erreur du wallet
+  const translateWalletError = (error: string | null): string => {
+    if (!error) return t('transaction_failed')
+    
+    const lowerError = error.toLowerCase()
+    if (lowerError.includes('rejected') || lowerError.includes('refused')) {
+      return t('transaction_rejected')
+    }
+    if (lowerError.includes('not connected')) {
+      return t('wallet_not_connected')
+    }
+    if (lowerError.includes('not installed')) {
+      return t('ultra_wallet_not_available')
+    }
+    return t('transaction_failed')
+  }
 
   // Gérer la fermeture de la popup en cliquant à l'extérieur
   useEffect(() => {
@@ -76,7 +94,6 @@ function ProfilePage() {
     const fetchUserData = async () => {
       if (blockchainId) {
         try {
-          setLoading(true)
           const response = await apiRequestor.get(`/users/wallets/${blockchainId}`)
 
           if (response.data && response.data.data && response.data.data.length > 0) {
@@ -120,9 +137,7 @@ function ProfilePage() {
           }
         } catch (error) {
           console.error('Erreur lors de la récupération des données utilisateur:', error)
-          showError('Impossible de récupérer votre profil')
-        } finally {
-          setLoading(false)
+          showError(t('profile_fetch_error'))
         }
       }
     }
@@ -141,14 +156,14 @@ function ProfilePage() {
   const handleSave = async () => {
     try {
       if (!blockchainId) {
-        showError('Connexion au portefeuille requise')
+        showError(t('wallet_connection_required'))
         return
       }
 
       // Récupérer d'abord l'ID utilisateur à partir du wallet
       const userResponse = await apiRequestor.get(`/users/wallets/${blockchainId}`)
       if (!userResponse.data || !userResponse.data.data || userResponse.data.data.length === 0) {
-        throw new Error('Utilisateur non trouvé')
+        throw new Error(t('user_not_found'))
       }
 
       const userId = userResponse.data.data[0].id
@@ -164,8 +179,8 @@ function ProfilePage() {
         // Préserver les wallets existants
         wallets: userData.wallets || {},
         // Envoyer les notifications au format tableau ["0"] ou ["1"]
-        sendnotif: [profile.emailNotifications ? "1" : "0"],
-        sendcomm: [profile.marketingCommunications ? "1" : "0"]
+        sendnotif: [profile.emailNotifications ? '1' : '0'],
+        sendcomm: [profile.marketingCommunications ? '1' : '0'],
       })
 
       // Mettre à jour l'état local après confirmation du serveur
@@ -175,23 +190,23 @@ function ProfilePage() {
       }))
 
       setIsEditing(false)
-      success('Email mis à jour avec succès !')
+      success(t('email_update_success'))
     } catch (error) {
       console.error("Erreur lors de la mise à jour de l'email:", error)
-      showError("Impossible de mettre à jour l'email")
+      showError(t('email_update_error'))
     }
   }
 
   const handleSaveUsername = async () => {
     if (!blockchainId) {
-      showError('Blockchain ID manquant.')
+      showError(t('blockchain_id_missing'))
       return
     }
 
     const trimmedUsername = newUsername.trim()
 
     if (trimmedUsername.length < 3) {
-      showError("Le nom d'utilisateur doit contenir au moins 3 caractères.")
+      showError(t('username_length_error'))
       return
     }
 
@@ -214,20 +229,21 @@ function ProfilePage() {
         }))
         setNewUsername(trimmedUsername)
         setIsEditingUsername(false)
-        success("Nom d'utilisateur mis à jour avec succès !")
+        success(t('username_update_success'))
       } else {
-        showError(walletError || 'Échec de la signature ou de la diffusion de la transaction.')
+        // Utiliser le message d'erreur du wallet s'il existe, sinon utiliser le message par défaut
+        showError(translateWalletError(walletError))
         console.error('Transaction failed or was declined:', response, walletError)
       }
     } catch (err) {
       console.error('Error during signTransaction process:', err)
-      showError("Une erreur inattendue s'est produite lors de la mise à jour du nom d'utilisateur.")
+      showError(t('unexpected_username_error'))
     }
   }
 
   const handleSaveAvatar = async () => {
     if (!blockchainId || !selectedNft) {
-      showError('Blockchain ID ou NFT manquant.')
+      showError(t('nft_missing'))
       return
     }
 
@@ -258,13 +274,13 @@ function ProfilePage() {
         }
 
         setIsAvatarModalOpen(false)
-        success('Avatar mis à jour avec succès !')
+        success(t('avatar_update_success'))
       } else {
         // En cas d'échec, on réinitialise l'avatar à sa valeur précédente
         if (blockchainId) {
           refreshUserAvatar(blockchainId)
         }
-        showError(walletError || 'Échec de la signature ou de la diffusion de la transaction.')
+        showError(translateWalletError(walletError))
         console.error('Transaction failed or was declined:', response, walletError)
       }
     } catch (err) {
@@ -273,7 +289,7 @@ function ProfilePage() {
         refreshUserAvatar(blockchainId)
       }
       console.error('Error during avatar update process:', err)
-      showError("Une erreur inattendue s'est produite lors de la mise à jour de l'avatar.")
+      showError(t('unexpected_avatar_error'))
     } finally {
       setIsUpdatingAvatar(false)
     }
@@ -281,7 +297,7 @@ function ProfilePage() {
 
   const handleRemoveAvatar = async () => {
     if (!blockchainId) {
-      showError('Blockchain ID manquant.')
+      showError(t('blockchain_id_missing'))
       return
     }
 
@@ -307,13 +323,10 @@ function ProfilePage() {
           refreshUserAvatar(blockchainId)
         }
 
-        success('Avatar supprimé avec succès !')
+        success(t('avatar_remove_success'))
       } else {
-        // En cas d'échec, réinitialiser l'avatar
-        if (blockchainId) {
-          refreshUserAvatar(blockchainId)
-        }
-        showError(walletError || 'Échec de la signature ou de la diffusion de la transaction.')
+        // Utiliser le message d'erreur du wallet s'il existe, sinon utiliser le message par défaut
+        showError(translateWalletError(walletError))
         console.error('Transaction failed or was declined:', response, walletError)
       }
     } catch (err) {
@@ -322,7 +335,7 @@ function ProfilePage() {
         refreshUserAvatar(blockchainId)
       }
       console.error('Error during avatar removal process:', err)
-      showError("Une erreur inattendue s'est produite lors de la suppression de l'avatar.")
+      showError(t('unexpected_avatar_remove_error'))
     } finally {
       setIsRemovingAvatar(false)
     }
@@ -331,7 +344,7 @@ function ProfilePage() {
   const handleCopyAddress = async () => {
     try {
       await navigator.clipboard.writeText(blockchainId || '')
-      success('Adresse du portefeuille copiée dans le presse-papiers !')
+      success(t('wallet_copy_success'))
     } catch (err) {
       console.error('Failed to copy address:', err)
     }
@@ -340,12 +353,12 @@ function ProfilePage() {
   const handleToggleEmailNotifications = async () => {
     try {
       if (!blockchainId) {
-        showError('Connexion au portefeuille requise')
+        showError(t('wallet_connection_required'))
         return
       }
 
       const newValue = !profile.emailNotifications
-      
+
       // Mettre à jour l'interface immédiatement pour une meilleure réactivité
       setProfile(prev => ({
         ...prev,
@@ -372,18 +385,18 @@ function ProfilePage() {
         wallets: userData.wallets || {},
         // Envoyer sendnotif et sendcomm au format tableau
         sendnotif: [newValue ? "1" : "0"],
-        sendcomm: [profile.marketingCommunications ? "1" : "0"]
+        sendcomm: [profile.marketingCommunications ? "1" : "0"],
       }
 
       // Mettre à jour la préférence en base de données
       await apiRequestor.patch(`/users/${userId}`, updateData)
 
       // Afficher la confirmation après succès
-      success(`Notifications par e-mail ${newValue ? 'activées' : 'désactivées'} !`)
+      success(t(profile.emailNotifications ? 'notifications_disabled' : 'notifications_enabled'))
     } catch (error) {
       console.error('Erreur lors de la mise à jour des notifications:', error)
-      showError('Impossible de mettre à jour les préférences de notification')
-      
+      showError(t('notifications_update_error'))
+
       // Restaurer l'état précédent en cas d'erreur
       setProfile(prev => ({
         ...prev,
@@ -395,12 +408,12 @@ function ProfilePage() {
   const handleToggleMarketingCommunications = async () => {
     try {
       if (!blockchainId) {
-        showError('Connexion au portefeuille requise')
+        showError(t('wallet_connection_required'))
         return
       }
 
       const newValue = !profile.marketingCommunications
-      
+
       // Mettre à jour l'interface immédiatement pour une meilleure réactivité
       setProfile(prev => ({
         ...prev,
@@ -426,19 +439,19 @@ function ProfilePage() {
         // Préserver les wallets existants
         wallets: userData.wallets || {},
         // Envoyer sendnotif et sendcomm au format tableau
-        sendnotif: [profile.emailNotifications ? "1" : "0"],
-        sendcomm: [newValue ? "1" : "0"]
+        sendnotif: [profile.emailNotifications ? '1' : '0'],
+        sendcomm: [newValue ? '1' : '0'],
       }
 
       // Mettre à jour la préférence en base de données
       await apiRequestor.patch(`/users/${userId}`, updateData)
 
       // Afficher la confirmation après succès
-      success(`Communications marketing ${newValue ? 'activées' : 'désactivées'} !`)
+      success(t(profile.marketingCommunications ? 'marketing_disabled' : 'marketing_enabled'))
     } catch (error) {
       console.error('Erreur lors de la mise à jour des communications marketing:', error)
-      showError('Impossible de mettre à jour les préférences de communication')
-      
+      showError(t('communications_update_error'))
+
       // Restaurer l'état précédent en cas d'erreur
       setProfile(prev => ({
         ...prev,
@@ -455,7 +468,8 @@ function ProfilePage() {
     <div className='min-h-screen bg-dark-950 text-white py-12'>
       <div className='container mx-auto px-4'>
         <div className='max-w-2xl mx-auto'>
-          <h1 className='text-3xl font-bold text-primary-300 mb-8'>Paramètres du profil</h1>
+          <h1 className='text-3xl font-bold text-primary-300 mb-8'>{t('profile_title')}</h1>
+          <p className='text-gray-600 mb-8'>{t('profile_subtitle')}</p>
 
           <div className='bg-dark-800 rounded-xl p-6 shadow-lg'>
             {/* Profile Avatar */}
@@ -493,15 +507,15 @@ function ProfilePage() {
                 </div>
               </div>
               <div>
-                <h2 className='text-xl font-semibold'>Votre profil</h2>
-                <p className='text-gray-400 text-sm'>Gérer les paramètres de votre compte</p>
+                <h2 className='text-xl font-semibold'>{t('profile_your_profile')}</h2>
+                <p className='text-gray-400 text-sm'>{t('profile_manage_settings')}</p>
                 <div className='mt-2 space-x-2'>
                   <button onClick={() => setIsAvatarModalOpen(true)} className='px-3 py-1 bg-primary-600 text-sm text-white rounded-lg hover:bg-primary-700 transition-colors'>
-                    Changer d'avatar
+                    {t('change_avatar')}
                   </button>
                   {profile.avatarNftId && (
                     <button onClick={handleRemoveAvatar} disabled={isRemovingAvatar} className={`px-3 py-1 bg-red-600 text-sm text-white rounded-lg transition-colors ${isRemovingAvatar ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'}`}>
-                      {isRemovingAvatar ? 'Suppression...' : "Supprimer l'avatar"}
+                      {isRemovingAvatar ? t('removing_avatar') : t('remove_avatar')}
                     </button>
                   )}
                 </div>
@@ -510,12 +524,12 @@ function ProfilePage() {
 
             {/* Username */}
             <div className='mb-6'>
-              <label className='block text-sm font-medium text-gray-400 mb-2'>Nom d'utilisateur</label>
+              <label className='block text-sm font-medium text-gray-400 mb-2'>{t('username')}</label>
               {isEditingUsername ? (
                 <div className='space-y-2'>
                   <div className='flex items-center space-x-2'>
                     <div className='relative w-full'>
-                      <input type='text' value={newUsername} onChange={e => setNewUsername(e.target.value)} className={`w-full px-4 py-2 bg-dark-900 border rounded-lg text-white focus:outline-none focus:border-primary-500 ${!usernameValid ? 'border-red-500' : 'border-dark-700'}`} placeholder="Entrez votre nom d'utilisateur (min. 3 caractères)" />
+                      <input type='text' value={newUsername} onChange={e => setNewUsername(e.target.value)} className={`w-full px-4 py-2 bg-dark-900 border rounded-lg text-white focus:outline-none focus:border-primary-500 ${!usernameValid ? 'border-red-500' : 'border-dark-700'}`} placeholder={t('username_placeholder')} />
                       {!usernameValid && newUsername.trim().length > 0 && (
                         <div className='absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500'>
                           <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor'>
@@ -525,7 +539,7 @@ function ProfilePage() {
                       )}
                     </div>
                     <button onClick={handleSaveUsername} disabled={isWalletLoading || !usernameValid || newUsername.trim().length < 3} className={`px-4 py-2 bg-primary-500 text-white rounded-lg transition-colors ${isWalletLoading || !usernameValid || newUsername.trim().length < 3 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-600'}`}>
-                      {isWalletLoading ? 'Enregistrement...' : 'Enregistrer'}
+                      {isWalletLoading ? t('saving') : t('save')}
                     </button>
                     <button
                       onClick={() => {
@@ -534,16 +548,16 @@ function ProfilePage() {
                       }}
                       disabled={isWalletLoading}
                       className={`px-4 py-2 bg-dark-700 text-white rounded-lg transition-colors ${isWalletLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-dark-600'}`}>
-                      Annuler
+                      {t('cancel')}
                     </button>
                   </div>
-                  <p className='text-xs text-gray-400'>Le nom d'utilisateur doit contenir au moins 3 caractères.</p>
+                  <p className='text-xs text-gray-400'>{t('username_min_length')}</p>
                 </div>
               ) : (
                 <div className='flex items-center space-x-2'>
-                  <input type='text' value={profile.username || ''} disabled placeholder="Aucun nom d'utilisateur défini" className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-gray-300 focus:outline-none' />
+                  <input type='text' value={profile.username || ''} disabled placeholder={t('username_placeholder')} className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-gray-300 focus:outline-none' />
                   <button onClick={() => setIsEditingUsername(true)} className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
-                    Modifier
+                    {t('edit')}
                   </button>
                 </div>
               )}
@@ -551,23 +565,23 @@ function ProfilePage() {
 
             {/* Wallet Address */}
             <div className='mb-6'>
-              <label className='block text-sm font-medium text-gray-400 mb-2'>Adresse du portefeuille</label>
+              <label className='block text-sm font-medium text-gray-400 mb-2'>{t('wallet_address')}</label>
               <div className='flex items-center space-x-2'>
                 <div className='flex-1 px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-gray-300'>{blockchainId}</div>
                 <button onClick={handleCopyAddress} className='px-3 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
-                  Copier
+                  {t('copy')}
                 </button>
               </div>
             </div>
 
             {/* Email */}
             <div className='mb-6'>
-              <label className='block text-sm font-medium text-gray-400 mb-2'>Adresse e-mail</label>
+              <label className='block text-sm font-medium text-gray-400 mb-2'>{t('email')}</label>
               {isEditing ? (
                 <div className='flex items-center space-x-2'>
-                  <input type='email' value={newEmail} onChange={e => setNewEmail(e.target.value)} className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-white focus:outline-none focus:border-primary-500' placeholder='Entrez votre e-mail' />
+                  <input type='email' value={newEmail} onChange={e => setNewEmail(e.target.value)} className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-white focus:outline-none focus:border-primary-500' placeholder={t('email_placeholder')} />
                   <button onClick={handleSave} className='px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors'>
-                    Enregistrer
+                    {t('save')}
                   </button>
                   <button
                     onClick={() => {
@@ -575,14 +589,14 @@ function ProfilePage() {
                       setNewEmail(profile.email)
                     }}
                     className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
-                    Annuler
+                    {t('cancel')}
                   </button>
                 </div>
               ) : (
                 <div className='flex items-center space-x-2'>
                   <input type='email' value={profile.email} disabled className='w-full px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-gray-300 focus:outline-none' />
                   <button onClick={() => setIsEditing(true)} className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
-                    Modifier
+                    {t('edit')}
                   </button>
                 </div>
               )}
@@ -590,11 +604,11 @@ function ProfilePage() {
 
             {/* Additional Settings */}
             <div className='space-y-4'>
-              <h3 className='text-lg font-semibold text-primary-300'>Préférences</h3>
+              <h3 className='text-lg font-semibold text-primary-300'>{t('preferences')}</h3>
               <div className='flex items-center justify-between py-3 border-b border-dark-700'>
                 <div>
-                  <h4 className='font-medium'>Notifications par e-mail</h4>
-                  <p className='text-sm text-gray-400'>Recevoir des mises à jour par e-mail concernant votre activité</p>
+                  <h4 className='font-medium'>{t('email_notifications')}</h4>
+                  <p className='text-sm text-gray-400'>{t('email_notifications_description')}</p>
                 </div>
                 <label className='relative inline-flex items-center cursor-pointer'>
                   <input type='checkbox' checked={profile.emailNotifications} onChange={handleToggleEmailNotifications} className='sr-only peer' />
@@ -603,8 +617,8 @@ function ProfilePage() {
               </div>
               <div className='flex items-center justify-between py-3 border-b border-dark-700'>
                 <div>
-                  <h4 className='font-medium'>Communications marketing</h4>
-                  <p className='text-sm text-gray-400'>Recevoir des mises à jour concernant les nouvelles collections</p>
+                  <h4 className='font-medium'>{t('marketing_communications')}</h4>
+                  <p className='text-sm text-gray-400'>{t('marketing_communications_description')}</p>
                 </div>
                 <label className='relative inline-flex items-center cursor-pointer'>
                   <input type='checkbox' checked={profile.marketingCommunications} onChange={handleToggleMarketingCommunications} className='sr-only peer' />
@@ -621,7 +635,7 @@ function ProfilePage() {
         <div className='fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4'>
           <div ref={avatarModalRef} className='bg-dark-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto' onClick={e => e.stopPropagation()}>
             <div className='sticky top-0 bg-dark-800 p-4 border-b border-dark-700 flex justify-between items-center'>
-              <h2 className='text-xl font-semibold text-primary-300'>Choisir un NFT pour votre avatar</h2>
+              <h2 className='text-xl font-semibold text-primary-300'>{t('select_nft_avatar_title')}</h2>
               <button onClick={() => setIsAvatarModalOpen(false)} className='p-1 rounded-full hover:bg-dark-700 transition-colors'>
                 <svg className='w-6 h-6 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -635,10 +649,10 @@ function ProfilePage() {
 
             <div className='sticky bottom-0 bg-dark-800 p-4 border-t border-dark-700 flex justify-end space-x-3'>
               <button onClick={() => setIsAvatarModalOpen(false)} className='px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors'>
-                Annuler
+                {t('cancel')}
               </button>
               <button onClick={handleSaveAvatar} disabled={!selectedNft || isUpdatingAvatar} className={`px-4 py-2 bg-primary-500 text-white rounded-lg transition-colors ${!selectedNft || isUpdatingAvatar ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-600'}`}>
-                {isUpdatingAvatar ? 'Enregistrement...' : 'Enregistrer'}
+                {isUpdatingAvatar ? t('saving') : t('save')}
               </button>
             </div>
           </div>

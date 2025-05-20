@@ -8,6 +8,7 @@ import {MaterialReactTable, type MRT_ColumnDef, type MRT_ColumnFiltersState, typ
 import {Box, IconButton, Tooltip} from '@mui/material'
 import {Delete as DeleteIcon, Edit as EditIcon} from '@mui/icons-material'
 import {ThemeProvider, createTheme} from '@mui/material/styles'
+import { useTranslation } from '../../hooks/useTranslation'
 
 // Interface utilisateur
 interface UserWallet {
@@ -40,6 +41,7 @@ interface User {
 }
 
 const UserManager = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [userCount, setUserCount] = useState(0)
@@ -88,7 +90,7 @@ const UserManager = () => {
       }
     } catch (error) {
       console.error('Erreur lors de la récupération des utilisateurs:', error)
-      showError('Impossible de charger les utilisateurs.')
+      showError(t('user_management_load_error'))
     } finally {
       setIsLoading(false)
     }
@@ -108,15 +110,13 @@ const UserManager = () => {
 
     try {
       await apiRequestor.delete(`/users/${userToDelete}`)
-      success('Utilisateur supprimé avec succès !')
-      // Fermer la modal et réinitialiser l'utilisateur à supprimer
+      success(t('user_management_delete_success'))
       setIsDeleteModalOpen(false)
       setUserToDelete(null)
-      // Rafraîchir la liste
       fetchUsers()
     } catch (err) {
       console.error('Erreur lors de la suppression:', err)
-      showError("Impossible de supprimer l'utilisateur.")
+      showError(t('user_management_delete_error'))
     }
   }
 
@@ -164,7 +164,7 @@ const UserManager = () => {
   const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => [
       {
-        header: 'ID',
+        header: t('user_management_id'),
         accessorFn: row => row.attributes.id,
         id: 'id',
         size: 80,
@@ -175,7 +175,7 @@ const UserManager = () => {
         ),
       },
       {
-        header: 'Nom',
+        header: t('user_management_name'),
         accessorFn: row => row.attributes.name,
         id: 'name',
         Cell: ({row, cell}) => (
@@ -185,7 +185,7 @@ const UserManager = () => {
         ),
       },
       {
-        header: 'Utilisateur',
+        header: t('user_management_username'),
         accessorFn: row => row.attributes.username,
         id: 'username',
         Cell: ({row, cell}) => (
@@ -195,7 +195,7 @@ const UserManager = () => {
         ),
       },
       {
-        header: 'Email',
+        header: t('user_management_email'),
         accessorFn: row => row.attributes.email,
         id: 'email',
         Cell: ({row, cell}) => (
@@ -205,23 +205,23 @@ const UserManager = () => {
         ),
       },
       {
-        header: 'Statut',
-        accessorFn: row => (row.attributes.block === 0 ? 'Actif' : 'Bloqué'),
+        header: t('user_management_status'),
+        accessorFn: row => (row.attributes.block === 0 ? t('user_management_status_active') : t('user_management_status_inactive')),
         id: 'status',
         size: 85,
         Cell: ({row}) => (
           <span onClick={() => handleRowClick(row.original.id)} className={`cursor-pointer inline-block px-2 py-1 text-xs leading-5 font-semibold rounded-full ${row.original.attributes.block === 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            {row.original.attributes.block === 0 ? 'Actif' : 'Bloqué'}
+            {row.original.attributes.block === 0 ? t('user_management_status_active') : t('user_management_status_inactive')}
           </span>
         ),
         filterVariant: 'select',
         filterSelectOptions: [
-          {value: 'Actif', text: 'Actif'},
-          {value: 'Bloqué', text: 'Bloqué'},
+          {value: t('user_management_status_active'), text: t('user_management_status_active')},
+          {value: t('user_management_status_inactive'), text: t('user_management_status_inactive')},
         ],
       },
       {
-        header: 'Wallet',
+        header: t('user_management_wallet'),
         accessorFn: row => {
           // Récupérer la valeur du wallet depuis row0.field1
           if (row.attributes.wallets) {
@@ -233,7 +233,7 @@ const UserManager = () => {
                 walletsObj = JSON.parse(walletsObj) as ParsedWallets;
               } catch (e) {
                 console.error('Erreur lors du parsing des wallets:', e);
-                return 'Format invalide';
+                return t('user_management_wallet_format_error');
               }
             }
             
@@ -269,13 +269,13 @@ const UserManager = () => {
             return row.attributes['wallet-id'];
           }
           
-          return 'Non défini';
+          return t('user_management_wallet_not_defined');
         },
         id: 'wallet',
         size: 150,
         Cell: ({row}) => {
           // Extraire la valeur du wallet depuis row0.field1
-          let walletValue = 'Non défini';
+          let walletValue = t('user_management_wallet_not_defined');
           
           if (row.original.attributes.wallets) {
             let walletsObj = row.original.attributes.wallets;
@@ -286,7 +286,7 @@ const UserManager = () => {
                 walletsObj = JSON.parse(walletsObj) as ParsedWallets;
               } catch (e) {
                 console.error('Erreur lors du parsing des wallets:', e);
-                walletValue = 'Format invalide';
+                walletValue = t('user_management_wallet_format_error');
               }
             }
             
@@ -319,7 +319,7 @@ const UserManager = () => {
           }
           
           // En dernier recours, utiliser wallet-id s'il existe
-          if (walletValue === 'Non défini' && row.original.attributes['wallet-id']) {
+          if (walletValue === t('user_management_wallet_not_defined') && row.original.attributes['wallet-id']) {
             walletValue = row.original.attributes['wallet-id'];
           }
 
@@ -335,7 +335,7 @@ const UserManager = () => {
         },
       },
       {
-        header: "Date d'inscription",
+        header: t('user_management_register_date'),
         accessorFn: row => row.attributes.registerDate,
         id: 'registerDate',
         Cell: ({row}) => (
@@ -346,7 +346,7 @@ const UserManager = () => {
         sortingFn: 'datetime',
       },
       {
-        header: 'Dernière visite',
+        header: t('user_management_last_visit'),
         accessorFn: row => row.attributes.lastvisitDate || '',
         id: 'lastvisitDate',
         Cell: ({row}) => (
@@ -357,20 +357,20 @@ const UserManager = () => {
         sortingFn: 'datetime',
       },
     ],
-    [handleRowClick]
+    [t]
   )
 
   return (
     <ThemeProvider theme={darkTheme}>
       <div className='bg-gray-800 rounded-lg p-4 shadow-lg'>
         <div className='flex justify-between items-center mb-6'>
-          <h2 className='text-xl font-semibold text-white'>Gestion des Utilisateurs ({userCount})</h2>
+          <h2 className='text-xl font-semibold text-white'>{t('user_management_title')} ({userCount})</h2>
           <div className='flex gap-2'>
-            <button onClick={fetchUsers} className='p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors' title='Actualiser'>
+            <button onClick={fetchUsers} className='p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors' title={t('user_management_refresh')}>
               <FaRedo />
             </button>
             <button onClick={handleAdd} className='flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors'>
-              <FaPlus /> Ajouter
+              <FaPlus /> {t('user_management_add')}
             </button>
           </div>
         </div>
@@ -403,7 +403,7 @@ const UserManager = () => {
             isLoading
               ? {
                   color: 'info',
-                  children: 'Chargement des données',
+                  children: t('user_management_loading'),
                 }
               : undefined
           }
@@ -416,13 +416,13 @@ const UserManager = () => {
           enableRowActions={true}
           displayColumnDefOptions={{
             'mrt-row-actions': {
-              header: 'Actions',
+              header: t('user_management_actions'),
               size: 120,
             },
           }}
           renderRowActions={({row}) => (
             <Box sx={{display: 'flex', gap: '8px', justifyContent: 'center'}}>
-              <Tooltip title='Modifier'>
+              <Tooltip title={t('user_management_edit')}>
                 <IconButton
                   onClick={e => {
                     e.stopPropagation()
@@ -433,7 +433,7 @@ const UserManager = () => {
                   <EditIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title='Supprimer'>
+              <Tooltip title={t('user_management_delete')}>
                 <IconButton
                   onClick={e => {
                     e.stopPropagation()
@@ -467,24 +467,24 @@ const UserManager = () => {
             sx: { cursor: 'pointer' }
           })}
           localization={{
-            actions: 'Actions',
-            and: 'et',
-            cancel: 'Annuler',
-            clearFilter: 'Effacer le filtre',
-            clearSearch: 'Effacer la recherche',
-            clearSort: 'Effacer le tri',
-            columnActions: 'Actions de colonne',
-            edit: 'Modifier',
-            expand: 'Étendre',
-            filterByColumn: 'Filtrer par {column}',
-            sortByColumnAsc: 'Trier par {column} croissant',
-            sortByColumnDesc: 'Trier par {column} décroissant',
-            showHideColumns: 'Afficher/Masquer les colonnes',
-            showHideFilters: 'Afficher/Masquer les filtres',
-            rowsPerPage: 'Lignes par page',
-            of: 'de',
-            noResultsFound: 'Aucun résultat trouvé',
-            search: 'Rechercher',
+            actions: t('user_management_actions'),
+            and: t('user_management_and'),
+            cancel: t('user_management_cancel'),
+            clearFilter: t('user_management_clear_filter'),
+            clearSearch: t('user_management_clear_search'),
+            clearSort: t('user_management_clear_sort'),
+            columnActions: t('user_management_column_actions'),
+            edit: t('user_management_edit'),
+            expand: t('user_management_expand'),
+            filterByColumn: t('user_management_filter_by'),
+            sortByColumnAsc: t('user_management_sort_asc'),
+            sortByColumnDesc: t('user_management_sort_desc'),
+            showHideColumns: t('user_management_show_hide_columns'),
+            showHideFilters: t('user_management_show_hide_filters'),
+            rowsPerPage: t('user_management_rows_per_page'),
+            of: t('user_management_of'),
+            noResultsFound: t('user_management_no_results'),
+            search: t('user_management_search'),
           }}
         />
 
@@ -492,7 +492,13 @@ const UserManager = () => {
         <UserAddEditModal isOpen={isModalOpen} onClose={handleModalClose} userId={selectedUserId} onSuccess={handleModalSuccess} />
 
         {/* Modal de confirmation de suppression */}
-        <DeleteConfirmationModal isOpen={isDeleteModalOpen} onClose={handleCancelDelete} onConfirm={handleConfirmDelete} title='Confirmer la suppression' message='Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.' />
+        <DeleteConfirmationModal 
+          isOpen={isDeleteModalOpen} 
+          onClose={handleCancelDelete} 
+          onConfirm={handleConfirmDelete} 
+          title={t('user_management_delete_confirm')} 
+          message={t('user_management_delete_message')} 
+        />
       </div>
     </ThemeProvider>
   )
