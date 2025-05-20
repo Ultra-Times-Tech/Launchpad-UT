@@ -180,7 +180,7 @@ const FilterBar: React.FC<FilterBarProps> = ({selectedCategories, selectedPriceR
               ))}
               {Array.from(selectedPriceRanges).map(range => (
                 <span key={range} className='px-3 py-1.5 bg-primary-500/20 text-white rounded-lg text-sm flex items-center gap-2 group hover:bg-primary-500/30 transition-colors'>
-                  {range.replace('-', ' to ').replace('under-', 'Under ').replace('above-', 'Above ')} ETH
+                  {range.replace('-', ' to ').replace('under-', 'Under ').replace('above-', 'Above ')} UOS
                   <button onClick={() => onPriceRangeToggle(range)} className='hover:text-primary-300 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20 rounded' aria-label={`Remove ${range} price filter`}>
                     <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />

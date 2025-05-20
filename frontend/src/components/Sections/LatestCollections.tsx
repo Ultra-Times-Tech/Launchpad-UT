@@ -82,7 +82,7 @@ function LatestCollections({latestCollections, mintActivities}: LatestCollection
           </div>
         </div>
 
-        <div className='lg:col-span-1'>
+        <div className='h-[300px] sm:h-[400px] lg:h-[500px] bg-dark-900 rounded-2xl p-4 sm:p-6 backdrop-blur-sm bg-opacity-50 shadow-xl'>
           <h3 className='text-lg sm:text-xl font-cabin font-bold mb-4 sm:mb-6 text-primary-300 px-2'>{t('mint_activities')}</h3>
           <div className='space-y-4 h-[calc(100%-3rem)] sm:h-[calc(100%-3.5rem)] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-dark-700 scrollbar-track-transparent hover:scrollbar-thumb-primary-500/50'>
             {mintActivities.map(activity => (
