@@ -184,7 +184,7 @@ function CollectionsPage() {
       {/* Main Content */}
       <div className='container mx-auto px-4 py-8'>
         {/* Filter Bar */}
-        <div className='mb-8' data-aos="fade-up">
+        <div className='mb-8 relative z-10' data-aos="fade-up">
           <FilterBar selectedCategories={selectedCategories} selectedPriceRanges={selectedPriceRanges} sortBy={sortBy} searchQuery={searchQuery} onCategoryToggle={handleCategoryToggle} onPriceRangeToggle={handlePriceRangeToggle} onSortChange={sort => setSortBy(sort as SortOption)} onSearchChange={setSearchQuery} onClearFilters={handleClearFilters} />
         </div>
 

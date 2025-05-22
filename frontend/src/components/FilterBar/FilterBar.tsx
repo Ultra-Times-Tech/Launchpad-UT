@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import {useTranslation} from '../../hooks/useTranslation'
 
 export type FilterCategory = 'art' | 'game-assets' | 'collectibles'
@@ -22,6 +22,11 @@ const FilterBar: React.FC<FilterBarProps> = ({selectedCategories, selectedPriceR
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<'categories' | 'price' | null>(null)
 
+  const categoriesDropdownRef = useRef<HTMLDivElement>(null)
+  const categoriesButtonRef = useRef<HTMLButtonElement>(null)
+  const priceDropdownRef = useRef<HTMLDivElement>(null)
+  const priceButtonRef = useRef<HTMLButtonElement>(null)
+
   const categories: {value: FilterCategory; label: string}[] = [
     {value: 'art', label: 'Art'},
     {value: 'game-assets', label: 'Game Assets'},
@@ -44,12 +49,27 @@ const FilterBar: React.FC<FilterBarProps> = ({selectedCategories, selectedPriceR
   ]
 
   const handleDropdownClick = (dropdown: 'categories' | 'price') => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown)
+    setOpenDropdown(prevOpen => (prevOpen === dropdown ? null : dropdown))
   }
 
-  const handleClickOutside = () => {
-    setOpenDropdown(null)
-  }
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openDropdown === 'categories') {
+        if (categoriesButtonRef.current && !categoriesButtonRef.current.contains(event.target as Node) && categoriesDropdownRef.current && !categoriesDropdownRef.current.contains(event.target as Node)) {
+          setOpenDropdown(null)
+        }
+      } else if (openDropdown === 'price') {
+        if (priceButtonRef.current && !priceButtonRef.current.contains(event.target as Node) && priceDropdownRef.current && !priceDropdownRef.current.contains(event.target as Node)) {
+          setOpenDropdown(null)
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [openDropdown])
 
   return (
     <div className='w-full'>
@@ -82,8 +102,8 @@ const FilterBar: React.FC<FilterBarProps> = ({selectedCategories, selectedPriceR
               {/* Categories Dropdown */}
               <div className='relative'>
                 <button
+                  ref={categoriesButtonRef}
                   onClick={() => handleDropdownClick('categories')}
-                  onBlur={() => setTimeout(handleClickOutside, 100)}
                   className='w-full lg:w-auto px-4 py-3 bg-dark-900 rounded-xl border border-dark-700 hover:border-primary-500 transition-all flex items-center justify-between gap-2 hover:bg-dark-800 focus:outline-none focus:ring-2 focus:ring-primary-500/20'
                   aria-expanded={openDropdown === 'categories'}
                   aria-haspopup='true'>
@@ -93,7 +113,7 @@ const FilterBar: React.FC<FilterBarProps> = ({selectedCategories, selectedPriceR
                   </svg>
                 </button>
                 {openDropdown === 'categories' && (
-                  <div className='absolute z-50 mt-2 w-64 bg-dark-900 rounded-xl shadow-xl border border-dark-700 p-4 backdrop-blur-xl'>
+                  <div ref={categoriesDropdownRef} className='absolute z-50 mt-2 w-64 bg-dark-900 rounded-xl shadow-xl border border-dark-700 p-4 backdrop-blur-xl'>
                     <div className='space-y-2'>
                       {categories.map(category => (
                         <label key={category.value} className='flex items-center space-x-3 cursor-pointer group hover:bg-dark-800 p-2 rounded-lg transition-colors'>
@@ -116,19 +136,14 @@ const FilterBar: React.FC<FilterBarProps> = ({selectedCategories, selectedPriceR
 
               {/* Price Ranges Dropdown */}
               <div className='relative'>
-                <button
-                  onClick={() => handleDropdownClick('price')}
-                  onBlur={() => setTimeout(handleClickOutside, 100)}
-                  className='w-full lg:w-auto px-4 py-3 bg-dark-900 rounded-xl border border-dark-700 hover:border-primary-500 transition-all flex items-center justify-between gap-2 hover:bg-dark-800 focus:outline-none focus:ring-2 focus:ring-primary-500/20'
-                  aria-expanded={openDropdown === 'price'}
-                  aria-haspopup='true'>
+                <button ref={priceButtonRef} onClick={() => handleDropdownClick('price')} className='w-full lg:w-auto px-4 py-3 bg-dark-900 rounded-xl border border-dark-700 hover:border-primary-500 transition-all flex items-center justify-between gap-2 hover:bg-dark-800 focus:outline-none focus:ring-2 focus:ring-primary-500/20' aria-expanded={openDropdown === 'price'} aria-haspopup='true'>
                   <span className='whitespace-nowrap'>{t('filter_by_price')}</span>
                   <svg className={`w-4 h-4 transition-transform ${openDropdown === 'price' ? 'rotate-180' : ''}`} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
                   </svg>
                 </button>
                 {openDropdown === 'price' && (
-                  <div className='absolute z-50 mt-2 w-64 bg-dark-900 rounded-xl shadow-xl border border-dark-700 p-4 backdrop-blur-xl'>
+                  <div ref={priceDropdownRef} className='absolute z-50 mt-2 w-64 bg-dark-900 rounded-xl shadow-xl border border-dark-700 p-4 backdrop-blur-xl'>
                     <div className='space-y-2'>
                       {priceRanges.map(range => (
                         <label key={range.value} className='flex items-center space-x-3 cursor-pointer group hover:bg-dark-800 p-2 rounded-lg transition-colors'>
