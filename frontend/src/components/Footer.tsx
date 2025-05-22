@@ -7,7 +7,7 @@ function Footer() {
   const {t, currentLang} = useTranslation()
 
   return (
-    <footer className='bg-dark-900 text-white py-12 border-t border-dark-700'>
+    <footer className='bg-dark-900 text-white py-8 md:py-12 border-t border-dark-700'>
       <div className='container mx-auto px-4'>
         <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
           <div className='text-center md:text-left'>
@@ -16,7 +16,7 @@ function Footer() {
               <span className='text-xl font-cabin font-semibold text-primary-300'>Ultra Times</span>
             </div>
             <p className='text-sm mb-4 font-quicksand text-gray-300'>{t('footer_about_description')}</p>
-            <p className='text-xs text-gray-400'>
+            <p className='text-xs text-gray-400 hidden md:block'>
               © {new Date().getFullYear()} Ultra Times - {t('footer_rights_reserved')}
             </p>
           </div>
@@ -74,6 +74,12 @@ function Footer() {
               </a>
             </div>
           </div>
+        </div>
+        {/* Copyright for mobile */}
+        <div className='mt-8 pt-8 border-t border-dark-700 md:hidden text-center'>
+          <p className='text-xs text-gray-400'>
+            © {new Date().getFullYear()} Ultra Times - {t('footer_rights_reserved')}
+          </p>
         </div>
       </div>
     </footer>
