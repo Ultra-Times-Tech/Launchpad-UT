@@ -11,13 +11,19 @@ function Footer() {
       <div className='container mx-auto px-4'>
         <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
           <div className='text-center md:text-left'>
-            <div className='flex items-center justify-center md:justify-start space-x-2 mb-4'>
-              <img src={getAssetUrl('/logos/logo-ut.png')} alt='Ultra Times Logo' className='h-8 w-auto' />
-              <span className='text-xl font-cabin font-semibold text-primary-300'>Ultra Times</span>
+            <div className='flex justify-center md:justify-start mb-4'>
+              <Link to='/' className='flex items-center space-x-2'>
+                <img src={getAssetUrl('/logos/logo-ut.png')} alt='Ultra Times Logo' className='h-8 w-auto' />
+                <span className='text-xl font-cabin font-semibold text-primary-300'>Ultra Times</span>
+              </Link>
             </div>
             <p className='text-sm mb-4 font-quicksand text-gray-300'>{t('footer_about_description')}</p>
             <p className='text-xs text-gray-400 hidden md:block'>
-              © {new Date().getFullYear()} Ultra Times - {t('footer_rights_reserved')}
+              © {new Date().getFullYear()}{' '}
+              <a href='https://discord.gg/BtaEJKsK' target='_blank' rel='noopener noreferrer' className='hover:text-primary-300 transition-colors'>
+                Ultra Times
+              </a>{' '}
+              - {t('footer_rights_reserved')}
             </p>
           </div>
 
@@ -78,7 +84,11 @@ function Footer() {
         {/* Copyright for mobile */}
         <div className='mt-8 pt-8 border-t border-dark-700 md:hidden text-center'>
           <p className='text-xs text-gray-400'>
-            © {new Date().getFullYear()} Ultra Times - {t('footer_rights_reserved')}
+            © {new Date().getFullYear()}{' '}
+            <a href='https://discord.gg/BtaEJKsK' target='_blank' rel='noopener noreferrer' className='hover:text-primary-300 transition-colors'>
+              Ultra Times
+            </a>{' '}
+            - {t('footer_rights_reserved')}
           </p>
         </div>
       </div>
