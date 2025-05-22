@@ -425,7 +425,7 @@ function MyCollectionsPage() {
       disable: 'mobile',
       startEvent: 'load',
       mirror: false,
-      anchorPlacement: 'top-bottom'
+      disableMutationObserver: true
     })
   }, [])
 
@@ -539,7 +539,7 @@ function MyCollectionsPage() {
           <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500'></div>
         </div>
       ) : filteredCollections.length === 0 ? (
-        <div className='text-center py-12' data-aos="fade-up" data-aos-duration="600">
+        <div className='text-center py-12' data-aos="fade-up" data-aos-duration="600" data-aos-anchor-placement="top-center">
           <p className='text-gray-400 text-lg'>{searchTerm ? t('no_collections_found') : t('no_collections')}</p>
           {!searchTerm && (
             <button onClick={handleCreateClick} className='mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 transition-colors'>
