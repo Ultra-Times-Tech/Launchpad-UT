@@ -15,11 +15,6 @@ function CollectionsPage() {
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [searchQuery, setSearchQuery] = useState('')
 
-  console.log('[CollectionsPage] State from useCollections:', { loading, error, allCollectionsLength: allCollections?.length });
-  if (allCollections) {
-    console.log('[CollectionsPage] allCollections RAW:', JSON.stringify(allCollections.slice(0, 2)));
-  }
-
   useEffect(() => {
     AOS.init({
       duration: 1000,
@@ -30,7 +25,6 @@ function CollectionsPage() {
 
   useEffect(() => {
     if (!loading && allCollections && allCollections.length > 0) {
-      console.log('[CollectionsPage] Collections loaded, refreshing AOS.');
       AOS.refresh();
     }
   }, [loading, allCollections]);
@@ -39,7 +33,6 @@ function CollectionsPage() {
 
   // Mapping des collections pour l'affichage
   const mappedCollections = useMemo(() => {
-    console.log('[CollectionsPage] Calculating mappedCollections. Input allCollections length:', allCollections?.length);
     const result = (allCollections || []).map(collection => ({
       id: collection.attributes.id,
       name: collection.attributes.name,
@@ -50,16 +43,11 @@ function CollectionsPage() {
       floorPrice: '0.5',
       category: collection.attributes.is_trending ? 'game-assets' : collection.attributes.is_featured ? 'art' : 'collectibles',
     }))
-    console.log('[CollectionsPage] Calculated mappedCollections. Output length:', result.length);
-    if (result.length > 0) {
-      console.log('[CollectionsPage] First mappedCollection:', JSON.stringify(result[0]));
-    }
     return result;
   }, [allCollections])
 
   // Filtrage et tri
   const filteredCollections = useMemo(() => {
-    console.log('[CollectionsPage] Calculating filteredCollections. Input mappedCollections length:', mappedCollections.length);
     const result = mappedCollections
       .filter(collection => {
         const matchesSearch = collection.name.toLowerCase().includes(searchQuery.toLowerCase()) || collection.artist.toLowerCase().includes(searchQuery.toLowerCase())
@@ -90,19 +78,11 @@ function CollectionsPage() {
             return b.id - a.id
         }
       })
-    console.log('[CollectionsPage] Calculated filteredCollections. Output length:', result.length);
-    if (result.length > 0) {
-      console.log('[CollectionsPage] First filteredCollection:', JSON.stringify(result[0]));
-    }
     return result;
   }, [mappedCollections, searchQuery, selectedCategories, selectedPriceRanges, sortBy])
 
   const totalPages = Math.ceil(filteredCollections.length / collectionsPerPage)
   const currentCollections = filteredCollections.slice((currentPage - 1) * collectionsPerPage, currentPage * collectionsPerPage)
-  console.log('[CollectionsPage] Calculated currentCollections. Output length:', currentCollections.length);
-  if (currentCollections.length > 0) {
-    console.log('[CollectionsPage] First currentCollection:', JSON.stringify(currentCollections[0]));
-  }
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
@@ -146,7 +126,6 @@ function CollectionsPage() {
   }
 
   if (loading) {
-    console.log('[CollectionsPage] Rendering: Loading state');
     return (
       <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
         <div className='flex flex-col items-center'>
@@ -158,7 +137,6 @@ function CollectionsPage() {
   }
 
   if (error && mappedCollections.length === 0) {
-    console.log('[CollectionsPage] Rendering: Error state', { error });
     return (
       <div className='min-h-screen bg-dark-950 text-white flex items-center justify-center'>
         <div className='text-center'>
@@ -169,7 +147,6 @@ function CollectionsPage() {
     )
   }
 
-  console.log('[CollectionsPage] Rendering: Collections list. currentCollections length:', currentCollections.length);
   return (
     <div className='min-h-screen bg-dark-950 text-white'>
       {/* Banner */}

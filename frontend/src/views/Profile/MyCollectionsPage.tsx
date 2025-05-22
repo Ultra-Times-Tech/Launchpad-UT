@@ -382,7 +382,6 @@ function MyCollectionsPage() {
         collectionsResponse.data.data.map(async (item: CollectionApiItem) => {
           try {
             const detailResponse = await apiRequestor.get(`/collections/${item.attributes.id}`)
-            console.log(`Detail for collection ${item.attributes.id}:`, detailResponse.data)
             return detailResponse.data.data
           } catch (err) {
             console.error(`Error fetching details for collection ${item.attributes.id}:`, err)
@@ -403,7 +402,6 @@ function MyCollectionsPage() {
         state: item.attributes.state !== undefined ? item.attributes.state : 0,
       }))
 
-      console.log('Processed collection data:', collectionData)
       setCollections(collectionData)
     } catch (err) {
       showError(t('collections_load_error'))
