@@ -5,6 +5,9 @@ import {getAssetUrl} from '../utils/imageHelper'
 import {useUltraWallet} from '../utils/ultraWalletHelper'
 import {createMintTransaction, calculateTotalPrice} from '../utils/transactionHelper'
 import {useTranslation} from '../hooks/useTranslation'
+// AOS
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 
 interface UltraError {
   message?: string;
@@ -296,6 +299,14 @@ function MintPage() {
     loadData()
   }, [category, id])
 
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100
+    })
+  }, [])
+
   const handleMint = async () => {
     setError(null)
     setSuccess(null)
@@ -450,7 +461,7 @@ function MintPage() {
   return (
     <div className='min-h-screen bg-dark-950 text-white'>
       {/* Hero Banner */}
-      <div className='relative h-64 w-full'>
+      <div className='relative h-64 w-full' data-aos="fade-down">
         <img src={getAssetUrl('/banners/dark-counseller.png')} alt='Mint Banner' className='w-full h-full object-cover' />
         <div className='absolute inset-0 bg-gradient-to-t from-dark-950 to-transparent flex flex-col items-center justify-center'>
           <h1 className='text-4xl font-cabin font-bold mb-2 text-primary-300'>{factory.name}</h1>
@@ -459,7 +470,7 @@ function MintPage() {
       </div>
 
       {/* Navigation Breadcrumb */}
-      <div className='bg-dark-900 py-3 border-b border-dark-700'>
+      <div className='bg-dark-900 py-3 border-b border-dark-700' data-aos="fade-up">
         <div className='container mx-auto px-4'>
           <div className='flex items-center text-sm'>
             <Link to='/' className='text-gray-400 hover:text-primary-300 transition-colors'>
@@ -479,7 +490,7 @@ function MintPage() {
       <div className='container mx-auto px-4 py-8'>
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-8'>
           {/* Left Column - Image */}
-          <div className='lg:col-span-8'>
+          <div className='lg:col-span-8' data-aos="fade-right">
             <div className='bg-dark-800 rounded-xl overflow-hidden shadow-lg backdrop-blur-sm border border-dark-700'>
               <div className='aspect-w-16 aspect-h-5'>
                 <img 
@@ -507,10 +518,10 @@ function MintPage() {
           </div>
 
           {/* Right Column - Mint Info */}
-          <div className='lg:col-span-4'>
+          <div className='lg:col-span-4' data-aos="fade-left">
             <div className='bg-dark-800 rounded-xl p-6 shadow-lg backdrop-blur-sm border border-dark-700 sticky top-4'>
               {/* Progress Bar */}
-              <div className='mb-6'>
+              <div className='mb-6' data-aos="fade-up" data-aos-delay="200">
                 <div className='flex justify-between items-center mb-2'>
                   <span className='text-gray-300 font-medium'>{t('mint_progress')}</span>
                   <span className='text-primary-300 font-medium'>
@@ -526,7 +537,7 @@ function MintPage() {
               </div>
 
               {/* Mint Amount Selector */}
-              <div className='space-y-4'>
+              <div className='space-y-4' data-aos="fade-up" data-aos-delay="300">
                 <div className='flex justify-between items-center'>
                   <span className='text-gray-300'>{t('mint_amount')}</span>
                   <div className='flex items-center space-x-3'>
@@ -603,7 +614,7 @@ function MintPage() {
               </div>
 
               {/* Mint Phases */}
-              <div className='mt-6 pt-6 border-t border-dark-700'>
+              <div className='mt-6 pt-6 border-t border-dark-700' data-aos="fade-up" data-aos-delay="400">
                 <h3 className='font-bold text-sm text-primary-300 mb-3'>{t('mint_phases')}</h3>
                 <div className='space-y-3'>
                   {phases.map((phase, index) => (
@@ -623,7 +634,7 @@ function MintPage() {
 
         {/* Marketing & Roadmap Section */}
         <div className='mt-12 grid grid-cols-1 md:grid-cols-2 gap-8'>
-          <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300'>
+          <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300' data-aos="fade-up" data-aos-delay="500">
             <div className='relative h-48 mb-4 rounded-lg overflow-hidden'>
               <img src={category === '1' ? getAssetUrl('/banners/dark-counseller.png') : getAssetUrl('/banners/phygital.png')} alt='Marketing' className='w-full h-full object-cover' />
               <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent'></div>
@@ -636,7 +647,7 @@ function MintPage() {
             </p>
           </div>
 
-          <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300'>
+          <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300' data-aos="fade-up" data-aos-delay="600">
             <h3 className='text-xl font-bold text-primary-300 mb-4'>{t('collection_details')}</h3>
             <div className='relative pl-8 before:content-[""] before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-primary-600'>
               <div className='mb-6 relative'>
@@ -673,7 +684,7 @@ function MintPage() {
 
         {/* Recently Minted Section */}
         <div className='mt-12'>
-          <div className='flex justify-between items-center mb-6'>
+          <div className='flex justify-between items-center mb-6' data-aos="fade-up" data-aos-delay="700">
             <h2 className='text-2xl font-bold text-primary-300'>{t('recently_minted')}</h2>
             <div className='flex items-center space-x-2'>
               <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className={`p-2 rounded-lg ${currentPage === 1 ? 'text-gray-600 cursor-not-allowed' : 'text-primary-300 hover:bg-dark-800'}`}>
@@ -692,8 +703,8 @@ function MintPage() {
             </div>
           </div>
           <div className='space-y-4'>
-            {currentMints.map(mint => (
-              <div key={mint.id} onClick={() => setSelectedMint(mint)} className='cursor-pointer'>
+            {currentMints.map((mint, index) => (
+              <div key={mint.id} onClick={() => setSelectedMint(mint)} className='cursor-pointer' data-aos="fade-up" data-aos-delay={800 + index * 100}>
                 <MintCard 
                   {...mint} 
                   collectionName={factory.collectionName} 

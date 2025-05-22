@@ -1,6 +1,8 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import {useTranslation} from '../hooks/useTranslation'
 import {getTwitterLink} from '../utils/generalHelper'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 
 interface FormData {
   name: string
@@ -19,6 +21,15 @@ function ContactPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100,
+      easing: 'ease-out-cubic',
+    })
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,15 +57,15 @@ function ContactPage() {
   return (
     <div className='min-h-screen bg-dark-950 text-white p-8'>
       <div className='max-w-4xl mx-auto'>
-        <h1 className='text-3xl font-bold text-primary-300 mb-8'>{t('contact_us')}</h1>
+        <h1 className='text-3xl font-bold text-primary-300 mb-8' data-aos="fade-down">{t('contact_us')}</h1>
 
         <div className='grid md:grid-cols-2 gap-8'>
           {/* Informations de contact */}
-          <div className='bg-dark-800 rounded-lg p-6 border border-dark-700'>
-            <h2 className='text-2xl font-bold text-primary-300 mb-6'>{t('contact_info')}</h2>
+          <div className='bg-dark-800 rounded-lg p-6 border border-dark-700' data-aos="fade-right" data-aos-delay="100">
+            <h2 className='text-2xl font-bold text-primary-300 mb-6' data-aos="fade-down" data-aos-delay="200">{t('contact_info')}</h2>
 
             <div className='space-y-6'>
-              <div>
+              <div data-aos="fade-up" data-aos-delay="300">
                 <h3 className='text-lg font-semibold text-white mb-2'>{t('contact_address')}</h3>
                 <p className='text-gray-300'>
                   123 Rue de l'Innovation
@@ -65,7 +76,7 @@ function ContactPage() {
                 </p>
               </div>
 
-              <div>
+              <div data-aos="fade-up" data-aos-delay="400">
                 <h3 className='text-lg font-semibold text-white mb-2'>{t('contact_email')}</h3>
                 <p className='text-gray-300'>
                   <a href='mailto:contact@ultratimes.com' className='text-primary-300 hover:text-primary-400'>
@@ -74,7 +85,7 @@ function ContactPage() {
                 </p>
               </div>
 
-              <div>
+              <div data-aos="fade-up" data-aos-delay="500">
                 <h3 className='text-lg font-semibold text-white mb-2'>{t('contact_hours')}</h3>
                 <p className='text-gray-300'>
                   {t('contact_hours_monday_friday')}
@@ -85,7 +96,7 @@ function ContactPage() {
                 </p>
               </div>
 
-              <div>
+              <div data-aos="fade-up" data-aos-delay="600">
                 <h3 className='text-lg font-semibold text-white mb-2'>{t('contact_follow')}</h3>
                 <div className='flex space-x-4'>
                   <a href='https://discord.gg/AQAAjF8vBJ' target='_blank' rel='noopener noreferrer' className='text-gray-400 hover:text-primary-300 transition-colors'>
@@ -112,11 +123,11 @@ function ContactPage() {
           </div>
 
           {/* Formulaire de contact */}
-          <div className='bg-dark-800 rounded-lg p-6 border border-dark-700'>
-            <h2 className='text-2xl font-bold text-primary-300 mb-6'>{t('contact_send_message')}</h2>
+          <div className='bg-dark-800 rounded-lg p-6 border border-dark-700' data-aos="fade-left" data-aos-delay="100">
+            <h2 className='text-2xl font-bold text-primary-300 mb-6' data-aos="fade-down" data-aos-delay="200">{t('contact_send_message')}</h2>
 
             <form onSubmit={handleSubmit} className='space-y-6'>
-              <div>
+              <div data-aos="fade-up" data-aos-delay="300">
                 <label htmlFor='name' className='block text-sm font-medium text-gray-300 mb-1'>
                   {t('contact_name')}
                 </label>
@@ -132,7 +143,7 @@ function ContactPage() {
                 />
               </div>
 
-              <div>
+              <div data-aos="fade-up" data-aos-delay="400">
                 <label htmlFor='email' className='block text-sm font-medium text-gray-300 mb-1'>
                   {t('contact_email')}
                 </label>
@@ -148,7 +159,7 @@ function ContactPage() {
                 />
               </div>
 
-              <div>
+              <div data-aos="fade-up" data-aos-delay="500">
                 <label htmlFor='subject' className='block text-sm font-medium text-gray-300 mb-1'>
                   {t('contact_subject')}
                 </label>
@@ -168,7 +179,7 @@ function ContactPage() {
                 </select>
               </div>
 
-              <div>
+              <div data-aos="fade-up" data-aos-delay="600">
                 <label htmlFor='message' className='block text-sm font-medium text-gray-300 mb-1'>
                   {t('contact_message')}
                 </label>
@@ -184,22 +195,24 @@ function ContactPage() {
                 />
               </div>
 
-              <button
-                type='submit'
-                disabled={isSubmitting}
-                className='w-full px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-              >
-                {isSubmitting ? t('contact_sending') : t('contact_send')}
-              </button>
+              <div data-aos="fade-up" data-aos-delay="700">
+                <button
+                  type='submit'
+                  disabled={isSubmitting}
+                  className='w-full px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                >
+                  {isSubmitting ? t('contact_sending') : t('contact_send')}
+                </button>
+              </div>
 
               {submitStatus === 'success' && (
-                <div className='p-4 bg-green-500/20 border border-green-500 rounded-lg text-green-300'>
+                <div className='p-4 bg-green-500/20 border border-green-500 rounded-lg text-green-300' data-aos="fade-up">
                   {t('contact_success')}
                 </div>
               )}
 
               {submitStatus === 'error' && (
-                <div className='p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-300'>
+                <div className='p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-300' data-aos="fade-up">
                   {t('contact_error')}
                 </div>
               )}

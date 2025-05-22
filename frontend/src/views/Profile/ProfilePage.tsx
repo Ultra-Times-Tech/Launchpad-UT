@@ -6,6 +6,8 @@ import {Uniq} from '../../utils/uniqService'
 import NftSelector from '../../components/UniqSelector'
 import useUserAvatar, {refreshUserAvatar, clearAvatarCache} from '../../hooks/useUserAvatar'
 import {useTranslation} from '../../contexts/TranslationContext'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 
 interface ProfileData {
   email: string
@@ -39,6 +41,14 @@ function ProfilePage() {
   const [newUsername, setNewUsername] = useState(profile.username || '')
   const [usernameValid, setUsernameValid] = useState(true)
   const {t} = useTranslation()
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100,
+    })
+  }, [])
 
   // Fonction pour traduire les messages d'erreur du wallet
   const translateWalletError = (error: string | null): string => {
@@ -465,12 +475,12 @@ function ProfilePage() {
     <div className='min-h-screen bg-dark-950 text-white py-12'>
       <div className='container mx-auto px-4'>
         <div className='max-w-2xl mx-auto'>
-          <h1 className='text-3xl font-bold text-primary-300 mb-2'>{t('profile_title')}</h1>
-          <p className='text-gray-600 mb-8'>{t('profile_subtitle')}</p>
+          <h1 className='text-3xl font-bold text-primary-300 mb-2' data-aos="fade-down">{t('profile_title')}</h1>
+          <p className='text-gray-600 mb-8' data-aos="fade-down" data-aos-delay="100">{t('profile_subtitle')}</p>
 
-          <div className='bg-dark-800 rounded-xl p-6 shadow-lg'>
+          <div className='bg-dark-800 rounded-xl p-6 shadow-lg' data-aos="fade-up">
             {/* Profile Avatar */}
-            <div className='flex items-center space-x-4 mb-8'>
+            <div className='flex items-center space-x-4 mb-8' data-aos="fade-up" data-aos-delay="200">
               <div className='relative w-20 h-20 cursor-pointer' onClick={() => setIsAvatarModalOpen(true)}>
                 {/* Fond circulaire */}
                 <div className='absolute inset-0 rounded-full bg-dark-900 z-0'></div>
@@ -520,7 +530,7 @@ function ProfilePage() {
             </div>
 
             {/* Username */}
-            <div className='mb-6'>
+            <div className='mb-6' data-aos="fade-up" data-aos-delay="300">
               <label className='block text-sm font-medium text-gray-400 mb-2'>{t('username')}</label>
               {isEditingUsername ? (
                 <div className='space-y-2'>
@@ -561,7 +571,7 @@ function ProfilePage() {
             </div>
 
             {/* Wallet Address */}
-            <div className='mb-6'>
+            <div className='mb-6' data-aos="fade-up" data-aos-delay="400">
               <label className='block text-sm font-medium text-gray-400 mb-2'>{t('wallet_address')}</label>
               <div className='flex items-center space-x-2'>
                 <div className='flex-1 px-4 py-2 bg-dark-900 border border-dark-700 rounded-lg text-gray-300'>{blockchainId}</div>
@@ -572,7 +582,7 @@ function ProfilePage() {
             </div>
 
             {/* Email */}
-            <div className='mb-6'>
+            <div className='mb-6' data-aos="fade-up" data-aos-delay="500">
               <label className='block text-sm font-medium text-gray-400 mb-2'>{t('email')}</label>
               {isEditing ? (
                 <div className='flex items-center space-x-2'>
@@ -600,7 +610,7 @@ function ProfilePage() {
             </div>
 
             {/* Additional Settings */}
-            <div className='space-y-4'>
+            <div className='space-y-4' data-aos="fade-up" data-aos-delay="600">
               <h3 className='text-lg font-semibold text-primary-300'>{t('preferences')}</h3>
               <div className='flex items-center justify-between py-3 border-b border-dark-700'>
                 <div>
@@ -629,7 +639,7 @@ function ProfilePage() {
 
       {/* Modal for NFT Selection */}
       {isAvatarModalOpen && (
-        <div className='fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4'>
+        <div className='fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4' data-aos="fade">
           <div ref={avatarModalRef} className='bg-dark-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto' onClick={e => e.stopPropagation()}>
             <div className='sticky top-0 bg-dark-800 p-4 border-b border-dark-700 flex justify-between items-center'>
               <h2 className='text-xl font-semibold text-primary-300'>{t('select_nft_avatar_title')}</h2>

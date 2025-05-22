@@ -132,7 +132,7 @@ function CollectionsPage() {
   return (
     <div className='min-h-screen bg-dark-950 text-white'>
       {/* Banner */}
-      <div className='relative h-80 w-full'>
+      <div className='relative h-80 w-full' data-aos="fade-down">
         <img src='https://picsum.photos/1920/600?random=5' alt='Collections Banner' className='w-full h-full object-cover' />
         <div className='absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center'>
           <h1 className='text-5xl font-cabin font-bold mb-4 text-primary-300'>{t('collections_title')}</h1>
@@ -143,20 +143,22 @@ function CollectionsPage() {
       {/* Main Content */}
       <div className='container mx-auto px-4 py-8'>
         {/* Filter Bar */}
-        <div className='mb-8'>
+        <div className='mb-8' data-aos="fade-up">
           <FilterBar selectedCategories={selectedCategories} selectedPriceRanges={selectedPriceRanges} sortBy={sortBy} searchQuery={searchQuery} onCategoryToggle={handleCategoryToggle} onPriceRangeToggle={handlePriceRangeToggle} onSortChange={sort => setSortBy(sort as SortOption)} onSearchChange={setSearchQuery} onClearFilters={handleClearFilters} />
         </div>
 
         {/* Collections Grid */}
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {currentCollections.map(collection => (
-            <CollectionCard key={collection.id} {...collection} />
+          {currentCollections.map((collection, index) => (
+            <div key={collection.id} data-aos="fade-up" data-aos-delay={index * 100}>
+              <CollectionCard {...collection} />
+            </div>
           ))}
         </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className='flex justify-center mt-12'>
+          <div className='flex justify-center mt-12' data-aos="fade-up">
             <div className='flex space-x-2'>
               <button onClick={() => handlePageChange(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className={`px-4 py-2 rounded-lg ${currentPage === 1 ? 'bg-dark-700 text-gray-500 cursor-not-allowed' : 'bg-dark-800 text-white hover:bg-primary-600 transition-colors'}`}>
                 {t('previous')}

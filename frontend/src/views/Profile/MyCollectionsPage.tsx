@@ -6,6 +6,8 @@ import useAlerts from '../../hooks/useAlert'
 import { useTranslation } from '../../contexts/TranslationContext'
 import {getAssetUrl} from '../../utils/imageHelper'
 import {Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Close as CloseIcon, PhotoCamera as PhotoCameraIcon} from '@mui/icons-material'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 
 interface Collection {
   id: number
@@ -415,6 +417,14 @@ function MyCollectionsPage() {
     loadCollections()
   }, [blockchainId, showError])
 
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100,
+    })
+  }, [])
+
   const filteredCollections = collections.filter(collection => collection.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   const handleEditClick = (collection: Collection) => {
@@ -507,7 +517,7 @@ function MyCollectionsPage() {
 
   return (
     <div className='container mx-auto px-4 py-8'>
-      <div className='flex justify-between items-center mb-8'>
+      <div className='flex justify-between items-center mb-8' data-aos="fade-down">
         <h1 className='text-3xl font-bold text-white'>{t('my_collections')}</h1>
         <div className='flex items-center space-x-4'>
           <div className='relative'>
@@ -521,11 +531,11 @@ function MyCollectionsPage() {
       </div>
 
       {loading ? (
-        <div className='flex justify-center items-center h-64'>
+        <div className='flex justify-center items-center h-64' data-aos="fade">
           <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500'></div>
         </div>
       ) : filteredCollections.length === 0 ? (
-        <div className='text-center py-12'>
+        <div className='text-center py-12' data-aos="fade-up">
           <p className='text-gray-400 text-lg'>{searchTerm ? t('no_collections_found') : t('no_collections')}</p>
           {!searchTerm && (
             <button onClick={handleCreateClick} className='mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 transition-colors'>
@@ -535,8 +545,8 @@ function MyCollectionsPage() {
         </div>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {filteredCollections.map(collection => (
-            <div key={collection.id} className='bg-dark-800 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300'>
+          {filteredCollections.map((collection, index) => (
+            <div key={collection.id} className='bg-dark-800 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300' data-aos="fade-up" data-aos-delay={index * 100}>
               <div className='aspect-w-16 aspect-h-9 relative group'>
                 <img src={getAssetUrl(collection.image)} alt={collection.name} className='w-full h-full object-cover' />
                 <div className='absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center'>

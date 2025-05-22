@@ -11,10 +11,22 @@ import Newsletter from '../components/Sections/Newsletter'
 import {mintActivities} from '../data/collections.data'
 // Types
 import {Collection} from '../types/collection.types'
+// AOS
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+import {useEffect} from 'react'
 
 function HomePage() {
   const {featuredCollections, trendingCollections, allCollections, loading, error} = useCollections()
   const {t} = useTranslation()
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100
+    })
+  }, [])
 
   if (loading) {
     return (
@@ -48,11 +60,21 @@ function HomePage() {
 
   return (
     <div className='bg-dark-950 text-white'>
-      <Slider title={t('slider_title')} description={t('slider_description')} buttonText={t('slider_button')} />
-      <FeaturedCollections collections={featuredCollections || []} />
-      <LatestCollections latestCollections={latestCollections} mintActivities={mintActivities} />
-      <TrendingCollections collections={trendingCollections || []} />
-      <Newsletter />
+      <div data-aos="fade-up" data-aos-duration="1200">
+        <Slider title={t('slider_title')} description={t('slider_description')} buttonText={t('slider_button')} />
+      </div>
+      <div data-aos="fade-up" data-aos-delay="200">
+        <FeaturedCollections collections={featuredCollections || []} />
+      </div>
+      <div data-aos="fade-up" data-aos-delay="400">
+        <LatestCollections latestCollections={latestCollections} mintActivities={mintActivities} />
+      </div>
+      <div data-aos="fade-up" data-aos-delay="600">
+        <TrendingCollections collections={trendingCollections || []} />
+      </div>
+      <div data-aos="fade-up" data-aos-delay="800">
+        <Newsletter />
+      </div>
     </div>
   )
 }

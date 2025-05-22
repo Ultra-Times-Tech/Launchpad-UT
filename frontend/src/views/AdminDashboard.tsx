@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import SliderManager from '../components/Admin/SliderManager';
@@ -6,6 +6,8 @@ import UserManager from '../components/Admin/UserManager';
 import { FaImages, FaUsers, FaCog } from 'react-icons/fa';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from '../hooks/useTranslation';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 interface MenuItem {
   id: string;
@@ -37,6 +39,14 @@ const contentVariants = {
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('slider');
   const { t } = useTranslation();
+
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 100,
+    });
+  }, []);
 
   const menuItems: MenuItem[] = [
     { id: 'slider', label: t('admin_slider_management'), icon: <FaImages /> },
@@ -72,18 +82,20 @@ const AdminDashboard = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-900">
       {/* Sidebar */}
-      <div className="w-full md:w-64 bg-gray-800 text-gray-100">
-        <div className="p-6 border-b border-gray-700">
+      <div className="w-full md:w-64 bg-gray-800 text-gray-100" data-aos="fade-right">
+        <div className="p-6 border-b border-gray-700" data-aos="fade-down" data-aos-delay="100">
           <h1 className="text-2xl font-cabin font-bold text-primary-300">{t('admin_title')}</h1>
         </div>
         <nav className="mt-6" role="navigation" aria-label="Menu principal">
-          {menuItems.map((item) => (
+          {menuItems.map((item, index) => (
             <motion.button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               aria-current={activeTab === item.id ? 'page' : undefined}
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
+              data-aos="fade-right"
+              data-aos-delay={100 * (index + 1)}
               className={`
                 w-full flex items-center gap-3 px-6 py-4 transition-colors duration-200
                 focus-visible:outline-none focus-visible:bg-gray-700
@@ -113,6 +125,8 @@ const AdminDashboard = () => {
             initial={false}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
+            data-aos="fade-up"
+            data-aos-delay="200"
           >
             <motion.h2 
               className="text-2xl font-cabin font-bold text-gray-100 mb-6"
@@ -120,6 +134,7 @@ const AdminDashboard = () => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
+              data-aos="fade-down"
             >
               {menuItems.find(item => item.id === activeTab)?.label}
             </motion.h2>

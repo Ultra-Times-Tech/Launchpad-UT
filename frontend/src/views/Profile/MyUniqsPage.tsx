@@ -4,6 +4,8 @@ import {useUltraWallet} from '../../utils/ultraWalletHelper'
 import {fetchUserUNIQs, Uniq, getCachedUNIQs, getCachedCollections, UNIQsCollection, isUNIQLoadingComplete} from '../../utils/uniqService'
 import useAlerts from '../../hooks/useAlert'
 import {useTranslation} from '../../hooks/useTranslation'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 
 const ITEMS_PER_PAGE = 12
 const INITIAL_COLLECTIONS_TO_SHOW = 10
@@ -29,6 +31,14 @@ function MyUniqsPage() {
   const inputRef = useRef<HTMLInputElement>(null)
   const spanRef = useRef<HTMLSpanElement>(null)
   const [inputWidth, setInputWidth] = useState<number>()
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100,
+    })
+  }, [])
 
   // Charger les NFTs au chargement de la page
   useEffect(() => {
@@ -350,7 +360,7 @@ function MyUniqsPage() {
       <div className='container mx-auto px-4'>
         <div className='max-w-5xl mx-auto'>
           {/* Header avec titre et barre de recherche */}
-          <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-dark-800'>
+          <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-dark-800' data-aos="fade-down">
             <h1 className='text-3xl font-bold text-primary-300'>{t('my_uniqs')}</h1>
 
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto'>
@@ -401,7 +411,7 @@ function MyUniqsPage() {
 
           {/* Sélecteur de collections */}
           {collections.length > 0 && !isLoading && (
-            <div className='mb-8'>
+            <div className='mb-8' data-aos="fade-up" data-aos-delay="200">
               <h2 className='text-xl font-bold mb-4'>{t('collections')} ({filteredCollections.length})</h2>
               <div className='flex flex-wrap gap-3'>
                 <button onClick={() => handleCollectionChange(null)} className={`px-4 py-2 rounded-lg transition-colors ${selectedCollection === null ? 'bg-primary-500 text-white' : 'bg-dark-800 text-white hover:bg-dark-700'}`}>
@@ -424,14 +434,14 @@ function MyUniqsPage() {
           )}
 
           {isLoading ? (
-            <div className='flex justify-center items-center py-20'>
+            <div className='flex justify-center items-center py-20' data-aos="fade">
               <div className='animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-500'></div>
             </div>
           ) : displayedNfts.length > 0 ? (
             <>
               {/* Affichage du nom de la collection sélectionnée */}
               {selectedCollection && collections.find(c => c.id === selectedCollection)?.description && !collectionSearchQuery && (
-                <div className='mb-6'>
+                <div className='mb-6' data-aos="fade-up" data-aos-delay="300">
                   <h2 className='text-2xl font-bold text-primary-300 mb-2'>{collections.find(c => c.id === selectedCollection)?.name}</h2>
                   <div className='text-gray-400'>{renderCollectionDescription(collections.find(c => c.id === selectedCollection))}</div>
                 </div>
@@ -441,14 +451,14 @@ function MyUniqsPage() {
               {collectionSearchQuery && getSearchResultsMessage()}
 
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'>
-                {displayedNfts.map(nft => {
+                {displayedNfts.map((nft, index) => {
                   const imageUrl = nft.metadata?.content?.medias?.square?.uri || nft.metadata?.content?.medias?.product?.uri || nft.metadata?.content?.medias?.gallery?.uri || nft.metadata?.content?.medias?.hero?.uri
 
                   // Récupérer le nom de la collection pour ce NFT
                   const collectionName = nft.metadata?.content?.subName || collections.find(c => c.id === nft.factory?.id || c.id === nft.collection?.id)?.name || t('unknown_collection')
 
                   return (
-                    <div key={nft.id} className='bg-dark-800 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 cursor-pointer' onClick={() => handleNftClick(nft)}>
+                    <div key={nft.id} className='bg-dark-800 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 cursor-pointer' onClick={() => handleNftClick(nft)} data-aos="fade-up" data-aos-delay={400 + index * 100}>
                       <div className='relative h-48'>
                         {imageUrl ? <img src={imageUrl} alt={nft.metadata?.content?.name || `NFT #${nft.serialNumber}`} className='w-full h-full object-cover' /> : <div className='w-full h-full bg-dark-800 flex items-center justify-center text-gray-500'>{t('no_image')}</div>}
                         <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent'></div>
@@ -478,7 +488,7 @@ function MyUniqsPage() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className='flex items-center justify-center space-x-4 mt-6'>
+                <div className='flex items-center justify-center space-x-4 mt-6' data-aos="fade-up" data-aos-delay="500">
                   <button onClick={handlePreviousPage} disabled={currentPage === 1} className={`px-4 py-2 rounded-lg transition-colors ${currentPage === 1 ? 'bg-dark-800 text-gray-500 cursor-not-allowed' : 'bg-dark-700 text-white hover:bg-dark-600'}`}>
                     {t('previous')}
                   </button>
@@ -551,7 +561,7 @@ function MyUniqsPage() {
               )}
             </>
           ) : (
-            <div className='text-center py-12 bg-dark-800 rounded-xl'>
+            <div className='text-center py-12 bg-dark-800 rounded-xl' data-aos="fade-up">
               <div className='w-16 h-16 bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-4'>
                 <svg className='w-8 h-8 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' />
@@ -576,7 +586,7 @@ function MyUniqsPage() {
 
       {/* Popup de détails du NFT */}
       {isNftDetailsOpen && selectedNft && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4' data-aos="fade">
           <div ref={nftDetailsRef} className='bg-dark-800 rounded-xl overflow-hidden max-w-3xl w-full max-h-[90vh] flex flex-col' onClick={e => e.stopPropagation()}>
             {/* Header de la popup */}
             <div className='sticky top-0 bg-dark-800 p-4 border-b border-dark-700 flex justify-between items-center'>
