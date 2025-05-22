@@ -73,7 +73,7 @@ function ContactPage() {
   }
 
   return (
-    <div className='min-h-screen bg-dark-950 text-white p-8'>
+    <div className='min-h-screen bg-dark-950 text-white p-8 overflow-x-hidden'>
       <div className='max-w-4xl mx-auto'>
         <h1 className='text-3xl font-bold text-primary-300 mb-8' data-aos="fade-down">{t('contact_us')}</h1>
 
