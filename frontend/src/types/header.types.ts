@@ -1,4 +1,4 @@
-import {TranslationKey} from './translations'
+import {TranslationKey} from './translations.types'
 
 export interface SocialLinkProps {
   href: string

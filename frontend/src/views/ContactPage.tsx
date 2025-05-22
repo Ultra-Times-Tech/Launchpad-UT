@@ -3,6 +3,9 @@ import {useTranslation} from '../hooks/useTranslation'
 import {getTwitterLink} from '../utils/generalHelper'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import axios, { AxiosError } from 'axios';
+import { ApiErrorResponse, ApiSuccessResponse } from '../types/api.types';
+import useAlerts from '../hooks/useAlert';
 
 interface FormData {
   name: string
@@ -13,6 +16,7 @@ interface FormData {
 
 function ContactPage() {
   const {t, currentLang} = useTranslation()
+  const { showAlert } = useAlerts();
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -20,7 +24,6 @@ function ContactPage() {
     message: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   useEffect(() => {
     AOS.init({
@@ -34,16 +37,31 @@ function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setSubmitStatus('idle')
 
     try {
-      // Simuler l'envoi du formulaire
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setSubmitStatus('success')
-      setFormData({name: '', email: '', subject: '', message: ''})
-    } catch (error) {
-      console.error("Erreur lors de l'envoi du message:", error)
-      setSubmitStatus('error')
+      const response = await axios.post<ApiSuccessResponse>('/api/emails/contact', formData);
+      
+      if (response.status === 200) {
+        setFormData({name: '', email: '', subject: '', message: ''});
+        showAlert(t('contact_success') || 'Message sent successfully!', 'success');
+      } else {
+        const messageToShow = response.data?.message || t('contact_error') || 'Failed to send message.';
+        showAlert(messageToShow, 'error');
+      }
+    } catch (err: unknown) {
+      console.error("Erreur lors de l'envoi du message:", err);
+      let finalErrorMessage = t('contact_error') || 'Failed to send message.';
+      if (axios.isAxiosError(err)) {
+        const error = err as AxiosError<ApiErrorResponse>; 
+        if (error.response && error.response.data && error.response.data.message) {
+          if (Array.isArray(error.response.data.message)) {
+            finalErrorMessage = error.response.data.message.join(', ');
+          } else if (typeof error.response.data.message === 'string'){
+            finalErrorMessage = error.response.data.message;
+          }
+        }
+      }
+      showAlert(finalErrorMessage, 'error');
     } finally {
       setIsSubmitting(false)
     }
@@ -204,18 +222,6 @@ function ContactPage() {
                   {isSubmitting ? t('contact_sending') : t('contact_send')}
                 </button>
               </div>
-
-              {submitStatus === 'success' && (
-                <div className='p-4 bg-green-500/20 border border-green-500 rounded-lg text-green-300' data-aos="fade-up">
-                  {t('contact_success')}
-                </div>
-              )}
-
-              {submitStatus === 'error' && (
-                <div className='p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-300' data-aos="fade-up">
-                  {t('contact_error')}
-                </div>
-              )}
             </form>
           </div>
         </div>

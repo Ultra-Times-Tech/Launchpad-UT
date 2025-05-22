@@ -8,6 +8,7 @@ import { UploadsModule } from '../modules/uploads/uploads.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { ConfigModule } from '@nestjs/config'
 import { join } from 'path'
+import { EmailsModule } from '../modules/emails/emails.module'
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { join } from 'path'
     AuthModule, 
     CollectionsModule, 
     UsersModule,
-    UploadsModule
+    UploadsModule,
+    EmailsModule,
   ],
 })
 export class AppModule {}

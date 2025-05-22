@@ -60,7 +60,7 @@ function HomePage() {
 
   return (
     <div className='bg-dark-950 text-white'>
-      <div data-aos="fade-up" data-aos-duration="1200">
+      <div data-aos="fade-down" data-aos-duration="1200">
         <Slider title={t('slider_title')} description={t('slider_description')} buttonText={t('slider_button')} />
       </div>
       <div data-aos="fade-up" data-aos-delay="200">

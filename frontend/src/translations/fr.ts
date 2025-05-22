@@ -1,4 +1,4 @@
-import { Translations } from '../types/translations'
+import { Translations } from '../types/translations.types'
 
 const fr: Translations = {
   home: 'Accueil',
@@ -41,6 +41,9 @@ const fr: Translations = {
   newsletter_button: 'S\'abonner',
   newsletter_success: 'Merci pour votre inscription !',
   newsletter_error: 'Une erreur est survenue. Veuillez réessayer.',
+  newsletter_error_empty: "Veuillez entrer votre adresse e-mail.",
+  newsletter_error_generic: "L'inscription a échoué. Veuillez réessayer.",
+  newsletter_loading: "Inscription en cours...",
   mint_activities: 'Activités de mint',
   footer_about: 'À propos',
   footer_about_description: 'Ultra Times est une plateforme innovante dédiée à l\'art numérique et aux NFTs, offrant une expérience unique aux collectionneurs et aux artistes.',

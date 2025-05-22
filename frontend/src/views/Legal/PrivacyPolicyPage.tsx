@@ -1,6 +1,6 @@
 import {Link} from 'react-router-dom'
 import {useTranslation} from '../../hooks/useTranslation'
-import {TranslationKey} from '../../types/translations'
+import {TranslationKey} from '../../types/translations.types'
 
 function PrivacyPolicyPage() {
   const {t} = useTranslation()
