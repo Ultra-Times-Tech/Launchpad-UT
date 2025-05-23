@@ -6,6 +6,7 @@ export interface Collection {
   attributes: {
     id: number
     name: string
+    content: string
     state: number
     publish_up: string | null
     publish_down: string | null

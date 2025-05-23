@@ -1,5 +1,4 @@
-import {FilterCategory} from '../components/FilterBar/FilterBar'
-import {MintActivity, CollectionCardProps, CollectionDetailsProps, FactoryCardProps} from '../types/collection.types'
+import {MintActivity, CollectionDetailsProps, FactoryCardProps} from '../types/collection.types'
 
 export const mintActivities: MintActivity[] = [
   {
@@ -144,7 +143,7 @@ export function getMockCollection(id: number): CollectionDetailsProps {
           collectionId: 1,
           name: 'Special Edition Factory',
           description: 'Limited edition items with unique properties and enhanced capabilities.',
-          image: '/banners/factory-1.png',
+          image: '/banners/factory-3.png',
           mintPrice: '0.8 UOS',
           supply: 200,
           minted: 189,
@@ -154,7 +153,7 @@ export function getMockCollection(id: number): CollectionDetailsProps {
           collectionId: 1,
           name: 'Legendary Weapons',
           description: 'The rarest and most powerful weapons in the game.',
-          image: '/banners/factory-2.png',
+          image: '/banners/factory-4.png',
           mintPrice: '1.2 UOS',
           supply: 50,
           minted: 42,
@@ -197,7 +196,7 @@ export function getMockCollection(id: number): CollectionDetailsProps {
           collectionId: 2,
           name: 'Ancient Relic Forge',
           description: 'Discover rare relics from forgotten civilizations.',
-          image: '/banners/factory-1.png',
+          image: '/banners/factory-3.png',
           mintPrice: '1.0 UOS',
           supply: 100,
           minted: 87,
@@ -207,7 +206,7 @@ export function getMockCollection(id: number): CollectionDetailsProps {
           collectionId: 2,
           name: 'Street Art Generator',
           description: 'Urban-inspired digital art with a modern twist.',
-          image: '/banners/factory-2.png',
+          image: '/banners/factory-4.png',
           mintPrice: '0.5 UOS',
           supply: 200,
           minted: 176,
@@ -217,68 +216,6 @@ export function getMockCollection(id: number): CollectionDetailsProps {
   ]
 
   return collections.find(c => c.id === id) || collections[0]
-}
-
-// Helper function to generate mock collections
-export function generateMockCollections(count: number): CollectionCardProps[] {
-  const categories: FilterCategory[] = ['art', 'collectibles', 'game-assets', 'music', 'photography', 'sports']
-  const baseCollections = [
-    {
-      id: 1,
-      name: 'Vox-in-Time',
-      description: 'A collection of rare weapons and equipment from the future, featuring unique designs and powerful capabilities.',
-      image: '/banners/vit-banner.png',
-      artist: 'Ultra Times Studios',
-      totalItems: 1000,
-      floorPrice: '0.5',
-      category: 'game-assets' as FilterCategory,
-    },
-    {
-      id: 2,
-      name: 'Ultra Street-Cubism',
-      description: 'Enter the world of mysterious artifacts with this collection of rare and powerful items created by ancient civilizations.',
-      image: '/banners/collection.png',
-      artist: 'Ultra Times Archaeology',
-      totalItems: 500,
-      floorPrice: '0.8',
-      category: 'art' as FilterCategory,
-    },
-    {
-      id: 3,
-      name: 'Crypto Punks Edition',
-      description: 'A collection featuring unique characters with different abilities, backgrounds, and stories from the Ultra Times universe.',
-      image: '/banners/factory-characters.png',
-      artist: 'Ultra Times Creative',
-      totalItems: 750,
-      floorPrice: '1.2',
-      category: 'collectibles' as FilterCategory,
-    },
-    {
-      id: 4,
-      name: 'Factory Power Booster',
-      description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem.',
-      image: '/banners/factory-powerbooster.png',
-      artist: 'Ultra Times Labs',
-      totalItems: 600,
-      floorPrice: '0.75',
-      category: 'game-assets' as FilterCategory,
-    },
-  ]
-
-  const collections: CollectionCardProps[] = []
-
-  for (let i = 0; i < count; i++) {
-    const baseCollection = baseCollections[i % baseCollections.length]
-    collections.push({
-      ...baseCollection,
-      id: i + 1,
-      name: i < baseCollections.length ? baseCollection.name : `${baseCollection.name} #${Math.floor(i / baseCollections.length) + 1}`,
-      category: categories[Math.floor(Math.random() * categories.length)],
-      floorPrice: (Math.random() * 15).toFixed(2),
-    })
-  }
-
-  return collections
 }
 
 // Helper function to check if price is in range
