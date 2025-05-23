@@ -203,8 +203,8 @@ function MyUniqsPage() {
         if (nft.serialNumber.toString().includes(searchTermLower)) return true
 
         // Recherche dans les attributs
-        if (nft.attributes && nft.attributes.length > 0) {
-          return nft.attributes.some(attr => attr.key.toLowerCase().includes(searchTermLower) || attr.value.toString().toLowerCase().includes(searchTermLower))
+        if (nft.metadata?.content?.attributes && nft.metadata.content.attributes.length > 0) {
+          return nft.metadata.content.attributes.some(attr => attr.key.toLowerCase().includes(searchTermLower) || attr.value.toString().toLowerCase().includes(searchTermLower))
         }
 
         return false
@@ -612,11 +612,11 @@ function MyUniqsPage() {
                   </div>
 
                   {/* Attributs */}
-                  {selectedNft.attributes && selectedNft.attributes.length > 0 && (
+                  {selectedNft.metadata?.content?.attributes && selectedNft.metadata.content.attributes.length > 0 && (
                     <div className='mt-4'>
                       <h3 className='text-lg font-semibold mb-2'>{t('attributes')}</h3>
                       <div className='grid grid-cols-2 gap-2'>
-                        {selectedNft.attributes.map((attr, index) => (
+                        {selectedNft.metadata.content.attributes.map((attr, index) => (
                           <div key={index} className='bg-dark-900 p-2 rounded-lg'>
                             <span className='text-xs text-gray-400 block'>{attr.key}</span>
                             <span className='text-sm text-white'>{attr.value.toString()}</span>

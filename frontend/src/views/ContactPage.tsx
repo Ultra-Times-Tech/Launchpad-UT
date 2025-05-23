@@ -97,8 +97,8 @@ function ContactPage() {
               <div data-aos="fade-up" data-aos-delay="400">
                 <h3 className='text-lg font-semibold text-white mb-2'>{t('contact_email')}</h3>
                 <p className='text-gray-300'>
-                  <a href='mailto:contact@ultratimes.com' className='text-primary-300 hover:text-primary-400'>
-                    contact@ultratimes.com
+                  <a href='mailto:info@ultratimes.io' className='text-primary-300 hover:text-primary-400'>
+                    info@ultratimes.io
                   </a>
                 </p>
               </div>

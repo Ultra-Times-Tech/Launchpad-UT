@@ -9,6 +9,10 @@ export interface Uniq {
       name: string
       description?: string
       subName?: string // Nom de la collection
+      attributes?: Array<{
+        key: string
+        value: string | number
+      }>
       medias: {
         square?: {uri: string}
         product?: {uri: string}
@@ -39,10 +43,7 @@ export interface Uniq {
     }
   }
   mintDate?: string
-  attributes?: Array<{
-    key: string
-    value: string | number
-  }>
+  type?: string
 }
 
 export interface UNIQsCollection {
