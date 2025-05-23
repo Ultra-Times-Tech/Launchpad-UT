@@ -584,7 +584,7 @@ function MintPage() {
                         href={`https://explorer.testnet.ultra.io/tx/${txHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
+                        className="flex items-center justify-center gap-2 bg-primary-500/30 hover:bg-primary-500/40 border-2 border-primary-400 text-gray-200 font-medium py-2.5 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] group"
                       >
                         <span>{t('view_transaction')}</span>
                         <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -594,7 +594,7 @@ function MintPage() {
                       {blockchainId && (
                         <Link 
                           to="/my-uniqs"
-                          className="flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
+                          className="flex items-center justify-center gap-2 bg-primary-500/30 hover:bg-primary-500/40 border-2 border-primary-400 text-gray-200 font-medium py-2.5 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] group"
                         >
                           <span>{t('view_my_uniqs')}</span>
                           <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
