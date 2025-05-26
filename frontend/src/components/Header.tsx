@@ -38,7 +38,7 @@ const Header = () => {
             <SocialLinks />
 
             {blockchainId ? (
-              <ProfileDropdown isOpen={isProfileOpen} blockchainId={blockchainId} t={t} handleDisconnect={handleDisconnect} setIsOpen={setIsProfileOpen} profileDropdownRef={profileDropdownRef} />
+              <ProfileDropdown isOpen={isProfileOpen} blockchainId={blockchainId} handleDisconnect={handleDisconnect} setIsOpen={setIsProfileOpen} profileDropdownRef={profileDropdownRef} />
             ) : (
               <button onClick={handleConnect} className='px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20'>
                 {t('connect_wallet' as const)}

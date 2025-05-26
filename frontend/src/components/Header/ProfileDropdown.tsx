@@ -2,10 +2,13 @@ import {Link} from 'react-router-dom'
 import {ProfileDropdownProps} from '../../types/header.types'
 import useUserAvatar from '../../hooks/useUserAvatar'
 import {useUsername} from '../../hooks/useUsername'
+import {useTranslation} from '../../hooks/useTranslation'
+import {AppRouteKey} from '../../contexts/TranslationContext'
 
-const ProfileDropdown = ({isOpen, blockchainId, t, handleDisconnect, setIsOpen, profileDropdownRef}: ProfileDropdownProps) => {
+const ProfileDropdown = ({isOpen, blockchainId, handleDisconnect, setIsOpen, profileDropdownRef}: ProfileDropdownProps) => {
   const {imageUrl, isLoading} = useUserAvatar(blockchainId)
   const {username, isLoading: usernameLoading} = useUsername(blockchainId)
+  const {t, generateLocalizedPath} = useTranslation()
 
   return (
     <div className='relative' ref={profileDropdownRef}>
@@ -33,13 +36,25 @@ const ProfileDropdown = ({isOpen, blockchainId, t, handleDisconnect, setIsOpen, 
             <p className='text-sm text-gray-400'>{t('connected_wallet' as const)}</p>
             <p className='text-sm font-medium text-primary-300 break-all'>{blockchainId}</p>
           </div>
-          <Link to='/profile' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsOpen(false)}>
+          <Link 
+            to={generateLocalizedPath('profile' as AppRouteKey)} 
+            className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' 
+            onClick={() => setIsOpen(false)}
+          >
             {t('profile_settings' as const)}
           </Link>
-          <Link to='/my-collections' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsOpen(false)}>
+          <Link 
+            to={generateLocalizedPath('my_collections' as AppRouteKey)} 
+            className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' 
+            onClick={() => setIsOpen(false)}
+          >
             {t('my_collections' as const)}
           </Link>
-          <Link to='/my-uniqs' className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' onClick={() => setIsOpen(false)}>
+          <Link 
+            to={generateLocalizedPath('my_uniqs' as AppRouteKey)} 
+            className='block px-4 py-2 text-sm text-white hover:bg-dark-700 transition-colors' 
+            onClick={() => setIsOpen(false)}
+          >
             {t('my_uniqs' as const)}
           </Link>
           <button onClick={handleDisconnect} className='w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-700 transition-colors'>

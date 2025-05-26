@@ -25,7 +25,6 @@ export interface LanguageSelectorProps {
 export interface ProfileDropdownProps {
   isOpen: boolean
   blockchainId: string
-  t: TranslationFunction
   handleDisconnect: () => void
   setIsOpen: (isOpen: boolean) => void
   profileDropdownRef: React.RefObject<HTMLDivElement>
