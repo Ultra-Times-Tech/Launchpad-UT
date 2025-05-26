@@ -248,6 +248,7 @@ const de: Translations = {
   marketing_communications_description: 'Erhalte Updates über neue Kollektionen',
   select_nft_avatar: 'UNIQ als Avatar auswählen',
   select_nft_avatar_title: 'UNIQ als Avatar auswählen',
+  select_uniq_avatar: 'UNIQ als Avatar auswählen',
   saving: 'Wird gespeichert...',
   wallet_required: 'Wallet-Verbindung nötig',
   profile_update_success: 'Profil erfolgreich aktualisiert!',

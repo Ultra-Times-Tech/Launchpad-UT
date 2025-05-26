@@ -457,6 +457,7 @@ export type TranslationKey =
   | 'contact_hours_saturday'
   | 'contact_hours_sunday'
   | 'contact_hours_closed'
+  | 'select_uniq_avatar'
 
 export type Language = 'fr' | 'en' | 'de'
 
@@ -466,7 +467,7 @@ export type TranslationValue = string | string[] | ((params: Record<string, stri
 export type RouteSegments = Record<string, string>;
 
 export type Translations = Record<TranslationKey, TranslationValue> & {
-  _routeSegments?: RouteSegments;
+  _routeSegments?: RouteSegments
 }
 
 export type TranslationFunction = (key: TranslationKey, params?: Record<string, string | number | boolean>) => string

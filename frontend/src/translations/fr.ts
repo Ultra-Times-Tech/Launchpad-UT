@@ -81,6 +81,7 @@ const fr: Translations = {
   marketing_communications_description: 'Recevoir des mises à jour concernant les nouvelles collections',
   select_nft_avatar: 'Choisir un NFT pour votre avatar',
   select_nft_avatar_title: 'Choisir un NFT pour votre avatar',
+  select_uniq_avatar: 'Sélectionner un UNIQ comme avatar',
   saving: 'Enregistrement...',
   wallet_required: 'Connexion au portefeuille requise',
   profile_update_success: 'Profil mis à jour avec succès !',

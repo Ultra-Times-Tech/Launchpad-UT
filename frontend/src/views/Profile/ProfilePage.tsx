@@ -67,7 +67,6 @@ function ProfilePage() {
     return t('transaction_failed')
   }
 
-  // Gérer la fermeture de la popup en cliquant à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (isAvatarModalOpen && avatarModalRef.current && !avatarModalRef.current.contains(event.target as Node)) {
