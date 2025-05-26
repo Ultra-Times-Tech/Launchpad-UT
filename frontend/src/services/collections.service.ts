@@ -12,7 +12,7 @@ class CollectionsService {
       return []
     }
   }
-  
+
   async getCollectionById(id: string): Promise<Collection | null> {
     try {
       const response = await apiRequestor.get<CollectionResponse>(`/collections/${id}`)
@@ -22,17 +22,17 @@ class CollectionsService {
       return null
     }
   }
-  
+
   async getFeaturedCollections(): Promise<FeaturedCollectionCardProps[]> {
     try {
       const collections = await this.getAllCollections()
-      
+
       return collections
         .filter(collection => collection.attributes.is_featured)
         .map(collection => ({
           id: collection.attributes.id,
           name: collection.attributes.name,
-          description: 'Collection description...', 
+          description: collection.attributes.content || '',
           image: collection.attributes.image || '/banners/default-banner.png',
           artist: 'Ultra Times',
           date: new Date(collection.attributes.modified).toLocaleDateString('en-US', {
@@ -49,17 +49,17 @@ class CollectionsService {
       return []
     }
   }
-  
+
   async getTrendingCollections(): Promise<TrendingCollection[]> {
     try {
       const collections = await this.getAllCollections()
-      
+
       return collections
         .filter(collection => collection.attributes.is_trending)
         .map(collection => ({
           id: collection.attributes.id,
           name: collection.attributes.name,
-          description: 'Enhance your gameplay with these power boosters that provide special abilities and advantages in the Ultra Times ecosystem, carefully crafted for maximum impact.',
+          description: collection.attributes.content || '',
           image: collection.attributes.image || 'https://picsum.photos/400/300?random=11',
           artist: 'Ultra Times',
           totalItems: 500,
@@ -71,13 +71,13 @@ class CollectionsService {
       return []
     }
   }
-  
+
   async getCollectionDetails(id: string): Promise<CollectionDetailsProps | null> {
     try {
       const collection = await this.getCollectionById(id)
-      
+
       if (!collection) return null
-      
+
       return {
         id: collection.attributes.id,
         name: collection.attributes.name,
@@ -89,17 +89,10 @@ class CollectionsService {
         releaseDate: new Date(collection.attributes.modified).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
-          day: 'numeric'
+          day: 'numeric',
         }),
-        features: [
-          'Each item has unique attributes and features',
-          'Items can be used in the Ultra Times ecosystem',
-          'Rare and legendary items include special benefits',
-          'Owners receive exclusive access to special events',
-          'Limited edition items with enhanced capabilities',
-          'Blockchain-verified ownership and authenticity'
-        ],
-        factories: getMockFactories(collection.attributes.id)
+        features: ['Each item has unique attributes and features', 'Items can be used in the Ultra Times ecosystem', 'Rare and legendary items include special benefits', 'Owners receive exclusive access to special events', 'Limited edition items with enhanced capabilities', 'Blockchain-verified ownership and authenticity'],
+        factories: getMockFactories(collection.attributes.id),
       }
     } catch (error) {
       console.error(`Error fetching collection details ${id}:`, error)
@@ -108,4 +101,4 @@ class CollectionsService {
   }
 }
 
-export const collectionsService = new CollectionsService() 
+export const collectionsService = new CollectionsService()

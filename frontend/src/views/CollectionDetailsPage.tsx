@@ -207,7 +207,7 @@ function CollectionDetailsPage() {
             </div>
 
             <div className='flex items-center justify-center' data-aos="fade-left" data-aos-delay="700">
-              <img src={getAssetUrl('/banners/dark-counseller.png')} alt='Dark Wisdom Counsellor' className='rounded-xl w-full h-48 object-cover' />
+              <img src={getAssetUrl('/banners/factory-1.png')} alt='Dark Wisdom Counsellor' className='rounded-xl w-full h-48 object-cover' />
             </div>
           </div>
         </div>

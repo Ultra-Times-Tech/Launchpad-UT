@@ -276,7 +276,7 @@ function MintPage() {
           const mockMintedItems = Array.from({length: 5}, (_, index) => ({
             id: index + 1,
             name: category === '1' ? 'Dark Wisdom Counsellor' : 'Phygital Voucher',
-            image: category === '1' ? getAssetUrl('/banners/dark-counseller.png') : getAssetUrl('/banners/phygital.png'),
+            image: category === '1' ? getAssetUrl('/banners/factory-1.png') : getAssetUrl('/banners/phygital.png'),
             price: '0 UOS',
             timestamp: `${index * 3 + 2} minutes ago`,
             minter: {
@@ -351,7 +351,7 @@ function MintPage() {
           const newMints = Array.from({ length: mintAmount }, (_, i) => ({
             id: mintedItems.length + i + 1,
             name: factory?.name || '',
-            image: category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniq-phygital.png'),
+            image: category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/phygital.png'),
             price: factory?.mintPrice || '',
             timestamp: 'just now',
             minter: {
@@ -463,7 +463,7 @@ function MintPage() {
     <div className='min-h-screen bg-dark-950 text-white'>
       {/* Hero Banner */}
       <div className='relative h-64 w-full' data-aos="fade-down">
-        <img src={getAssetUrl('/banners/dark-counseller.png')} alt='Mint Banner' className='w-full h-full object-cover' />
+        <img src={getAssetUrl('/banners/factory-1.png')} alt='Mint Banner' className='w-full h-full object-cover' />
         <div className='absolute inset-0 bg-gradient-to-t from-dark-950 to-transparent flex flex-col items-center justify-center'>
           <h1 className='text-4xl font-cabin font-bold mb-2 text-primary-300'>{factory.name}</h1>
           <p className='text-lg font-quicksand'>from {factory.collectionName} by Ultra Times</p>
@@ -501,13 +501,13 @@ function MintPage() {
             <div className='bg-dark-800 rounded-xl overflow-hidden shadow-lg backdrop-blur-sm border border-dark-700'>
               <div className='aspect-w-16 aspect-h-5'>
                 <img 
-                  src={category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniq-phygital.png')} 
+                  src={category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/phygital.png')} 
                   alt={factory.name} 
                   className='w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity'
                   onClick={() => setSelectedMint({
                     id: 0,
                     name: factory.name,
-                    image: category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/uniq-phygital.png'),
+                    image: category === '1' ? getAssetUrl('/banners/uniq-counsellor.png') : getAssetUrl('/banners/phygital.png'),
                     price: factory.mintPrice,
                     timestamp: '',
                     minter: { address: '', username: '' },
@@ -591,7 +591,7 @@ function MintPage() {
                         href={`https://explorer.testnet.ultra.io/tx/${txHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
+                        className="flex items-center justify-center gap-2 bg-primary-500/30 hover:bg-primary-500/40 border-2 border-primary-400 text-gray-200 font-medium py-2.5 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] group"
                       >
                         <span>{t('view_transaction')}</span>
                         <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -601,7 +601,7 @@ function MintPage() {
                       {blockchainId && (
                         <Link 
                           to={generateLocalizedPath('my_uniqs' as AppRouteKey)}
-                          className="flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
+                          className="flex items-center justify-center gap-2 bg-primary-500/30 hover:bg-primary-500/40 border-2 border-primary-400 text-gray-200 font-medium py-2.5 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] group"
                         >
                           <span>{t('view_my_uniqs')}</span>
                           <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -643,7 +643,7 @@ function MintPage() {
         <div className='mt-12 grid grid-cols-1 md:grid-cols-2 gap-8'>
           <div className='bg-dark-800 p-6 rounded-xl shadow-lg backdrop-blur-sm border border-dark-700 transform hover:translate-y-[-2px] transition-all duration-300' data-aos="fade-up" data-aos-delay="500">
             <div className='relative h-48 mb-4 rounded-lg overflow-hidden'>
-              <img src={category === '1' ? getAssetUrl('/banners/dark-counseller.png') : getAssetUrl('/banners/phygital.png')} alt='Marketing' className='w-full h-full object-cover' />
+              <img src={category === '1' ? getAssetUrl('/banners/factory-1.png') : getAssetUrl('/banners/phygital.png')} alt='Marketing' className='w-full h-full object-cover' />
               <div className='absolute inset-0 bg-gradient-to-t from-dark-900 to-transparent'></div>
             </div>
             <h3 className='text-xl font-bold text-primary-300 mb-2'>{t('exclusive_benefits')}</h3>
