@@ -1,9 +1,9 @@
 import fr from './fr'
 import en from './en'
 import de from './de'
-import { TranslationKey } from '../types/translations.types'
+import { Language, Translations } from '../types/translations.types'
 
-export const translations: Record<'fr' | 'en' | 'de', Record<TranslationKey, string>> = {
+export const allTranslations: Record<Language, Translations> = {
   fr,
   en,
   de

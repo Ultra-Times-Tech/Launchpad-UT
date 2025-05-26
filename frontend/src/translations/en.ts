@@ -483,7 +483,27 @@ const en: Translations = {
   contact_hours_monday_friday: 'Monday - Friday: 9:00 AM - 6:00 PM',
   contact_hours_saturday: 'Saturday: 10:00 AM - 4:00 PM',
   contact_hours_sunday: 'Sunday:',
-  contact_hours_closed: 'Closed'
+  contact_hours_closed: 'Closed',
+  // Ajout des segments de route
+  _routeSegments: {
+    home: '', // Pour la page d'accueil, le segment est souvent vide après /en/
+    collections: 'collections',
+    collection_details: 'collection', // pour /collection/:id -> /en/collection/:id
+    mint: 'mint', // pour /mint/:category/:id -> /en/mint/:category/:id
+    profile: 'profile',
+    my_uniqs: 'my-uniqs',
+    my_collections: 'my-collections',
+    admin_ut: 'admin-ut', // Les routes admin/test peuvent souvent rester non traduites
+    legal: 'legal',
+    privacy: 'privacy',
+    terms: 'terms',
+    contact: 'contact',
+    // Test routes - can remain untranslated or be translated
+    factory_test: 'factory-test',
+    mint_test: 'mint-test',
+    collections_test: 'collections-test',
+    upload_test: 'upload-test'
+  }
 }
 
 export default en 

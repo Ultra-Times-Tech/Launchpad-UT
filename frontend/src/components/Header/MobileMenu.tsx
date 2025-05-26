@@ -3,10 +3,15 @@ import {MobileMenuProps} from '../../types/header.types'
 import SocialLinks from './SocialLinks'
 import useUserAvatar from '../../hooks/useUserAvatar'
 import {useUsername} from '../../hooks/useUsername'
+import {useTranslation} from '../../contexts/TranslationContext'
 
 const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDisconnect}: MobileMenuProps) => {
   const {imageUrl, isLoading} = useUserAvatar(blockchainId)
   const {username, isLoading: usernameLoading} = useUsername(blockchainId)
+  const {generateLocalizedPath} = useTranslation()
+
+  const navItems: Array<'home' | 'collections' | 'contact'> = ['home', 'collections', 'contact']
+  const profileItems: Array<'profile' | 'my_collections' | 'my_uniqs'> = ['profile', 'my_collections', 'my_uniqs']
 
   return (
     <>
@@ -15,8 +20,8 @@ const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDi
       <div className={`fixed top-16 left-0 right-0 bg-dark-900 border-b border-dark-700 transition-all duration-300 ease-in-out lg:hidden z-40 ${isOpen ? 'translate-y-0 opacity-100 visible' : 'translate-y-[-100%] opacity-0 invisible'}`}>
         <div className='px-4 sm:px-6 py-4'>
           <nav className='flex flex-col space-y-4'>
-            {(['home', 'collections', 'contact'] as const).map(item => (
-              <Link key={item} to={`/${item === 'home' ? '' : item}`} onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>
+            {navItems.map(item => (
+              <Link key={item} to={generateLocalizedPath(item)} onClick={closeMenu} className='text-white hover:text-primary-300 transition-colors py-2'>
                 {t(item)}
               </Link>
             ))}
@@ -40,15 +45,11 @@ const MobileMenu = ({isOpen, blockchainId, t, closeMenu, handleConnect, handleDi
                     <p className='text-sm font-medium text-primary-300 break-all'>{blockchainId}</p>
                   </div>
                 </div>
-                <Link to='/profile' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
-                  {t('profile_settings' as const)}
-                </Link>
-                <Link to='/my-collections' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
-                  {t('my_collections' as const)}
-                </Link>
-                <Link to='/my-uniqs' onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
-                  {t('my_uniqs' as const)}
-                </Link>
+                {profileItems.map(item => (
+                  <Link key={item} to={generateLocalizedPath(item)} onClick={closeMenu} className='block py-2 text-white hover:text-primary-300 transition-colors'>
+                    {t(item as any)}
+                  </Link>
+                ))}
                 <button onClick={handleDisconnect} className='w-full text-left py-2 text-red-400 hover:text-red-500 transition-colors'>
                   {t('disconnect' as const)}
                 </button>

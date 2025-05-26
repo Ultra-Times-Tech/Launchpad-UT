@@ -1,9 +1,10 @@
 import {Link} from 'react-router-dom'
 import {useTranslation} from '../../hooks/useTranslation'
 import {TranslationKey} from '../../types/translations.types'
+import {AppRouteKey} from '../../contexts/TranslationContext'
 
 function PrivacyPolicyPage() {
-  const {t} = useTranslation()
+  const {t, generateLocalizedPath} = useTranslation()
 
   const renderList = (key: TranslationKey) => {
     const items = t(key)
@@ -66,7 +67,10 @@ function PrivacyPolicyPage() {
         <div className='mt-8 text-center text-gray-400'>
           <p>
             {t('need_help')}{' '}
-            <Link to='/contact' className='text-primary-300 hover:text-primary-400'>
+            <Link 
+              to={generateLocalizedPath('contact' as AppRouteKey)} 
+              className='text-primary-300 hover:text-primary-400'
+            >
               {t('contact_us')}
             </Link>
           </p>

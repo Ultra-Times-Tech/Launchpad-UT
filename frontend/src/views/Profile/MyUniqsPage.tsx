@@ -4,6 +4,7 @@ import {useUltraWallet} from '../../utils/ultraWalletHelper'
 import {fetchUserUNIQs, Uniq, getCachedUNIQs, getCachedCollections, UNIQsCollection, isUNIQLoadingComplete} from '../../utils/uniqService'
 import useAlerts from '../../hooks/useAlert'
 import {useTranslation} from '../../hooks/useTranslation'
+import {AppRouteKey} from '../../contexts/TranslationContext'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 
@@ -11,7 +12,7 @@ const ITEMS_PER_PAGE = 12
 const INITIAL_COLLECTIONS_TO_SHOW = 10
 
 function MyUniqsPage() {
-  const {t} = useTranslation()
+  const {t, generateLocalizedPath} = useTranslation()
   const {blockchainId} = useUltraWallet()
   const {error: showError} = useAlerts()
   const [uniqs, setNfts] = useState<Uniq[]>([])
@@ -403,7 +404,10 @@ function MyUniqsPage() {
                 )}
               </div>
 
-              <Link to='/collections' className='px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors whitespace-nowrap w-full sm:w-auto text-center'>
+              <Link 
+                to={generateLocalizedPath('collections' as AppRouteKey)} 
+                className='px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors whitespace-nowrap w-full sm:w-auto text-center'
+              >
                 {t('explore_collections')}
               </Link>
             </div>
@@ -575,7 +579,10 @@ function MyUniqsPage() {
                     {t('view_all_uniqs')}
                   </button>
                 )}
-                <Link to='/collections' className='px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors inline-block'>
+                <Link 
+                  to={generateLocalizedPath('collections' as AppRouteKey)} 
+                  className='px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors inline-block'
+                >
                   {t('explore_collections')}
                 </Link>
               </div>

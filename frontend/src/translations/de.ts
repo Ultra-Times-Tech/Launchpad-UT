@@ -480,7 +480,25 @@ const de: Translations = {
   contact_hours_monday_friday: 'Montag - Freitag: 9:00 - 18:00 Uhr',
   contact_hours_saturday: 'Samstag: 10:00 - 16:00 Uhr',
   contact_hours_sunday: 'Sonntag:',
-  contact_hours_closed: 'Geschlossen'
+  contact_hours_closed: 'Geschlossen',
+  _routeSegments: {
+    home: '',
+    collections: 'kollektionen',
+    collection_details: 'kollektion',
+    mint: 'minten',
+    profile: 'profil',
+    my_uniqs: 'meine-uniqs',
+    my_collections: 'meine-kollektionen',
+    admin_ut: 'admin-ut',
+    legal: 'impressum',
+    privacy: 'datenschutz',
+    terms: 'nutzungsbedingungen',
+    contact: 'kontakt',
+    factory_test: 'test-factory',
+    mint_test: 'test-mint',
+    collections_test: 'test-kollektionen',
+    upload_test: 'test-upload'
+  }
 }
 
 export default de 

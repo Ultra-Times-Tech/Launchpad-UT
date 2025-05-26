@@ -1,6 +1,7 @@
 import {Link} from 'react-router-dom'
 import {getAssetUrl} from '../../utils/imageHelper'
 import {useTranslation} from '../../hooks/useTranslation'
+import {AppRouteKey} from '../../contexts/TranslationContext'
 
 export interface FeaturedCollectionCardProps {
   id: number
@@ -15,7 +16,7 @@ export interface FeaturedCollectionCardProps {
 }
 
 function FeaturedCollectionCard({id, name, description, image, artist, date, comingSoon = false}: FeaturedCollectionCardProps) {
-  const { t } = useTranslation()
+  const { t, generateLocalizedPath } = useTranslation()
 
   return (
     <div className='bg-dark-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 flex flex-col h-full'>
@@ -36,7 +37,10 @@ function FeaturedCollectionCard({id, name, description, image, artist, date, com
         <p className='text-gray-300 text-sm mb-4 line-clamp-2'>{description}</p>
 
         <div className='mt-auto'>
-          <Link to={`/collection/${id}`} className='block w-full'>
+          <Link 
+            to={generateLocalizedPath('collection_details' as AppRouteKey, { id: String(id) })}
+            className='block w-full'
+          >
             <button className={`w-full font-medium py-2 px-4 rounded-lg transition duration-200 text-sm ${comingSoon ? 'bg-primary-700 text-white cursor-default' : 'bg-primary-500 hover:bg-primary-700 text-white'}`}>
               {comingSoon ? t('collection_coming_soon') : t('collection_mint_access')}
             </button>

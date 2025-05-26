@@ -1,19 +1,20 @@
 import {Link} from 'react-router-dom'
 import FeaturedCollectionCard, {FeaturedCollectionCardProps} from '../Card/FeaturedCollectionCard'
 import {useTranslation} from '../../hooks/useTranslation'
+import {AppRouteKey} from '../../contexts/TranslationContext'
 
 interface FeaturedCollectionsProps {
   collections: FeaturedCollectionCardProps[]
 }
 
 function FeaturedCollections({collections}: FeaturedCollectionsProps) {
-  const {t} = useTranslation()
+  const {t, generateLocalizedPath} = useTranslation()
 
   return (
     <div className='container mx-auto px-4 py-12'>
       <div className='flex justify-between items-center mb-8' data-aos="fade-down">
         <h2 className='text-2xl font-cabin font-bold text-primary-300'>{t('featured_collections')}</h2>
-        <Link to='/collections' className='text-gray-400 hover:text-white font-medium hidden sm:block'>
+        <Link to={generateLocalizedPath('collections' as AppRouteKey)} className='text-gray-400 hover:text-white font-medium hidden sm:block'>
           {t('view_all_collections')} →
         </Link>
       </div>
@@ -27,7 +28,7 @@ function FeaturedCollections({collections}: FeaturedCollectionsProps) {
       </div>
 
       <div className='flex justify-center mt-8' data-aos="fade-up">
-        <Link to='/collections'>
+        <Link to={generateLocalizedPath('collections' as AppRouteKey)}>
           <button className='bg-primary-500 hover:bg-primary-600 text-white font-medium py-2 px-6 rounded-lg transition duration-200 text-sm'>{t('load_more_collections')}</button>
         </Link>
       </div>

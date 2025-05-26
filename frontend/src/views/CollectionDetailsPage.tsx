@@ -6,6 +6,7 @@ import {CollectionDetailsProps} from '../types/collection.types'
 import {collectionsService} from '../services/collections.service'
 import {getMockCollection} from '../data/collections.data'
 import {useTranslation} from '../hooks/useTranslation'
+import {AppRouteKey} from '../contexts/TranslationContext'
 // AOS
 import AOS from 'aos'
 import 'aos/dist/aos.css'
@@ -16,7 +17,7 @@ function CollectionDetailsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'story' | 'features'>('story')
-  const {t} = useTranslation()
+  const {t, generateLocalizedPath} = useTranslation()
 
   useEffect(() => {
     AOS.init({
@@ -72,7 +73,10 @@ function CollectionDetailsPage() {
       <div className='min-h-screen bg-dark-950 text-white flex flex-col items-center justify-center'>
         <h2 className='text-2xl font-bold text-red-500 mb-4'>Error</h2>
         <p className='mb-6 text-gray-300'>{error}</p>
-        <Link to='/collections' className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200'>
+        <Link 
+          to={generateLocalizedPath('collections' as AppRouteKey)} 
+          className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200'
+        >
           Back to Collections
         </Link>
       </div>
@@ -84,7 +88,10 @@ function CollectionDetailsPage() {
       <div className='min-h-screen bg-dark-950 text-white flex flex-col items-center justify-center'>
         <h2 className='text-2xl font-bold mb-4'>Collection Not Found</h2>
         <p className='mb-6'>The collection you're looking for doesn't exist or has been removed.</p>
-        <Link to='/collections' className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200'>
+        <Link 
+          to={generateLocalizedPath('collections' as AppRouteKey)} 
+          className='bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200'
+        >
           Back to Collections
         </Link>
       </div>
@@ -110,7 +117,10 @@ function CollectionDetailsPage() {
       <div className='bg-dark-800 py-4 sticky top-0 z-10 shadow-lg' data-aos="fade-up">
         <div className='container mx-auto px-4'>
           <div className='flex justify-between items-center'>
-            <Link to='/collections' className='text-white hover:text-primary-300 transition'>
+            <Link 
+              to={generateLocalizedPath('collections' as AppRouteKey)} 
+              className='text-white hover:text-primary-300 transition'
+            >
               ← Back to Collections
             </Link>
             <div className='flex space-x-6'>

@@ -5,6 +5,7 @@ import {getAssetUrl} from '../utils/imageHelper'
 import {useUltraWallet} from '../utils/ultraWalletHelper'
 import {createMintTransaction, calculateTotalPrice} from '../utils/transactionHelper'
 import {useTranslation} from '../hooks/useTranslation'
+import {AppRouteKey} from '../contexts/TranslationContext'
 // AOS
 import AOS from 'aos'
 import 'aos/dist/aos.css'
@@ -230,7 +231,7 @@ function MintPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [txHash, setTxHash] = useState<string | null>(null)
   const itemsPerPage = 5
-  const {t} = useTranslation()
+  const {t, generateLocalizedPath} = useTranslation()
 
   useEffect(() => {
     if (!isConnected) {
@@ -473,11 +474,17 @@ function MintPage() {
       <div className='bg-dark-900 py-3 border-b border-dark-700' data-aos="fade-up">
         <div className='container mx-auto px-4'>
           <div className='flex items-center text-sm'>
-            <Link to='/' className='text-gray-400 hover:text-primary-300 transition-colors'>
+            <Link 
+              to={generateLocalizedPath('home' as AppRouteKey)} 
+              className='text-gray-400 hover:text-primary-300 transition-colors'
+            >
               Homepage
             </Link>
             <span className='mx-2 text-gray-600'>/</span>
-            <Link to={`/collection/${id}`} className='text-gray-400 hover:text-primary-300 transition-colors'>
+            <Link 
+              to={generateLocalizedPath('collection_details' as AppRouteKey, { id: id })} 
+              className='text-gray-400 hover:text-primary-300 transition-colors'
+            >
               {factory.collectionName}
             </Link>
             <span className='mx-2 text-gray-600'>/</span>
@@ -593,7 +600,7 @@ function MintPage() {
                       </a>
                       {blockchainId && (
                         <Link 
-                          to="/my-uniqs"
+                          to={generateLocalizedPath('my_uniqs' as AppRouteKey)}
                           className="flex items-center justify-center gap-2 bg-dark-700 hover:bg-dark-600 border border-primary-400 text-primary-300 font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:translate-y-[-1px] group"
                         >
                           <span>{t('view_my_uniqs')}</span>

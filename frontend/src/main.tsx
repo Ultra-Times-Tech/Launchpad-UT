@@ -13,14 +13,14 @@ const basePath = import.meta.env.PROD ? '' : import.meta.env.VITE_APP_PATHNAME |
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
+  <BrowserRouter basename={basePath ? `/${basePath}` : ''}>
     <ApolloProvider client={client}>
       <AlertProvider>
         <TranslationProvider>
-          <BrowserRouter basename={basePath ? `/${basePath}` : ''}>
-            <App />
-          </BrowserRouter>
+          <App />
         </TranslationProvider>
       </AlertProvider>
     </ApolloProvider>
+  </BrowserRouter>
   // </StrictMode>
 )

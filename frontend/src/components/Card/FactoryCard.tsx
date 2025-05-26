@@ -1,6 +1,7 @@
 import {Link} from 'react-router-dom'
 import {getAssetUrl} from '../../utils/imageHelper'
 import {useTranslation} from '../../hooks/useTranslation'
+import {AppRouteKey} from '../../contexts/TranslationContext'
 
 export interface FactoryCardProps {
   id: number
@@ -14,7 +15,7 @@ export interface FactoryCardProps {
 }
 
 function FactoryCard({id, collectionId, name, description, image, mintPrice, supply, minted}: FactoryCardProps) {
-  const {t} = useTranslation()
+  const {t, generateLocalizedPath} = useTranslation()
 
   return (
     <div className='bg-dark-800 rounded-xl overflow-hidden'>
@@ -42,7 +43,10 @@ function FactoryCard({id, collectionId, name, description, image, mintPrice, sup
           </div>
         </div>
 
-        <Link to={`/mint/${id}/${collectionId}`} className='block w-full'>
+        <Link 
+          to={generateLocalizedPath('mint' as AppRouteKey, {category: String(id), id: String(collectionId)})}
+          className='block w-full'
+        >
           <button className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200'>{t('mint_access')}</button>
         </Link>
       </div>

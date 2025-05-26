@@ -27,7 +27,7 @@ const GermanFlag = () => (
 )
 
 export const useTranslation = () => {
-  const { currentLang, setCurrentLang, t } = useTranslationContext()
+  const { currentLang, setCurrentLang, t, generateLocalizedPath, allTranslations, tReady } = useTranslationContext()
 
   const getCurrentFlag = (): ReactElement => {
     switch (currentLang) {
@@ -46,6 +46,9 @@ export const useTranslation = () => {
     t,
     currentLang,
     setCurrentLang,
-    getCurrentFlag
+    getCurrentFlag,
+    generateLocalizedPath,
+    allTranslations,
+    tReady
   }
 } 

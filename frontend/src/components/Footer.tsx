@@ -2,9 +2,10 @@ import {Link} from 'react-router-dom'
 import {getAssetUrl} from '../utils/imageHelper'
 import {useTranslation} from '../contexts/TranslationContext'
 import {getTwitterLink} from '../utils/generalHelper'
+import { AppRouteKey } from '../contexts/TranslationContext'
 
 function Footer() {
-  const {t, currentLang} = useTranslation()
+  const {t, currentLang, generateLocalizedPath} = useTranslation()
 
   return (
     <footer className='bg-dark-900 text-white py-8 md:py-12 border-t border-dark-700'>
@@ -12,7 +13,7 @@ function Footer() {
         <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
           <div className='text-center md:text-left'>
             <div className='flex justify-center md:justify-start mb-4'>
-              <Link to='/' className='flex items-center space-x-2'>
+              <Link to={generateLocalizedPath('home' as AppRouteKey)} className='flex items-center space-x-2'>
                 <img src={getAssetUrl('/logos/logo-ut.png')} alt='Ultra Times Logo' className='h-8 w-auto' />
                 <span className='text-xl font-cabin font-semibold text-primary-300'>Ultra Times</span>
               </Link>
@@ -30,13 +31,13 @@ function Footer() {
           <div className='text-center md:text-left'>
             <h3 className='font-cabin font-semibold mb-4 text-primary-300'>{t('footer_quick_links')}</h3>
             <div className='flex flex-wrap gap-2 justify-center md:justify-start'>
-              <Link to='/' className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
+              <Link to={generateLocalizedPath('home' as AppRouteKey)} className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
                 {t('home')}
               </Link>
-              <Link to='/collections' className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
+              <Link to={generateLocalizedPath('collections' as AppRouteKey)} className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
                 {t('collections')}
               </Link>
-              <Link to='/contact' className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
+              <Link to={generateLocalizedPath('contact' as AppRouteKey)} className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
                 {t('contact')}
               </Link>
             </div>
@@ -45,13 +46,13 @@ function Footer() {
           <div className='text-center md:text-left'>
             <h3 className='font-cabin font-semibold mb-4 text-primary-300'>{t('footer_legal')}</h3>
             <div className='space-y-2 font-quicksand flex flex-col items-center md:items-start'>
-              <Link to='/legal' className='text-gray-300 hover:text-primary-300 transition-colors'>
+              <Link to={generateLocalizedPath('legal' as AppRouteKey)} className='text-gray-300 hover:text-primary-300 transition-colors'>
                 {t('footer_legal')}
               </Link>
-              <Link to='/terms' className='text-gray-300 hover:text-primary-300 transition-colors'>
+              <Link to={generateLocalizedPath('terms' as AppRouteKey)} className='text-gray-300 hover:text-primary-300 transition-colors'>
                 {t('footer_terms')}
               </Link>
-              <Link to='/privacy' className='text-gray-300 hover:text-primary-300 transition-colors'>
+              <Link to={generateLocalizedPath('privacy' as AppRouteKey)} className='text-gray-300 hover:text-primary-300 transition-colors'>
                 {t('footer_privacy')}
               </Link>
             </div>

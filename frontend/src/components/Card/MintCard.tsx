@@ -1,5 +1,6 @@
 import {Link} from 'react-router-dom'
 import {useTranslation} from '../../hooks/useTranslation'
+import {AppRouteKey} from '../../contexts/TranslationContext'
 
 export interface MintProps {
   id: number
@@ -16,7 +17,7 @@ export interface MintProps {
 }
 
 function MintCard({collectionName, itemName, price, timestamp, image, transactionHash, minter}: MintProps) {
-  const {t} = useTranslation()
+  const {t, generateLocalizedPath} = useTranslation()
 
   return (
     <div className='group relative bg-dark-800 bg-opacity-50 p-5 rounded-2xl hover:bg-opacity-70 transition-all duration-300 backdrop-blur-sm border border-dark-700 hover:border-primary-500 hover:shadow-lg hover:shadow-primary-500/10'>
@@ -29,7 +30,10 @@ function MintCard({collectionName, itemName, price, timestamp, image, transactio
 
         {/* Content */}
         <div className='flex-grow min-w-0'>
-          <Link to={`/collection/${itemName}`} className='block group-hover:transform group-hover:-translate-y-0.5 transition-transform duration-300'>
+          <Link 
+            to={generateLocalizedPath('collection_details' as AppRouteKey, { id: itemName })}
+            className='block group-hover:transform group-hover:-translate-y-0.5 transition-transform duration-300'
+          >
             <h4 className='font-cabin font-semibold text-primary-200 truncate text-lg group-hover:text-primary-300 transition-colors duration-300'>{itemName}</h4>
           </Link>
 

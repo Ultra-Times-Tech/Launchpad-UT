@@ -8,6 +8,7 @@ import {getAssetUrl} from '../../utils/imageHelper'
 import {Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Close as CloseIcon, PhotoCamera as PhotoCameraIcon} from '@mui/icons-material'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import { AppRouteKey } from '../../contexts/TranslationContext'
 
 interface Collection {
   id: number
@@ -352,8 +353,8 @@ function CollectionForm({collection, onSave, onCancel, title, submitLabel}: Coll
 }
 
 function MyCollectionsPage() {
+  const {t, generateLocalizedPath} = useTranslation()
   const {blockchainId} = useUltraWallet()
-  const {t} = useTranslation()
   const {error: showError, success: showSuccess} = useAlerts()
   const [collections, setCollections] = useState<Collection[]>([])
   const [loading, setLoading] = useState(true)
@@ -553,7 +554,10 @@ function MyCollectionsPage() {
                 <img src={getAssetUrl(collection.image)} alt={collection.name} className='w-full h-full object-cover' />
                 <div className='absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center'>
                   <div className='flex space-x-3'>
-                    <Link to={`/collection/${collection.id}`} className='bg-primary-600 hover:bg-primary-500 text-white p-2 rounded-full transition-colors'>
+                    <Link 
+                      to={generateLocalizedPath('collection_details' as AppRouteKey, { id: String(collection.id) })}
+                      className='bg-primary-600 hover:bg-primary-500 text-white p-2 rounded-full transition-colors'
+                    >
                       <span className='sr-only'>{t('view')}</span>
                       <svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
                         <path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'></path>
@@ -576,7 +580,10 @@ function MyCollectionsPage() {
                 <p className='text-gray-400 line-clamp-2'>{collection.content || t('no_description')}</p>
                 <div className='mt-4 flex justify-between items-center'>
                   <span className='text-xs text-gray-500'>{t('id')}: {collection.id}</span>
-                  <Link to={`/collection/${collection.id}`} className='text-primary-500 hover:text-primary-400 text-sm font-medium transition-colors'>
+                  <Link 
+                    to={generateLocalizedPath('collection_details' as AppRouteKey, { id: String(collection.id) })}
+                    className='text-primary-500 hover:text-primary-400 text-sm font-medium transition-colors'
+                  >
                     {t('view_details')} →
                   </Link>
                 </div>

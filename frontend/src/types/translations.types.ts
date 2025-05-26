@@ -462,6 +462,11 @@ export type Language = 'fr' | 'en' | 'de'
 
 export type TranslationValue = string | string[] | ((params: Record<string, string | number | boolean>) => string)
 
-export type Translations = Record<TranslationKey, TranslationValue>
+// Defines the structure for translating route segments
+export type RouteSegments = Record<string, string>;
+
+export type Translations = Record<TranslationKey, TranslationValue> & {
+  _routeSegments?: RouteSegments;
+}
 
 export type TranslationFunction = (key: TranslationKey, params?: Record<string, string | number | boolean>) => string

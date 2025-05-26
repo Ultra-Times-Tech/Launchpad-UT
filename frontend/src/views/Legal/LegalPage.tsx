@@ -1,8 +1,9 @@
 import {Link} from 'react-router-dom'
 import {useTranslation} from '../../hooks/useTranslation'
+import {AppRouteKey} from '../../contexts/TranslationContext'
 
 function LegalPage() {
-  const {t} = useTranslation()
+  const {t, generateLocalizedPath} = useTranslation()
 
   return (
     <div className="min-h-screen bg-dark-950 text-white p-8">
@@ -47,7 +48,10 @@ function LegalPage() {
         <div className="mt-8 text-center text-gray-400">
           <p>
             {t('need_help')}{' '}
-            <Link to="/contact" className="text-primary-300 hover:text-primary-400">
+            <Link 
+              to={generateLocalizedPath('contact' as AppRouteKey)} 
+              className="text-primary-300 hover:text-primary-400"
+            >
               {t('contact_us')}
             </Link>
           </p>

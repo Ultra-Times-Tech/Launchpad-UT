@@ -1,6 +1,7 @@
 import {Link} from 'react-router-dom'
 import {getAssetUrl} from '../../utils/imageHelper'
 import {useTranslation} from '../../hooks/useTranslation'
+import {AppRouteKey} from '../../contexts/TranslationContext'
 
 export interface CollectionCardProps {
   id: number
@@ -14,7 +15,7 @@ export interface CollectionCardProps {
 }
 
 function CollectionCard({id, name, description, image, artist}: CollectionCardProps) {
-  const {t} = useTranslation()
+  const {t, generateLocalizedPath} = useTranslation()
 
   return (
     <div className='h-[450px] bg-dark-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 flex flex-col select-none' style={{userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none'}}>
@@ -33,7 +34,11 @@ function CollectionCard({id, name, description, image, artist}: CollectionCardPr
           {description}
         </p>
 
-        <Link to={`/collection/${id}`} className='mt-auto block w-full select-none' style={{userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none'}}>
+        <Link 
+          to={generateLocalizedPath('collection_details' as AppRouteKey, {id: String(id)})}
+          className='mt-auto block w-full select-none' 
+          style={{userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none'}}
+        >
           <button className='w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200 select-none' style={{userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none'}}>
             {t('view_collection')}
           </button>

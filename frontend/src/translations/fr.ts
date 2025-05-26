@@ -483,7 +483,27 @@ const fr: Translations = {
   contact_hours_monday_friday: 'Lundi - Vendredi : 9h00 - 18h00',
   contact_hours_saturday: 'Samedi : 10h00 - 16h00',
   contact_hours_sunday: 'Dimanche :',
-  contact_hours_closed: 'Fermé'
+  contact_hours_closed: 'Fermé',
+  // Ajout des segments de route
+  _routeSegments: {
+    home: '', // Pour la page d'accueil /fr/
+    collections: 'collections', // Peut être 'collectes' si désiré
+    collection_details: 'collection', // pour /collection/:id -> /fr/collection/:id
+    mint: 'minter', // pour /mint/:category/:id -> /fr/minter/:category/:id (ou garder 'mint')
+    profile: 'profil',
+    my_uniqs: 'mes-uniqs',
+    my_collections: 'mes-collections',
+    admin_ut: 'admin-ut',
+    legal: 'mentions-legales',
+    privacy: 'politique-de-confidentialite',
+    terms: 'conditions-d-utilisation', // ou termes-et-conditions
+    contact: 'contact',
+    // Routes de test
+    factory_test: 'test-factory',
+    mint_test: 'test-mint',
+    collections_test: 'test-collections',
+    upload_test: 'test-upload'
+  }
 }
 
 export default fr 
