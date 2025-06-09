@@ -23,11 +23,6 @@ Le système de cache intelligent permet de maintenir les données des collection
 - **Mise à jour silencieuse** : Pas de rechargement de page, juste les données
 - **Logging** : Console log quand de nouvelles données sont détectées
 
-### 4. Indicateur Visuel
-- **Statut en temps réel** : Affiche quand les données sont en cours de mise à jour
-- **Rafraîchissement manuel** : Bouton pour forcer une mise à jour
-- **Position fixe** : Coin supérieur droit pour un accès facile
-
 ## Configuration
 
 ### Environnements
@@ -73,17 +68,6 @@ Modifiez `frontend/src/config/cache.config.ts` pour ajuster :
 - Les erreurs de polling en arrière-plan n'affectent pas l'UI
 - Conserve les données existantes en cas d'erreur réseau
 - Retry automatique au prochain polling
-
-## Monitoring
-
-### Console Logs
-- `Collections mises à jour avec de nouvelles données` : Nouvelles données détectées
-- `Error refreshing data:` : Erreur pendant le refresh en arrière-plan
-
-### Indicateurs Visuels
-- Point orange clignotant : Données en cours de mise à jour
-- Bouton "Actualiser" : Permet un refresh manuel
-- Animation de rotation : Refresh en cours
 
 ## Compatibilité
 

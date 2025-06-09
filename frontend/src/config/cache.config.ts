@@ -24,18 +24,18 @@ export const getEnvironmentConfig = () => {
   if (isDevelopment) {
     return {
       ...CACHE_CONFIG,
-      // En développement, cache plus court et polling plus fréquent
-      TTL: 2 * 60 * 1000, // 2 minutes
-      POLLING_INTERVAL: 15 * 1000, // 15 secondes
+      // En développement, cache court et polling fréquent pour tester
+      TTL: 30 * 1000, // 30 secondes - très rapide pour le dev
+      POLLING_INTERVAL: 5 * 1000, // 5 secondes - quasi temps réel
     }
   }
   
   if (isProduction) {
     return {
       ...CACHE_CONFIG,
-      // En production, cache plus long et polling moins fréquent
-      TTL: 10 * 60 * 1000, // 10 minutes
-      POLLING_INTERVAL: 60 * 1000, // 1 minute
+      // En production, bon compromis réactivité/performance
+      TTL: 2 * 60 * 1000, // 2 minutes - cache raisonnable
+      POLLING_INTERVAL: 15 * 1000, // 15 secondes - réactif sans être agressif
     }
   }
   
