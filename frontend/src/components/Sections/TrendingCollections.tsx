@@ -28,7 +28,7 @@ function TrendingCollections({collections}: TrendingCollectionsProps) {
     <div className='bg-dark-900 py-16'>
       <div className='container mx-auto px-4'>
         <div className='flex justify-between items-center mb-12' data-aos="fade-down">
-          <h2 className='text-2xl font-cabin font-bold text-primary-300'>{t('trending_collections')}</h2>
+          <h2 className='text-2xl font-cabin font-bold text-primary-300 before:bg-[url("https://ultratimes.io/images/logo/logo_UT_icon-2.png")]'>{t('trending_collections')}</h2>
         </div>
 
         <div className='relative group'>

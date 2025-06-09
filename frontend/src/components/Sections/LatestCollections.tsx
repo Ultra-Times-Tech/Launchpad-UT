@@ -44,7 +44,7 @@ function LatestCollections({latestCollections, mintActivities}: LatestCollection
   if (!latestCollections || latestCollections.length === 0) {
     return (
       <div className='container mx-auto px-4 py-12 mb-12'>
-        <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300'>{t('latest_collections')}</h2>
+        <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300 before:bg-[url("https://ultratimes.io/images/logo/logo_UT_icon-2.png")]'>{t('latest_collections')}</h2>
         <div className='text-center text-gray-400'>{t('loading')}</div>
       </div>
     )
@@ -54,7 +54,7 @@ function LatestCollections({latestCollections, mintActivities}: LatestCollection
 
   return (
     <div className='container mx-auto px-4 py-12 mb-12'>
-      <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300'>{t('latest_collections')}</h2>
+      <h2 className='text-2xl font-cabin font-bold mb-8 text-center text-primary-300 before:bg-[url("https://ultratimes.io/images/logo/logo_UT_icon-2.png")]'>{t('latest_collections')}</h2>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
         <div className='lg:col-span-2'>

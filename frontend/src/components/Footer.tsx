@@ -31,13 +31,13 @@ function Footer() {
           <div className='text-center md:text-left'>
             <h3 className='font-cabin font-semibold mb-4 text-primary-300'>{t('footer_quick_links')}</h3>
             <div className='flex flex-wrap gap-2 justify-center md:justify-start'>
-              <Link to={generateLocalizedPath('home' as AppRouteKey)} className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
+              <Link to={generateLocalizedPath('home' as AppRouteKey)} className='bg-dark-800 px-3 py-1 rounded-full text-xs text-white hover:bg-dark-700 transition-colors'>
                 {t('home')}
               </Link>
-              <Link to={generateLocalizedPath('collections' as AppRouteKey)} className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
+              <Link to={generateLocalizedPath('collections' as AppRouteKey)} className='bg-dark-800 px-3 py-1 rounded-full text-xs text-white hover:bg-dark-700 transition-colors'>
                 {t('collections')}
               </Link>
-              <Link to={generateLocalizedPath('contact' as AppRouteKey)} className='bg-dark-800 px-3 py-1 rounded-full text-xs text-primary-300 hover:bg-dark-700 transition-colors'>
+              <Link to={generateLocalizedPath('contact' as AppRouteKey)} className='bg-dark-800 px-3 py-1 rounded-full text-xs text-white hover:bg-dark-700 transition-colors'>
                 {t('contact')}
               </Link>
             </div>

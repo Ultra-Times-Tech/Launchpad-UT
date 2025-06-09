@@ -13,7 +13,7 @@ function FeaturedCollections({collections}: FeaturedCollectionsProps) {
   return (
     <div className='container mx-auto px-4 py-12'>
       <div className='flex justify-between items-center mb-8' data-aos="fade-down">
-        <h2 className='text-2xl font-cabin font-bold text-primary-300'>{t('featured_collections')}</h2>
+        <h2 className='text-2xl font-cabin font-bold text-primary-300 before:bg-[url("https://ultratimes.io/images/logo/logo_UT_icon-2.png")]'>{t('featured_collections')}</h2>
         <Link to={generateLocalizedPath('collections' as AppRouteKey)} className='text-gray-400 hover:text-white font-medium hidden sm:block'>
           {t('view_all_collections')} →
         </Link>

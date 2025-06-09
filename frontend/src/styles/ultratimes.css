@@ -1,12 +1,3 @@
-header.fixed.top-0.left-0.right-0.border-b.border-dark-700.bg-dark-900.text-white.w-full.z-50.transition-all.duration-300 {
-  background-color: #121315;
-}
-header.fixed.top-0.left-0.right-0.border-b.border-dark-700.bg-dark-900.text-white.w-full.z-50.transition-all.duration-300
-  a.text-white.hover\:text-primary-300.transition-colors.px-2 {
-  text-transform: uppercase;
-  font-weight: 800;
-}
-
 h1.text-2xl.sm\:text-3xl.lg\:text-5xl.font-cabin.font-bold.mb-2.sm\:mb-4.text-primary-300.text-center.select-none,
 h1.text-5xl.font-cabin.font-bold.mb-4.text-primary-300,
 h1.text-5xl.font-bold.mb-4.text-center.text-primary-300 {
@@ -27,10 +18,6 @@ button.bg-primary-500.hover\:bg-primary-600.text-white.font-medium.py-2.px-6.rou
 .flex.justify-between.items-center.mb-2
   h3.text-lg.font-cabin.font-bold.text-primary-300 {
   font-size: 1.4rem;
-}
-
-a.bg-dark-800.px-3.py-1.rounded-full.text-xs.text-primary-300.hover\:bg-dark-700.transition-colors {
-  color: #fff;
 }
 
 .h-\[450px\].bg-dark-800.rounded-xl.overflow-hidden.shadow-lg.hover\:shadow-2xl.transition.duration-300.flex.flex-col.select-none,
@@ -106,7 +93,6 @@ h2.text-2xl.font-cabin.font-bold.text-primary-300::before {
   height: 20px;
   margin-right: 9px;
   transform: translateY(3px);
-  background-image: url(https://ultratimes.io/images/logo/logo_UT_icon-2.png);
   background-size: contain;
   background-repeat: no-repeat;
 }
