@@ -102,10 +102,13 @@ Modifiez `frontend/src/config/cache.config.ts` pour ajuster :
 ### Pages avec Cache Intelligent
 - ✅ **Page Collections** (`/collections`) : Liste des collections avec cache et polling
 - ✅ **Détails Collection** (`/collection/:id`) : Détails individuels avec cache séparé
+- ✅ **Page Mint** (`/mint/:category/:id`) : Données de factory construites à partir des collections
 - ✅ **Page d'Accueil** : Collections featured et trending en cache
 
 ### Navigation Sans Chargement
 - **Collections → Détails** : Construction instantanée à partir des données existantes
+- **Détails → Mint** : Données de factory construites depuis les collections en cache
+- **Collections → Mint** : Chargement instantané sans délai artificiel
 - **Détails → Collections** : Retour immédiat aux données en cache
 - **Accueil → Collections** : Transition fluide sans rechargement
 - **Optimisation intelligente** : Aucun appel API si les données de base sont disponibles
@@ -113,6 +116,7 @@ Modifiez `frontend/src/config/cache.config.ts` pour ajuster :
 ### Hooks Disponibles
 - `useCollections()` : Pour la liste des collections
 - `useCollectionDetails(id)` : Pour les détails d'une collection spécifique
+- `useMintData(factoryId, collectionId)` : Pour les données de mint optimisées
 
 ### Avantages Utilisateur
 - 🚀 **Navigation instantanée** entre les pages
@@ -131,7 +135,8 @@ Le système évite les appels API inutiles en construisant les détails des coll
 4. **Priorité 4** : Appel API en dernier recours
 
 ### Réduction des Requêtes Réseau
-- **90% des cas** : Aucun appel API pour les détails
+- **90% des cas** : Aucun appel API pour les détails et le mint
 - **Construction locale** : Utilise les données de la liste des collections
 - **Cache persistant** : Les détails construits sont sauvegardés
+- **Délais optimisés** : 100ms au lieu de 800ms pour les fallbacks
 - **Fallback intelligent** : API seulement si nécessaire 

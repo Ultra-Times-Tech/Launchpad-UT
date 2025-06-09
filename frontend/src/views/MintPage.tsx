@@ -5,6 +5,7 @@ import {getAssetUrl} from '../utils/imageHelper'
 import {useUltraWallet} from '../utils/ultraWalletHelper'
 import {createMintTransaction, calculateTotalPrice} from '../utils/transactionHelper'
 import {useTranslation} from '../hooks/useTranslation'
+import {useMintData, MintItem} from '../hooks/useMintData'
 import {AppRouteKey} from '../contexts/TranslationContext'
 // AOS
 import AOS from 'aos'
@@ -22,36 +23,7 @@ interface UltraError {
   code?: number;
 }
 
-interface MintItem {
-  id: number
-  name: string
-  image: string
-  price: string
-  timestamp: string
-  minter: {
-    address: string
-    username: string
-  }
-  transactionHash: string
-  tokenId: string
-  rarity: string
-}
-
-interface MintPhase {
-  name: string
-  active: boolean
-  date: string
-}
-
-interface Factory {
-  id: number
-  name: string
-  description: string
-  mintPrice: string
-  supply: number
-  minted: number
-  collectionName: string
-}
+// Les interfaces sont maintenant définies dans useMintData
 
 interface MintDetailsModalProps {
   mint: MintItem | null
@@ -220,10 +192,10 @@ const MintDetailsModal: React.FC<MintDetailsModalProps> = ({mint, onClose}) => {
 function MintPage() {
   const {category, id} = useParams<{category: string; id: string}>()
   const {isConnected, isLoading: walletLoading, error: walletError, blockchainId} = useUltraWallet()
-  const [loading, setLoading] = useState(true)
-  const [factory, setFactory] = useState<Factory | null>(null)
-  const [mintedItems, setMintedItems] = useState<MintItem[]>([])
-  const [phases, setPhases] = useState<MintPhase[]>([])
+  
+  // Utiliser le hook optimisé pour les données de mint
+  const {factory, mintedItems, phases, loading, updateFactoryAfterMint, setMintedItems} = useMintData(category || '', id || '')
+  
   const [mintAmount, setMintAmount] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedMint, setSelectedMint] = useState<MintItem | null>(null)
@@ -241,64 +213,7 @@ function MintPage() {
     }
   }, [isConnected])
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true)
-      try {
-        setTimeout(() => {
-          const factoryNames: Record<string, string> = {
-            '1': 'Dark Wisdom Counsellor',
-            '2': 'Phygital Voucher',
-          }
-
-          const collectionNames: Record<string, string> = {
-            '1': 'Ultra Street-Cubism',
-            '2': 'Ultra Street-Cubism',
-          }
-
-          setFactory({
-            id: Number(category),
-            name: factoryNames[category || '1'] || 'Dark Wisdom Counsellor',
-            description: category === '1' 
-              ? 'A stunning Dark Street Cubism painting inspired by an Ultra\'s Movement Elder design. This exclusive creation is personally signed by C-la. By acquiring this Art, you\'re automatically entered into a special raffle that occurs every 5 UniQ purchases (excluding Vouchers), giving you a chance to win a high-rarity ViT UniQ from the UT Collection.'
-              : 'Transform your digital Ultra Street-Cubism collection into a physical masterpiece. This voucher entitles you to receive a printed version of your UniQ on a premium 60cm x 80cm dibond support, ensuring durability and longevity. (Shipping costs not included) For more information, contact Ultra Times teams on Discord: https://discord.gg/R2zvShJAyh',
-            mintPrice: '10.00000000 UOS',
-            supply: 10,
-            minted: 0,
-            collectionName: collectionNames[id || '1'] || 'Ultra Street-Cubism',
-          })
-
-          setPhases([
-            {name: 'Public Mint', active: true, date: 'Available now'},
-          ])
-
-          // Add more minted items
-          const mockMintedItems = Array.from({length: 5}, (_, index) => ({
-            id: index + 1,
-            name: category === '1' ? 'Dark Wisdom Counsellor' : 'Phygital Voucher',
-            image: category === '1' ? getAssetUrl('/banners/factory-1.png') : getAssetUrl('/banners/phygital.png'),
-            price: '0 UOS',
-            timestamp: `${index * 3 + 2} minutes ago`,
-            minter: {
-              address: `ultra${(10000 + index).toString().padStart(8, '0')}`,
-              username: ['CryptoWhale', 'NFTHunter', 'PixelMaster', 'ArtCollector', 'CryptoArtist'][index],
-            },
-            transactionHash: `e632c1912a0edea37aef901749${index}c2554fe8a37f011ac9424b4f3cae124049b3`,
-            tokenId: `#${1234 + index}`,
-            rarity: 'Legendary',
-          }))
-
-          setMintedItems(mockMintedItems)
-          setLoading(false)
-        }, 800)
-      } catch (error) {
-        console.error('Error loading mint data:', error)
-        setLoading(false)
-      }
-    }
-
-    loadData()
-  }, [category, id])
+  // L'ancien useEffect de chargement des données est maintenant géré par useMintData
 
   useEffect(() => {
     AOS.init({
@@ -363,14 +278,8 @@ function MintPage() {
             rarity: 'Legendary',
           }))
           
-          setMintedItems([...newMints, ...mintedItems])
-          
-          if (factory) {
-            setFactory({
-              ...factory,
-              minted: factory.minted + mintAmount
-            })
-          }
+          // Utiliser la fonction optimisée pour mettre à jour les données
+          updateFactoryAfterMint(mintAmount, newMints)
         } else {
           console.error('Réponse invalide:', response)
           setError(t('unknown_error'))

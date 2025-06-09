@@ -362,7 +362,7 @@ function MyUniqsPage() {
         <div className='max-w-5xl mx-auto'>
           {/* Header avec titre et barre de recherche */}
           <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-dark-800' data-aos="fade-down">
-            <h1 className='text-3xl font-bold text-primary-300'>{t('my_uniqs')}</h1>
+            <h1 className='text-3xl font-bold text-primary-300'>{t('my_uniqs')} ({uniqs.length})</h1>
 
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto'>
               <div className='relative sm:w-auto'>
