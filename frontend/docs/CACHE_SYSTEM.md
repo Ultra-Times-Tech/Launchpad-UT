@@ -29,14 +29,14 @@ Le système de cache intelligent permet de maintenir les données des collection
 
 #### Développement
 ```typescript
-TTL: 2 minutes
-POLLING_INTERVAL: 15 secondes
+TTL: 30 secondes
+POLLING_INTERVAL: 5 secondes
 ```
 
 #### Production
 ```typescript
-TTL: 10 minutes
-POLLING_INTERVAL: 1 minute
+TTL: 2 minutes
+POLLING_INTERVAL: 15 secondes
 ```
 
 ### Personnalisation
