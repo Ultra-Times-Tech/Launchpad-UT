@@ -1,3 +1,12 @@
+header.fixed.top-0.left-0.right-0.border-b.border-dark-700.bg-dark-900.text-white.w-full.z-50.transition-all.duration-300 {
+  background-color: #121315;
+}
+header.fixed.top-0.left-0.right-0.border-b.border-dark-700.bg-dark-900.text-white.w-full.z-50.transition-all.duration-300
+  a.text-white.hover\:text-primary-300.transition-colors.px-2 {
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
 h1.text-2xl.sm\:text-3xl.lg\:text-5xl.font-cabin.font-bold.mb-2.sm\:mb-4.text-primary-300.text-center.select-none,
 h1.text-5xl.font-cabin.font-bold.mb-4.text-primary-300,
 h1.text-5xl.font-bold.mb-4.text-center.text-primary-300 {

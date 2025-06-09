@@ -26,11 +26,15 @@ export function useCollections() {
     }
   }, [])
 
-  // Gère le fetch initial des collections - vérifie aussi si les données sont obsolètes
+  // Gère le fetch initial des collections
   useEffect(() => {
-    if (_hasHydrated && !hasInitialized.current && (allCollections.length === 0 || isDataStale())) {
+    if (_hasHydrated && !hasInitialized.current) {
       hasInitialized.current = true
-      fetchCollections()
+      
+      // Si on n'a pas de données OU si les données sont obsolètes, on fetch
+      if (allCollections.length === 0 || isDataStale()) {
+        fetchCollections()
+      }
     }
   }, [_hasHydrated, allCollections.length, isDataStale, fetchCollections])
 

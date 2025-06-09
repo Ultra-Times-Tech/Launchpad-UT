@@ -2,10 +2,8 @@ import {useEffect, useState} from 'react'
 import {useParams, Link} from 'react-router-dom'
 import {getAssetUrl} from '../utils/imageHelper'
 import FactoryCard from '../components/Card/FactoryCard'
-import {CollectionDetailsProps} from '../types/collection.types'
-import {collectionsService} from '../services/collections.service'
-import {getMockCollection} from '../data/collections.data'
 import {useTranslation} from '../hooks/useTranslation'
+import {useCollectionDetails} from '../hooks/useCollectionDetails'
 import {AppRouteKey} from '../contexts/TranslationContext'
 // AOS
 import AOS from 'aos'
@@ -13,11 +11,11 @@ import 'aos/dist/aos.css'
 
 function CollectionDetailsPage() {
   const {id} = useParams<{id: string}>()
-  const [collection, setCollection] = useState<CollectionDetailsProps | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'story' | 'features'>('story')
   const {t, generateLocalizedPath} = useTranslation()
+  
+  // Utiliser le hook avec cache intelligent
+  const {details: collection, loading, error} = useCollectionDetails(id || '')
 
   useEffect(() => {
     AOS.init({
@@ -26,36 +24,6 @@ function CollectionDetailsPage() {
       offset: 100
     })
   }, [])
-
-  useEffect(() => {
-    const fetchCollection = async () => {
-      setLoading(true)
-      try {
-        if (!id) throw new Error('Collection ID is required')
-        
-        const collectionDetails = await collectionsService.getCollectionDetails(id)
-        
-        if (collectionDetails) {
-          setCollection(collectionDetails)
-          setError(null)
-        } else {
-          throw new Error('Collection not found')
-        }
-      } catch (error) {
-        console.error('Error fetching collection:', error)
-        setError('Failed to load collection. Please try again later.')
-        
-        if (id) {
-          const mockCollection = getMockCollection(Number(id))
-          setCollection(mockCollection)
-        }
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchCollection()
-  }, [id])
 
   if (loading) {
     return (
