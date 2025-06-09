@@ -10,6 +10,7 @@ export function useCollections() {
     loading,
     error,
     fetchCollections,
+    isDataStale,
     _hasHydrated
   } = useCollectionsStore()
 
@@ -25,13 +26,13 @@ export function useCollections() {
     }
   }, [])
 
-  // Gère le fetch initial des collections (une seule fois)
+  // Gère le fetch initial des collections - vérifie aussi si les données sont obsolètes
   useEffect(() => {
-    if (_hasHydrated && !hasInitialized.current && allCollections.length === 0) {
+    if (_hasHydrated && !hasInitialized.current && (allCollections.length === 0 || isDataStale())) {
       hasInitialized.current = true
       fetchCollections()
     }
-  }, [_hasHydrated, allCollections.length, fetchCollections])
+  }, [_hasHydrated, allCollections.length, isDataStale, fetchCollections])
 
   return {
     UNIQs,

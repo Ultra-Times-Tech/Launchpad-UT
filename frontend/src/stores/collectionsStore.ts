@@ -36,7 +36,7 @@ export const useCollectionsStore = create<CollectionsState>()(
       lastFetchTime: null,
       _hasHydrated: false,
       setHasHydrated: (hydrated: boolean) => set({_hasHydrated: hydrated}),
-      
+
       // Vérifie si les données sont obsolètes
       isDataStale: () => {
         const {lastFetchTime} = get()
@@ -47,7 +47,7 @@ export const useCollectionsStore = create<CollectionsState>()(
       // Récupération initiale des collections
       fetchCollections: async () => {
         const currentState = get()
-        
+
         // Si les données ne sont pas obsolètes et qu'on a déjà des collections, ne pas refetch
         if (!currentState.isDataStale() && currentState.allCollections.length > 0) {
           set({loading: false})
@@ -86,24 +86,17 @@ export const useCollectionsStore = create<CollectionsState>()(
       // Rafraîchissement forcé des collections
       refreshCollections: async () => {
         const currentState = get()
-        
-        console.log('🔄 Polling démarré - Vérification des mises à jour...')
-        
+
         // Garde les données actuelles pendant le refresh pour éviter le flicker
         set({error: null})
-        
+
         try {
           const collections = await collectionsService.getAllCollections()
           const featured = await collectionsService.getFeaturedCollections()
           const trending = await collectionsService.getTrendingCollections()
 
-          console.log('📡 Données récupérées depuis l\'API')
-
           // Vérifie s'il y a des changements avant de mettre à jour
-          const hasChanges = 
-            JSON.stringify(collections) !== JSON.stringify(currentState.allCollections) ||
-            JSON.stringify(featured) !== JSON.stringify(currentState.featuredCollections) ||
-            JSON.stringify(trending) !== JSON.stringify(currentState.trendingCollections)
+          const hasChanges = JSON.stringify(collections) !== JSON.stringify(currentState.allCollections) || JSON.stringify(featured) !== JSON.stringify(currentState.featuredCollections) || JSON.stringify(trending) !== JSON.stringify(currentState.trendingCollections)
 
           if (hasChanges) {
             set({
@@ -112,20 +105,16 @@ export const useCollectionsStore = create<CollectionsState>()(
               trendingCollections: trending,
               lastFetchTime: Date.now(),
             })
-            console.log('✅ Collections mises à jour avec de nouvelles données')
-          } else {
-            console.log('ℹ️ Aucun changement détecté - Interface non mise à jour')
           }
         } catch (error) {
           console.error('❌ Erreur lors du refresh:', error)
-          // Ne pas mettre d'erreur pour un refresh en arrière-plan
         }
       },
     }),
     {
       name: 'collections-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
+      partialize: state => ({
         allCollections: state.allCollections,
         featuredCollections: state.featuredCollections,
         trendingCollections: state.trendingCollections,
@@ -155,16 +144,16 @@ class CollectionsPollingService {
 
   start() {
     if (this.isActive) return
-    
+
     this.isActive = true
-    
+
     // Écoute les changements de visibilité de la page
     this.setupVisibilityListener()
-    
+
     this.intervalId = setInterval(() => {
       // Ne polling que si la page est visible
       if (!this.isPageVisible) return
-      
+
       const store = useCollectionsStore.getState()
       if (store._hasHydrated && store.isDataStale()) {
         store.refreshCollections()
@@ -185,7 +174,7 @@ class CollectionsPollingService {
     const handleVisibilityChange = () => {
       const wasHidden = !this.isPageVisible
       this.isPageVisible = !document.hidden
-      
+
       // Si la page redevient visible après avoir été cachée, force un refresh
       if (wasHidden && this.isPageVisible) {
         const store = useCollectionsStore.getState()
