@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useUltraWallet } from '../../utils/ultraWalletHelper';
+import { getAssetUrl } from '../../utils/imageHelper';
 import { FaWallet, FaCreditCard } from 'react-icons/fa';
 
 interface PaymentSelectorProps {
@@ -154,34 +155,6 @@ const PaymentSelector: React.FC<PaymentSelectorProps> = ({ amount, quantity = 1,
   const [selectedMethod, setSelectedMethod] = useState<'wallet' | 'card'>('wallet');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showCardForm, setShowCardForm] = useState(false);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-
-  // Préchargement des images SVG et initialisation
-  useEffect(() => {
-    const preloadImages = async () => {
-      const imagePromises = [
-        '/launchpad-ut/assets/payment/visa.svg',
-        '/launchpad-ut/assets/payment/mastercard.svg'
-      ].map(src => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = resolve;
-          img.onerror = reject;
-          img.src = src;
-        });
-      });
-
-      try {
-        await Promise.all(imagePromises);
-        setImagesLoaded(true);
-      } catch (error) {
-        console.warn('Erreur lors du préchargement des images de paiement:', error);
-        setImagesLoaded(true); // Continuer même en cas d'erreur
-      }
-    };
-
-    preloadImages();
-  }, []);
 
   // Fonction pour convertir UOS en EUR approximatif (taux fictif pour la démo)
   const convertToEur = (uosAmount: string): string => {
@@ -312,16 +285,14 @@ const PaymentSelector: React.FC<PaymentSelectorProps> = ({ amount, quantity = 1,
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span className="text-green-400 text-xs">{t('secure_payment')}</span>
                 </div>
-                {imagesLoaded && (
-                  <div className="flex space-x-2">
-                    <div className="bg-white rounded-lg p-2 shadow-md">
-                      <img src="/launchpad-ut/assets/payment/visa.svg" alt="Visa" className="h-8 w-auto" />
-                    </div>
-                    <div className="bg-white rounded-lg p-2 shadow-md">
-                      <img src="/launchpad-ut/assets/payment/mastercard.svg" alt="Mastercard" className="h-8 w-auto" />
-                    </div>
+                <div className="flex space-x-2">
+                  <div className="bg-white rounded-lg p-2 shadow-md">
+                    <img src={getAssetUrl('/payment/visa.svg')} alt="Visa" className="h-8 w-auto" />
                   </div>
-                )}
+                  <div className="bg-white rounded-lg p-2 shadow-md">
+                    <img src={getAssetUrl('/payment/mastercard.svg')} alt="Mastercard" className="h-8 w-auto" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -14,6 +14,19 @@ import AOS from 'aos'
 import 'aos/dist/aos.css'
 import {FaWallet} from 'react-icons/fa'
 
+// Fonction utilitaire pour précharger les images de paiement
+const preloadPaymentImages = () => {
+  const imageUrls = [
+    getAssetUrl('/payment/visa.svg'),
+    getAssetUrl('/payment/mastercard.svg')
+  ]
+  
+  imageUrls.forEach(url => {
+    const img = new Image()
+    img.src = url
+  })
+}
+
 interface UltraError {
   message?: string
   data?: {
@@ -190,6 +203,9 @@ function MintPage() {
       once: true,
       offset: 0,
     })
+    
+    // Précharger les images de paiement dès le montage du composant
+    preloadPaymentImages()
   }, [])
 
   useEffect(() => {
