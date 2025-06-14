@@ -7,6 +7,7 @@ import LanguageSelector from './Header/LanguageSelector'
 import SocialLinks from './Header/SocialLinks'
 import ProfileDropdown from './Header/ProfileDropdown'
 import MobileMenu from './Header/MobileMenu'
+import { FaWallet } from 'react-icons/fa'
 
 const Header = () => {
   const {t, setCurrentLang, getCurrentFlag, currentLang} = useTranslation()
@@ -24,12 +25,15 @@ const Header = () => {
   return (
     <header className='fixed top-0 left-0 right-0 border-b border-dark-700 bg-dark-900 text-white w-full z-50 transition-all duration-300'>
       <div className='w-full px-4 sm:px-6 lg:px-4'>
-        <div className='flex items-center justify-between h-16'>
+        <div className='relative flex items-center justify-between h-16'>
           <div className='flex-shrink-0'>
             <Logo />
           </div>
 
-          <DesktopNavigation t={t} closeMenu={closeMenu} />
+          {/* Menu centré absolument */}
+          <div className='absolute left-1/2 transform -translate-x-1/2 hidden lg:block'>
+            <DesktopNavigation t={t} closeMenu={closeMenu} />
+          </div>
 
           {/* Desktop Actions */}
           <div className='hidden lg:flex items-center space-x-6'>
@@ -40,7 +44,8 @@ const Header = () => {
             {blockchainId ? (
               <ProfileDropdown isOpen={isProfileOpen} blockchainId={blockchainId} handleDisconnect={handleDisconnect} setIsOpen={setIsProfileOpen} profileDropdownRef={profileDropdownRef} />
             ) : (
-              <button onClick={handleConnect} className='px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20'>
+              <button onClick={handleConnect} className='px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20 flex items-center gap-2'>
+                <FaWallet className='w-4 h-4' />
                 {t('connect_wallet' as const)}
               </button>
             )}

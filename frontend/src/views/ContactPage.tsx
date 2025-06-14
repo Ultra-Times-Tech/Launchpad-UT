@@ -29,7 +29,7 @@ function ContactPage() {
     AOS.init({
       duration: 1000,
       once: true,
-      offset: 100,
+      offset: 0,
       easing: 'ease-out-cubic',
     })
   }, [])

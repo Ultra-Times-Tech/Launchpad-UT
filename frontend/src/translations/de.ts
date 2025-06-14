@@ -499,7 +499,34 @@ const de: Translations = {
     mint_test: 'test-mint',
     collections_test: 'test-kollektionen',
     upload_test: 'test-upload'
-  }
+  },
+  payment_method: 'Zahlungsmethode',
+  ultra_wallet_payment: 'Ultra Wallet Zahlung',
+  ultra_wallet_payment_description: 'Bezahlen Sie direkt mit Ihrem Ultra Wallet in UOS',
+  card_payment: 'Kreditkartenzahlung',
+  card_payment_description: 'Bezahlen Sie mit Kreditkarte (Visa, Mastercard)',
+  total_amount: 'Gesamtbetrag',
+  processing_payment: 'Zahlung wird verarbeitet...',
+  pay_now: 'Jetzt bezahlen',
+  complete_purchase: 'Kauf abschließen',
+  payment_failed: 'Zahlung fehlgeschlagen',
+  payment_card_success: 'Kartenzahlung erfolgreich! Ihr UNIQ wird in Kürze geliefert.',
+  choose_payment_method: 'Wählen Sie Ihre bevorzugte Zahlungsmethode',
+  wallet_connected: 'Wallet verbunden',
+  secure_payment: 'Sichere Zahlung',
+  connect_wallet_to_mint: 'Sie müssen Ihr Ultra Wallet verbinden, um UNIQs zu minten.',
+  card_payment_details: 'Kartenzahlungsdetails',
+  enter_card_information: 'Geben Sie Ihre Kreditkarteninformationen ein',
+  cardholder_name: 'Name des Karteninhabers',
+  card_number: 'Kartennummer',
+  expiry_date: 'Ablaufdatum',
+  cvv: 'CVV',
+  confirm_payment: 'Zahlung bestätigen',
+  pay_with_wallet: 'Mit Wallet bezahlen',
+  pay_with_card: 'Mit Karte bezahlen',
+  payment_card_success_alert: 'Kartenzahlung erfolgreich simuliert!',
+  mint_success_alert: 'Mint erfolgreich! Ihre UNIQs wurden erstellt.',
+  opening_wallet: 'Wallet wird geöffnet...'
 }
 
 export default de 

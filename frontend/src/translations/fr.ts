@@ -504,7 +504,35 @@ const fr: Translations = {
     mint_test: 'test-mint',
     collections_test: 'test-collections',
     upload_test: 'test-upload'
-  }
+  },
+  // Nouvelles traductions pour le paiement
+  payment_method: 'Méthode de paiement',
+  ultra_wallet_payment: 'Paiement par Wallet Ultra',
+  ultra_wallet_payment_description: 'Payez directement avec votre wallet Ultra en UOS',
+  card_payment: 'Paiement par carte bancaire',
+  card_payment_description: 'Payez par carte bancaire (Visa, Mastercard)',
+  total_amount: 'Montant total',
+  processing_payment: 'Traitement du paiement...',
+  pay_now: 'Payer maintenant',
+  complete_purchase: 'Finaliser l\'achat',
+  payment_failed: 'Échec du paiement',
+  payment_card_success: 'Paiement par carte réussi ! Votre UNIQ sera livré sous peu.',
+  choose_payment_method: 'Choisissez votre méthode de paiement préférée',
+  wallet_connected: 'Wallet connecté',
+  secure_payment: 'Paiement sécurisé',
+  connect_wallet_to_mint: 'Vous devez connecter votre wallet Ultra pour pouvoir minter des UNIQs.',
+  card_payment_details: 'Détails de paiement par carte',
+  enter_card_information: 'Entrez vos informations de carte bancaire',
+  cardholder_name: 'Nom du titulaire',
+  card_number: 'Numéro de carte',
+  expiry_date: 'Date d\'expiration',
+  cvv: 'CVV',
+  confirm_payment: 'Confirmer le paiement',
+  pay_with_wallet: 'Payer avec le wallet',
+  pay_with_card: 'Payer par carte',
+  payment_card_success_alert: 'Paiement par carte simulé avec succès !',
+  mint_success_alert: 'Mint réussi ! Vos UNIQs ont été créés.',
+  opening_wallet: 'Ouverture du wallet...'
 }
 
 export default fr 
